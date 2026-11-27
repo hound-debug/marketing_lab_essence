@@ -957,7 +957,7 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("change",e=>{if(e.target.matches("[data-why]")){setFb(fbKey(curTeam,curIdx)+":why",e.target.value);toast("틀린 이유를 다음 판독 기준에 반영합니다.");}});
 document.addEventListener("keydown",e=>{
-  if(document.getElementById("jira").open||e.target.matches("input,select,textarea")||!document.getElementById("labView").hidden) return;
+  if(document.getElementById("jira").open||(e.target.matches&&e.target.matches("input,select,textarea,button"))&&e.key===" "||(e.target.matches&&e.target.matches("input,select,textarea"))||!document.getElementById("labView").hidden) return;
   const o=ordered(curTeam).map(x=>x.i); const p=o.indexOf(curIdx);
   if(e.key==="ArrowDown"||e.key==="j"&&false){e.preventDefault();selectIssue(o[Math.min(p+1,o.length-1)]);}
   else if(e.key==="ArrowUp"){e.preventDefault();selectIssue(o[Math.max(p-1,0)]);}
