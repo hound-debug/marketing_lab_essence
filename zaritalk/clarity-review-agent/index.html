@@ -743,7 +743,7 @@ function toast(msg){const d=document.createElement("div");d.className="toast";d.
 const KO = [[/\(rage\)/g,"(분노 클릭)"],[/\(dead\)/g,"(반응 없는 클릭)"],[/\(quickback\)/g,"(바로 뒤로가기)"],[/\(excessive scroll\)/g,"(스크롤 반복)"],
   [/\brage\b/g,"분노 클릭"],[/\bdead\b/g,"반응 없는 클릭"],[/\bquickback\b/g,"바로 뒤로가기"],[/excessive scroll/g,"스크롤 반복"],[/ x(\d+)/g," $1번"],[/\bx(\d+)\b/g,"$1번"]];
 const ko = s => KO.reduce((a,[r,v])=>a.replace(r,v), String(s));
-function splitHyp(h){const i=h.indexOf("확인 필요"); if(i<0) return [h,""]; return [h.slice(0,i).replace(/[\s.:(]+$/,"").trim()||"기록만으로 단정할 수 없음", h.slice(i).replace(/^확인 필요[:)\s]*/,"").replace(/\)$/,"")];}
+function splitHyp(h){const i=h.indexOf("확인 필요"); if(i<0) return [h,""]; const head=h.slice(0,i).replace(/[\s.:(]+$/,"").trim()||"기록만으로 단정할 수 없음"; let unk=h.slice(i).replace(/^확인 필요[:)\s]*/,"").replace(/\)$/,"").trim(); if(unk.replace(/[\s.。]/g,"").length<4) unk="코드·네트워크 기록으로 원인 확인"; return [head, unk];}
 function splitSug(s){const m=s.split(/\s(?=\(?\d\)\s?)|\s(?=대안:)/); const first=m[0].replace(/^[^(]*?:\s*(?=\(1\))/,"").replace(/^\(?1\)\s?/,""); return [first.trim(), m.slice(1).join(" ").trim()];}
 const isObserve = it => (it.similar!=null ? it.similar<3 : true) && !it.sessions.some(x=>byId[x]?.signals.jsErrors.length);
 function sigList(s){return Object.keys(LABEL).filter(k=>cnt(s,k)).map(k=>LABEL[k]);}
