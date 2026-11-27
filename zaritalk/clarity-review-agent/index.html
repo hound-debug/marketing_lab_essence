@@ -4,299 +4,199 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* 레이아웃: 위에서 아래로 「지금 → 선별 실험 → 팀별 보고」 3단, 오른쪽에 녹화 기록 서랍 */
+/* PC 우선 3단: 위 막대(팀·요약) / 왼쪽 문제 목록 / 오른쪽 상세(재생기+행동 기록 | AI 판독) — Sentry·Linear·PostHog 패턴 */
 :root{
-  --bg:#f5f7fb; --panel:#ffffff; --line:#dfe3ec; --fg:#1d2230; --muted:#6b7385;
-  --brand:#2c7fff; --brand-soft:#e6efff; --deep:#1e45ac;
-  --hot:#d6453d; --hot-soft:#fde9e7; --warn:#b7791f; --warn-soft:#fdf3dc; --ok:#2f9e4f; --ok-soft:#e3f6e8; --idle:#8a90a0; --idle-soft:#eef0f4;
-  --slack:#ffffff; --slack-fg:#1d1c1d; --mention:#e8f5fa; --mention-fg:#1264a3;
+  --bg:#f4f5f8; --panel:#ffffff; --sunk:#f7f8fa; --line:#e3e6ec; --fg:#1b1f2a; --muted:#69707f;
+  --brand:#2c6bff; --brand-soft:#e8efff; --deep:#1d47b8;
+  --hot:#d6453d; --hot-soft:#fdecea; --warn:#b26b00; --warn-soft:#fff3dc; --ok:#23854a; --ok-soft:#e5f5ea; --idle:#8a90a0; --idle-soft:#eef0f4;
   --sans:"Pretendard Variable",Pretendard,"Noto Sans KR",-apple-system,system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#12151c; --panel:#1a1e27; --line:#2c3240; --fg:#e7eaf1; --muted:#9aa2b4;
-  --brand:#5b9bff; --brand-soft:#1f2c47; --deep:#9ec0ff;
-  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#262b36;
-  --slack:#1a1d21; --slack-fg:#d1d2d3; --mention:#1d3a4d; --mention-fg:#7fc3ec; color-scheme:dark}}
+  --bg:#101318; --panel:#171b22; --sunk:#12161c; --line:#2a303b; --fg:#e7eaf1; --muted:#9aa2b4;
+  --brand:#5b8dff; --brand-soft:#1d2a47; --deep:#a9c2ff;
+  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#242a35; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#12151c; --panel:#1a1e27; --line:#2c3240; --fg:#e7eaf1; --muted:#9aa2b4;
-  --brand:#5b9bff; --brand-soft:#1f2c47; --deep:#9ec0ff;
-  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#262b36;
-  --slack:#1a1d21; --slack-fg:#d1d2d3; --mention:#1d3a4d; --mention-fg:#7fc3ec; color-scheme:dark}
+  --bg:#101318; --panel:#171b22; --sunk:#12161c; --line:#2a303b; --fg:#e7eaf1; --muted:#9aa2b4;
+  --brand:#5b8dff; --brand-soft:#1d2a47; --deep:#a9c2ff;
+  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#242a35; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
-.wrap{max-width:1080px;margin:0 auto;display:grid;gap:36px}
-h1,h2,h3{text-wrap:balance;margin:0;line-height:1.3}
-h1{font-size:28px;font-weight:700;letter-spacing:-.02em}
-h2{font-size:20px;font-weight:700;letter-spacing:-.01em}
-h3{font-size:15px;font-weight:700}
-p{margin:0}
-.muted{color:var(--muted)}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-header{display:grid;gap:10px}
-.tag{display:inline-flex;align-items:center;gap:6px;width:fit-content;font-size:12px;font-weight:500;letter-spacing:.02em;
-  padding:3px 10px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
-.steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.step{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
-.step b{font-family:var(--mono);color:var(--brand);font-weight:500}
-section{display:grid;gap:14px}
-.sec-head{display:grid;gap:4px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
-.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:760px){.cmp{grid-template-columns:1fr}}
-.cmp .label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
-/* 슬랙 미리보기 */
-.slack{background:var(--slack);color:var(--slack-fg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.55;min-width:0}
-.slack .who{display:flex;gap:10px;align-items:center;margin-bottom:6px}
-.slack .ava{width:32px;height:32px;border-radius:6px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
-.slack .name{font-weight:700}
-.slack .time{font-size:12px;color:var(--muted)}
-.slack a,.linkish{color:var(--mention-fg);text-decoration:none;cursor:pointer;background:none;border:0;padding:0;font:inherit}
-.slack a:hover,.linkish:hover{text-decoration:underline}
-.mention{background:var(--mention);color:var(--mention-fg);border-radius:3px;padding:0 2px}
-.slack ol{margin:6px 0;padding-left:22px}
-.issue{border-left:3px solid var(--line);padding:6px 0 6px 12px;margin:12px 0;display:grid;gap:3px}
-.issue.sev-높음{border-left-color:var(--hot)} .issue.sev-중간{border-left-color:var(--warn)} .issue.sev-낮음{border-left-color:var(--idle)}
-.issue .t{font-weight:700}
-.issue .row{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px}
-@media (max-width:560px){.issue .row{grid-template-columns:1fr;gap:0}}
-.issue .row span:first-child{color:var(--muted);font-size:13px}
-.fb{display:flex;gap:6px;margin-top:6px}
-.fb button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:2px 10px;cursor:pointer}
-.fb button[aria-pressed="true"].yes{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
-.fb button[aria-pressed="true"].no{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
-/* 조절판 */
-.lab{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
-@media (max-width:860px){.lab{grid-template-columns:1fr}}
-.ctrl{display:grid;gap:14px}
-.ctrl .item{display:grid;gap:4px}
-.ctrl label{display:flex;justify-content:space-between;font-size:13px}
-.ctrl input[type=range]{width:100%;accent-color:var(--brand)}
-.ctrl .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px}
-.ctrl button.reset{font:inherit;font-size:13px;border:1px solid var(--line);background:none;color:var(--fg);border-radius:8px;padding:6px 10px;cursor:pointer;width:fit-content}
-.summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
-.p-sig{background:var(--hot-soft);color:var(--hot)} .p-exp{background:var(--brand-soft);color:var(--deep)}
-.p-idle{background:var(--idle-soft);color:var(--idle)} .p-low{background:var(--idle-soft);color:var(--idle)}
-.tblwrap{overflow-x:auto;min-width:0}
-table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
-th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.02em}
-td.mono,th{white-space:nowrap}
-td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{white-space:nowrap;font-size:11px;padding:1px 6px;border-radius:4px;background:var(--idle-soft);color:var(--fg);font-family:var(--mono)}
-.chip.on{background:var(--hot-soft);color:var(--hot)}
-.rowbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--mention-fg);cursor:pointer;padding:0;font-family:var(--mono)}
-.note{font-size:13px;padding:8px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn)}
-/* 팀 탭 */
-.tabs{display:flex;flex-wrap:wrap;gap:6px}
-.tabs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:5px 14px;cursor:pointer}
-.tabs button[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
-.tabs .n{font-family:var(--mono);font-size:12px;opacity:.8;margin-left:4px}
-/* 서랍 */
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--panel);border-left:1px solid var(--line);
-  padding:calc(20px + env(safe-area-inset-top,0px)) calc(20px + env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) 20px;
-  overflow-y:auto;box-shadow:-12px 0 32px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .2s ease;z-index:20;display:grid;gap:14px;align-content:start;visibility:hidden}
-.drawer.open{transform:none;visibility:visible}
-.drawer .x{justify-self:end;font:inherit;border:1px solid var(--line);background:none;color:var(--fg);border-radius:8px;padding:4px 10px;cursor:pointer}
-.tl{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.tl li{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:6px 8px;border-radius:6px;font-size:13px}
-.tl li .ts{font-family:var(--mono);color:var(--muted)}
-.tl li.hit{background:var(--hot-soft)}
-.tl li.hit .ts{color:var(--hot);font-weight:500}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
-.kv dt{color:var(--muted)} .kv dd{margin:0}
-button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
-
-/* 녹화별 문제 순간 카드 */
-.moments{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:4px}
-.mcard{display:grid;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel);min-width:0}
-.mcard .thumb{display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;border-radius:8px;overflow:hidden;position:relative}
-.mcard .thumb svg{display:block;width:100%;height:auto}
-.mcard .thumb{background:var(--idle-soft);border:1px solid var(--line)}
-.mcard .thumb .pg{position:absolute;left:8px;top:6px;font-size:11px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--muted)}
-.mcard .thumb .play{position:absolute;inset:auto 8px 8px auto;background:rgba(0,0,0,.65);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px;font-family:var(--mono)}
-.mcard .thumb:hover{outline:2px solid var(--brand)}
-.mcard .cap{font-size:12px;white-space:nowrap;display:flex;justify-content:space-between;gap:6px;align-items:center}
-.mcard .src{font-size:12px}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.55}
+h1,h2,h3,p{margin:0}
+.muted{color:var(--muted)} .mono{font-family:var(--mono);font-variant-numeric:tabular-nums} .small{font-size:12.5px}
+button{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;min-height:620px}
+/* 위 막대 */
+.top{display:flex;align-items:center;gap:16px;padding:10px max(16px,env(safe-area-inset-left,0px));background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+.brand .logo{width:24px;height:24px;border-radius:6px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:11px}
+.demo{font-size:11.5px;font-weight:500;color:var(--warn);background:var(--warn-soft);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.teams{display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:3px;flex-wrap:wrap}
+.teams button{border:0;background:none;border-radius:7px;padding:5px 11px;cursor:pointer;font-size:13.5px;white-space:nowrap}
+.teams button .n{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-left:4px}
+.teams button[aria-selected="true"]{background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:700}
+.teams button[aria-selected="true"] .n{color:var(--hot)}
+.views{margin-left:auto;display:flex;gap:4px}
+.views button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px}
+.views button[aria-pressed="true"]{border-color:var(--brand);color:var(--deep);background:var(--brand-soft)}
+/* 본문 2단 */
+.body{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:0}
+.list{border-right:1px solid var(--line);background:var(--panel);overflow-y:auto;min-height:0}
+.lhead{padding:14px 16px 10px;border-bottom:1px solid var(--line);display:grid;gap:4px;position:sticky;top:0;background:var(--panel);z-index:1}
+.lhead h2{font-size:15px}
+.lhead .kpi{font-size:12.5px;color:var(--muted)} .lhead .kpi b{color:var(--fg)}
+.group{padding:10px 16px 4px;font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.row{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;width:100%;text-align:left;border:0;border-left:3px solid transparent;background:none;padding:10px 14px 10px 13px;cursor:pointer;border-bottom:1px solid var(--line)}
+.row:hover{background:var(--sunk)}
+.row[aria-selected="true"]{background:var(--brand-soft);border-left-color:var(--brand)}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--idle)}
+.dot.높음{background:var(--hot)} .dot.중간{background:var(--warn)} .dot.obs{background:transparent;border:2px solid var(--idle)}
+.row .t{font-weight:700;font-size:13.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row .m{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:4px;font-size:12px;color:var(--muted);align-items:center}
+.row .done{color:var(--ok);font-weight:700}
+.badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap}
+.b-new{background:var(--brand-soft);color:var(--deep)} .b-rep{background:var(--warn-soft);color:var(--warn)} .b-jira{background:var(--ok-soft);color:var(--ok)}
+.b-obs{background:transparent;color:var(--muted);border:1px solid var(--line)} .b-exp{background:var(--idle-soft);color:var(--fg)}
+.b-높음{background:var(--hot-soft);color:var(--hot)} .b-중간{background:var(--warn-soft);color:var(--warn)} .b-낮음{background:var(--idle-soft);color:var(--idle)}
+.kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;color:var(--muted)}
+.lfoot{padding:12px 16px;font-size:12px;color:var(--muted)}
+/* 상세 */
+.detail{overflow-y:auto;min-height:0;padding:18px 22px 40px}
+.dhead{display:grid;gap:8px;margin-bottom:14px}
+.dhead h1{font-size:20px;line-height:1.35;letter-spacing:-.01em}
+.dhead .imp{font-size:13.5px;color:var(--muted)} .dhead .imp b{color:var(--fg)}
+.warn{font-size:13px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:4px 10px;width:fit-content}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:16px}
+.bar button,.bar select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:13px;color:var(--fg)}
+.bar button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+.bar button[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.bar button.no[aria-pressed="true"]{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+.bar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.bar .judge{margin-left:auto;display:flex;gap:6px;align-items:center}
+.grid2{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.15fr);gap:18px;align-items:start}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.pane h3{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:12px 14px 0}
 /* 재생기 */
-.player{display:grid;gap:10px}
-.player .screen{display:grid;place-items:center;background:var(--idle-soft);border-radius:10px;padding:12px}
-.player .screen svg{width:200px;height:auto}
-.pbar{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
-.pbar button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:4px 10px;cursor:pointer}
-.scrub{position:relative;height:28px}
+.player{display:grid;gap:0}
+.stage{display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px;padding:14px;align-items:start}
+.stage .phone svg{width:100%;height:auto;display:block}
+.now{display:grid;gap:6px;align-content:start}
+.now .ts{font-family:var(--mono);font-size:22px;font-weight:500}
+.now .ev{font-size:14px;font-weight:700}
+.now .pg{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.now a{font-size:13px;color:var(--deep)}
+.ctrl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:0 14px 12px}
+.ctrl button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:13px;white-space:nowrap}
+.scrub{position:relative;height:30px}
 .scrub input{position:absolute;inset:0;width:100%;margin:0;accent-color:var(--brand);background:transparent}
-.scrub .mk{position:absolute;top:2px;width:3px;height:8px;border-radius:2px;background:var(--hot);transform:translateX(-1px);pointer-events:none}
-.tl li{cursor:pointer}
-.tl li.cur{outline:2px solid var(--brand);outline-offset:-2px}
+.scrub .mk{position:absolute;top:1px;width:4px;height:9px;border-radius:2px;background:var(--hot);transform:translateX(-2px);pointer-events:none}
+.scrub .mk.err{background:var(--hot);height:12px}
+.recs{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap}
+.rec{border:1px solid var(--line);background:var(--sunk);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12.5px;text-align:left;display:grid;gap:0}
+.rec[aria-pressed="true"]{border-color:var(--brand);background:var(--brand-soft)}
+.rec small{color:var(--muted);font-family:var(--mono);font-size:11px}
+.events{list-style:none;margin:0;padding:6px 6px 8px;border-top:1px solid var(--line);max-height:300px;overflow-y:auto}
+.events li{display:grid;grid-template-columns:48px 14px minmax(0,1fr);gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:13px}
+.events li:hover{background:var(--sunk)}
+.events li .t{font-family:var(--mono);color:var(--muted);font-size:12px}
+.events li .i{width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--line)}
+.events li.sig .i{background:var(--hot)}
+.events li.cur{background:var(--brand-soft)}
+.events li.key{font-weight:700}
+.events li.key .t{color:var(--hot)}
+/* AI 판독 */
+.ai{display:grid;gap:0}
+.ai section{padding:12px 14px;border-top:1px solid var(--line);display:grid;gap:4px}
+.ai section:first-of-type{border-top:0}
+.ai .lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.ai .fix{background:var(--ok-soft);border-radius:8px;margin:0 10px;border-top:0}
+.ai .fix .lbl{color:var(--ok)}
+.ai .fix + section{border-top:0}
+.ai .fix p{font-size:14.5px;font-weight:500}
+.ai .raw{font-size:12.5px;color:var(--muted)}
+.ai dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:13px}
+.ai dt{color:var(--muted)} .ai dd{margin:0}
+/* 선별 기준 보기 */
+.lab{padding:20px 22px;overflow-y:auto}
+.labgrid{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;align-items:start;margin-top:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.ctrlp{display:grid;gap:12px}
+.ctrlp .item{display:grid;gap:2px}
+.ctrlp label{display:flex;justify-content:space-between;font-size:13px}
+.ctrlp input[type=range]{width:100%;accent-color:var(--brand)}
+.ctrlp .chk{display:flex;gap:8px;font-size:13px}
+.ctrlp button.reset{border:1px solid var(--line);background:none;border-radius:8px;padding:5px 10px;cursor:pointer;width:fit-content}
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.pill{display:inline-flex;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-sig{background:var(--hot-soft);color:var(--hot)} .p-exp{background:var(--brand-soft);color:var(--deep)} .p-idle,.p-low{background:var(--idle-soft);color:var(--idle)}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap} td.mono{white-space:nowrap}
+td.num{text-align:right;font-family:var(--mono)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:11px;padding:1px 6px;border-radius:4px;background:var(--idle-soft);font-family:var(--mono);white-space:nowrap}
+.chip.on{background:var(--hot-soft);color:var(--hot)}
+.rowbtn{background:none;border:0;color:var(--deep);cursor:pointer;padding:0;font-family:var(--mono)}
+.note{font-size:13px;padding:8px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);font-size:13px;padding:8px 14px;border-radius:8px;z-index:40;max-width:calc(100% - 32px)}
-
-/* v3: 머리줄·배지·행동 */
-.head{display:grid;gap:4px;margin:4px 0 6px}
-.head .line{font-size:13px}
-.badge{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap;vertical-align:1px}
-.b-new{background:var(--brand-soft);color:var(--deep)} .b-rep{background:var(--warn-soft);color:var(--warn)}
-.b-exp{background:var(--idle-soft);color:var(--fg)} .b-obs{background:var(--idle-soft);color:var(--muted)}
-.b-hot{background:var(--hot-soft);color:var(--hot)} .b-rep-k{background:var(--ok-soft);color:var(--ok)} .b-main{background:var(--fg);color:var(--bg)}
-.impact{font-size:13px;color:var(--muted)}
-.impact b{color:var(--fg);font-variant-numeric:tabular-nums}
-details.more summary{cursor:pointer;color:var(--mention-fg);font-size:13px;width:fit-content}
-details.more>div{margin-top:4px;color:var(--muted);font-size:13px}
-.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
-.acts button,.acts select{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:3px 10px;cursor:pointer}
-.acts button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
-.acts button[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
-.acts .sep{width:1px;height:18px;background:var(--line);margin:0 2px}
-.acts button.no[aria-pressed="true"]{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
-.obs{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
-.obs>summary{cursor:pointer;font-weight:700;font-size:14px}
-.obs>summary span{font-weight:400;color:var(--muted);font-size:13px}
-.issue.observe{opacity:.95}
-.sametip{font-size:12px;color:var(--warn)}
-dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--fg);padding:18px;width:min(560px,calc(100% - 32px))}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--fg);padding:18px;width:min(620px,calc(100% - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.4)}
-dialog textarea{width:100%;min-height:300px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg);color:var(--fg)}
+dialog textarea{width:100%;min-height:340px;font-family:var(--mono);font-size:12.5px;line-height:1.5;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--sunk);color:var(--fg)}
 dialog .row2{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-dialog button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:5px 12px;cursor:pointer}
+dialog button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 12px;cursor:pointer}
 dialog button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
-
-/* v4: 팀 고르기 → 보고 카드 중심 */
-.wrap{max-width:860px}
-.small{font-size:13px}
-.guide{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
-.guide li{display:flex;align-items:center;gap:8px}
-.guide b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-family:var(--mono)}
-.main{display:grid;gap:12px}
-.picker{display:flex;flex-wrap:wrap;gap:6px}
-.picker button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:10px;padding:8px 14px;cursor:pointer;display:grid;gap:0;text-align:left;line-height:1.3}
-.picker button small{font-size:11.5px;color:var(--muted)}
-.picker button[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
-.picker button[aria-selected="true"] small{color:#fff;opacity:.85}
-.report{background:var(--slack);color:var(--slack-fg);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
-.rhead{display:flex;gap:12px;align-items:flex-start}
-.rhead .ava{width:36px;height:36px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
-.rhead h2{font-size:18px}
-.rhead .sub{font-size:13px;color:var(--muted);margin-top:2px}
-.rhead .sub b{color:var(--fg)}
-.card{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
-.card.sev-높음{border-left-color:var(--hot)} .card.sev-중간{border-left-color:var(--warn)} .card.sev-낮음{border-left-color:var(--idle)}
-@media (max-width:600px){.card{grid-template-columns:1fr}.card .shot{max-width:170px}}
-.shot{position:relative;display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;border-radius:14px}
-.shot svg{display:block;width:100%;height:auto}
-.shot .play{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 12px;white-space:nowrap;font-family:var(--mono)}
-.shot:hover svg,.shot:focus-visible svg{filter:drop-shadow(0 0 0 2px var(--brand))}
-.shot:hover .play{background:var(--brand)}
-.card .body{display:grid;gap:8px;align-content:start;min-width:0}
-.card h3{font-size:16px;line-height:1.4}
-.card .impact{font-size:13px;color:var(--muted)}
-.card .impact b{color:var(--fg)}
-.facts{display:grid;gap:6px;margin:0}
-.facts div{display:grid;gap:1px}
-.facts dt{font-size:12px;font-weight:700;color:var(--muted)}
-.facts dd{margin:0;font-size:14px}
-.facts dd.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.fix{background:var(--ok-soft);border-radius:8px;padding:8px 10px}
-.fix dt{color:var(--ok)}
-.card details.more>summary{cursor:pointer;color:var(--mention-fg);font-size:13px;width:fit-content}
-.card details.more[open]>summary{margin-bottom:8px}
-.minis{display:flex;flex-wrap:wrap;gap:10px}
-.mini{display:grid;gap:4px;width:110px;font-size:12px}
-.mini .shot .play{font-size:11px;padding:2px 8px;bottom:6px}
-.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.acts .q{font-size:12px;color:var(--muted);margin-left:auto}
-.extra{display:grid;gap:10px}
-details.fold{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 16px}
-details.fold>summary{cursor:pointer;font-weight:700;font-size:15px}
-details.fold[open]>summary{margin-bottom:12px}
-ul.diff{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
-.obs2{border-top:1px dashed var(--line);padding-top:10px}
-.obs2>summary{cursor:pointer;font-weight:700;font-size:14px}
-.obs2>summary span{font-weight:400;color:var(--muted);font-size:13px}
-.obs2[open]>summary{margin-bottom:10px}
-.obs2 .card{opacity:.92}
-
-.badges{display:flex;flex-wrap:wrap;gap:4px}
-.b-obs-o{background:transparent;color:var(--muted);border:1px solid var(--line)}
-.sev-b-높음{background:var(--hot-soft);color:var(--hot)} .sev-b-중간{background:var(--warn-soft);color:var(--warn)} .sev-b-낮음{background:var(--idle-soft);color:var(--idle)}
-.warn{font-size:13px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:4px 8px;width:fit-content}
-.judge{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center;margin-left:auto}
-details.known{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px 14px}
-details.known>summary{cursor:pointer;font-size:14px;font-weight:700}
-details.known[open]>summary{margin-bottom:10px}
-details.known .card{border:0;padding:0;border-left:0}
-.pickfirst{text-align:center;padding:36px 18px}
-footer{font-size:13px;color:var(--muted);display:grid;gap:4px}
+@media (max-width:1180px){.grid2{grid-template-columns:1fr}}
+@media (max-width:820px){
+  .app{height:auto;display:block}
+  .body{grid-template-columns:1fr}
+  .list{border-right:0;max-height:none}
+  .detail,.lab{overflow:visible;padding:16px}
+  .stage{grid-template-columns:140px minmax(0,1fr)}
+  .labgrid{grid-template-columns:1fr}
+  .views{margin-left:0}
+}
 </style>
 </head><body>
 
-<div class="wrap">
-  <header>
-    <span class="tag">체험판 · 가짜 녹화 10개</span>
-    <h1>클래리티 리뷰 에이전트</h1>
-    <p class="muted">매일 아침 9시, AI가 어제 녹화를 먼저 보고 <b style="color:var(--fg)">「어디서 왜 막혔는지」</b>만 골라 팀 PO에게 보냅니다.</p>
-    <ol class="guide" aria-label="써 보는 순서">
-      <li><b>1</b>내 팀 고르기</li><li><b>2</b>폰 화면을 누르면 그 순간부터 재생</li><li><b>3</b>맞으면 지라 초안 만들기</li>
-    </ol>
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="logo">AI</span>클래리티 리뷰 에이전트</div>
+    <span class="demo">체험판 · 가짜 녹화</span>
+    <nav class="teams" role="tablist" aria-label="팀" id="teams"></nav>
+    <div class="views" aria-label="보기">
+      <button data-view="report" aria-pressed="true">오늘의 보고</button>
+      <button data-view="lab" aria-pressed="false">녹화 고르는 기준</button>
+    </div>
   </header>
-
-  <section class="main">
-    <div class="picker" role="tablist" aria-label="팀 고르기" id="tabs"></div>
-    <div id="teamMsg"></div>
-  </section>
-
-  <section class="extra">
-    <details class="fold"><summary><span>지금 리포트와 무엇이 다른가요?</span></summary>
-      <div class="cmp">
-        <div><div class="label">지금 (링크 10개)</div>
-          <div class="slack">
-            <div class="who"><div class="ava">콜</div><div><span class="name">콜독(리포팅)</span> <span class="time">오전 9:00</span></div></div>
-            <div><b>[자리페이팀]</b> <span class="mention">@블루</span></div>
-            <ol><li><a>보기</a> (6분15초 · /pay)</li><li><a>보기</a> (4분42초 · /pay)</li><li><a>보기</a> (15분01초 · /pay)</li><li class="muted">… 10개까지</li></ol>
-          </div>
-          <p class="muted small">왜 봐야 하는지 없음 · 10개를 처음부터 재생</p></div>
-        <div><div class="label">바뀐 뒤</div>
-          <ul class="diff">
-            <li>같은 원인 녹화를 <b>1건으로 묶음</b> (몇 명이 겪었는지 표시)</li>
-            <li>문제 <b>순간의 화면</b>부터 바로 재생</li>
-            <li>원인 가설·<b>고치는 방법</b>까지 · 지라 초안 1번에</li>
-            <li>어제도 보낸 문제는 <b>🔁 반복</b>으로 표시하고, 지라가 있으면 <b>한 줄로 접음</b></li>
-          </ul></div>
+  <main class="body" id="reportView">
+    <aside class="list" id="list" aria-label="문제 목록"></aside>
+    <section class="detail" id="detail" aria-live="polite"></section>
+  </main>
+  <main class="lab" id="labView" hidden>
+    <h2 style="font-size:18px">AI에게 보낼 녹화는 이렇게 고릅니다</h2>
+    <p class="muted" style="margin-top:4px">문제 신호(분노 클릭·JS 오류 등)에 점수를 매겨 팀마다 상위 녹화와, 신호 없이 이탈한 「탐색」 녹화를 고릅니다. 10분 넘게 켜 두고 아무것도 안 한 녹화는 뺍니다. 가중치를 움직여 보세요.</p>
+    <div class="labgrid">
+      <div class="panel ctrlp" id="ctrl"></div>
+      <div class="panel" style="min-width:0">
+        <div class="summary" id="sum"></div>
+        <div class="note" id="note" hidden>설정이 기본값과 달라요. 오늘의 보고는 기본값으로 판독한 결과예요.</div>
+        <div class="tblwrap"><table>
+          <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
+          <tbody id="rows"></tbody></table></div>
       </div>
-    </details>
-    <details class="fold"><summary><span>AI에게 보낼 녹화는 어떻게 고르나요? (직접 조절해 보기)</span></summary>
-      <p class="muted small" style="margin:8px 0 12px">문제 신호(분노 클릭·JS 오류 등)에 점수를 매겨 팀마다 상위 녹화 + 신호 없는 「탐색」 녹화를 고릅니다. 10분 넘게 켜 두고 아무것도 안 한 녹화는 뺍니다.</p>
-      <div class="lab">
-        <div class="panel ctrl" id="ctrl"></div>
-        <div class="panel" style="min-width:0">
-          <div class="summary" id="sum"></div>
-          <div class="note" id="note" hidden>설정이 기본값과 달라요. 위 팀 보고는 기본값으로 판독한 결과예요.</div>
-          <div class="tblwrap"><table>
-            <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
-            <tbody id="rows"></tbody></table></div>
-        </div>
-      </div>
-    </details>
-  </section>
-
-  <footer>
-    <p>판독 모델 Claude Haiku(팀당 1회). 녹화·영향 숫자·반복 이력은 실제 자리톡 화면을 본뜬 가짜 데이터입니다. 폰 화면 그림은 행동 기록으로 그린 것이고, 실제 운영에서는 클래리티 재생 화면 캡처로 바뀝니다.</p>
-  </footer>
+    </div>
+  </main>
 </div>
 
 <dialog id="jira" aria-label="지라 초안">
-  <h3 style="margin-bottom:8px">지라 초안</h3>
-  <p class="muted" style="font-size:13px;margin-bottom:8px">실제 운영에서는 이 내용으로 지라 이슈가 바로 만들어지고, 다음 날 같은 문제는 「🔁 반복 · 지라 키」 한 줄로 줄어듭니다. 체험판에서는 복사만 됩니다.</p>
+  <h3 style="margin-bottom:6px">지라 초안</h3>
+  <p class="muted small" style="margin-bottom:8px">실제 운영에서는 이 내용으로 지라 이슈가 바로 만들어지고, 다음 날 같은 문제는 「🔁 반복 · 지라 키」로 표시됩니다. 체험판에서는 복사만 됩니다.</p>
   <textarea id="jiraTxt" aria-label="지라 초안 내용"></textarea>
   <div class="row2"><button id="jiraClose">닫기</button><button class="primary" id="jiraCopy">복사</button></div>
 </dialog>
-<aside class="drawer" id="drawer" aria-hidden="true" aria-label="녹화 행동 기록">
-  <button class="x" id="dx">닫기</button>
-  <div id="dbody"></div>
-</aside>
 
 <script>
 const SESSIONS = [
@@ -879,73 +779,6 @@ function renderTable(){
 function fbKey(t,i){return `fb:${t}:${i}`}
 function getFb(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function setFb(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
-
-function shotBtn(s,m,cls){const ii=idxAt(s,sec(m));return `<button class="shot ${cls||""}" data-sid="${s.sessionId}" data-ts="${m}" aria-label="${esc(screenName(pageAt(s,ii)))} 화면 ${m}부터 재생">${screen(s,ii)}<span class="play">▶ ${m}부터</span></button>`;}
-function issueBlock(tname,it,i,allIss,obs){
-  const [sid,ts]=it.moment.split(" "); const k=fbKey(tname,i); const f=getFb(k);
-  const order=[sid,...it.sessions.filter(x=>x!==sid)].filter(x=>byId[x]);
-  const ctx=CTX.teams[tname]||{};
-  const rp=it.repeat;
-  const badge = obs?`<span class="badge b-obs-o">관찰</span>`:rp?`<span class="badge b-rep">🔁 ${rp.days}일 연속 보고${rp.jira?"":" · 아직 지라 없음"}</span>`:`<span class="badge b-new">🆕 오늘 처음</span>`;
-  const kind=it.kind==="탐색"?` <span class="badge b-exp">오류 없이 이탈</span>`:"";
-  const sevB=` <span class="badge sev-b-${esc(it.severity)}">심각도 ${esc(it.severity)}</span>`;
-  const pct = it.similar!=null && ctx.pageSessions ? Math.round(it.similar/ctx.pageSessions*1000)/10 : null;
-  const impact = it.similar!=null
-    ? `어제 ${esc(TPAGE[tname]||"팀 화면")} 녹화 ${ctx.pageSessions?.toLocaleString()}개 중 <b>${it.similar}개(${pct}%)</b>에서 같은 문제 · 그중 ${order.length}개를 AI가 직접 봤어요`
-    : `오류 신호가 없는 녹화 1개라 몇 명이 겪었는지는 아직 몰라요 · 비슷한 녹화가 3개 쌓이면 문제로 올려요`;
-  const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
-  const pressed=v=>getFb(k+":act")===v;
-  const minis=order.map((x,j)=>{const s=byId[x];const m=x===sid?ts:momentOf(s,sid,ts);
-    return `<div class="mini">${shotBtn(s,m)}<span><b>${j===0?"대표 녹화":"녹화 "+(j+1)}</b> <span class="muted mono">${fmt(s.durationSec)}</span></span><span class="muted">${esc(s.device)} · ${esc(s.os||"")}</span><a class="src" href="${esc(srcUrl(s,m))}" data-src="1" target="_blank" rel="noopener">클래리티 원본 ↗</a></div>`}).join("");
-  const body=`<article class="card sev-${esc(it.severity)}">
-    ${shotBtn(byId[sid],ts)}
-    <div class="body">
-      <div class="badges">${badge}${sevB}${kind}</div>
-      ${rp&&!rp.jira&&!obs?`<p class="warn">⚠ ${rp.days}일째 같은 문제가 보고됐는데 아직 처리 전이에요</p>`:""}
-      <h3>${esc(ko(it.title))}</h3>
-      <p class="impact">${impact}</p>
-      <dl class="facts">
-        <div><dt>무슨 일이 있었나</dt><dd>${esc(it.summary||ko(it.evidence))}</dd></div>
-        <div class="fix"><dt>이렇게 고쳐 보세요</dt><dd>${esc(s1)}</dd></div>
-      </dl>
-      <div class="acts">
-        <button class="primary" data-jira="${tname}|${i}">지라 초안 만들기</button>
-        <button data-act="${k}" data-v="send" aria-pressed="${pressed("send")}">담당자에게 전달</button>
-        <button data-act="${k}" data-v="known" aria-pressed="${pressed("known")}">이미 아는 문제</button>
-        <span class="judge"><span class="muted small">AI 판독</span>
-          <button class="yes" data-k="${k}" data-v="y" aria-pressed="${f==="y"}" aria-label="AI 판독 맞음">✅ 맞음</button>
-          <button class="no" data-k="${k}" data-v="n" aria-pressed="${f==="n"}" aria-label="AI 판독 틀림">❌ 틀림</button>
-          <select data-why="${k}" aria-label="틀린 이유" ${f==="n"?"":"hidden"}>
-            ${["이유 고르기","원인이 다름","정상 동작임","우리 팀 아님","기록 데이터 오류"].map(o=>`<option ${getFb(k+":why")===o?"selected":""}>${o}</option>`).join("")}
-          </select></span>
-      </div>
-      <details class="more"><summary>자세히 보기 · 원인 가설, 행동 기록, 녹화 ${order.length}개 모두</summary>
-        <dl class="facts">
-          <div><dt>원인 가설 <span class="muted" style="font-weight:400">(AI 확신: ${unk?"낮음":"중간"})</span></dt><dd>${esc(hy)}</dd></div>
-          ${unk?`<div><dt>확인할 것</dt><dd>${esc(unk)}</dd></div>`:""}
-          ${s2?`<div><dt>다른 방법</dt><dd>${esc(s2.replace(/^대안:\s*/,""))}</dd></div>`:""}
-          <div><dt>행동 기록 (원문)</dt><dd class="small">${esc(ko(it.evidence))}</dd></div>
-          <div><dt>녹화별 문제 순간</dt><dd><div class="minis">${minis}</div></dd></div>
-        </dl>
-      </details>
-    </div>
-  </article>`;
-  if(rp&&rp.jira&&!obs) return `<details class="known"><summary><span class="badge b-rep-k">🔁 ${rp.days}일 연속 · ${esc(rp.jira)} 진행 중</span> ${esc(ko(it.title))} <span class="muted small">· 펼치기</span></summary>${body}</details>`;
-  return body;
-}
-function teamMessage(tname){
-  const iss=ISSUES[tname]||[]; const ctx=CTX.teams[tname]||{};
-  const main=iss.map((it,i)=>[it,i]).filter(([it])=>!isObserve(it)), obs=iss.map((it,i)=>[it,i]).filter(([it])=>isObserve(it));
-  const nNew=main.filter(([it])=>!it.repeat).length, nRep=main.length-nNew;
-  const head = main.length ? `오늘 볼 문제 ${main.length}건` : `오늘은 바로 볼 문제가 없어요`;
-  const sub = [main.length?`🆕 오늘 처음 ${nNew} · 🔁 반복 ${nRep}`:"", obs.length?`관찰 ${obs.length}`:"", ctx.metric?`${esc(ctx.metric)} 어제 <b>${esc(ctx.value)}</b> (7일 평균 ${esc(ctx.avg7)})`:""].filter(Boolean).join(" · ");
-  return `<div class="report">
-    <div class="rhead"><div class="ava">AI</div><div><div class="muted small">클래리티 리뷰 에이전트 · 오전 9:00 · <span class="mention">@${esc(tname)} PO</span></div>
-      <h2>${esc(tname)} · ${head}</h2><div class="sub">${sub}</div></div></div>
-    ${main.map(([it,i])=>issueBlock(tname,it,i,iss,false)).join("")}
-    ${obs.length?`<details class="obs2" ${main.length?"":"open"}><summary>관찰 ${obs.length}건 <span>· 아직 겪은 사람이 적어 문제로 올리지 않았어요</span></summary><div style="display:grid;gap:12px">${obs.map(([it,i])=>issueBlock(tname,it,i,iss,true)).join("")}</div></details>`:""}
-  </div>`;
-}
 function jiraText(tname,i){
   const it=ISSUES[tname][i]; const [sid,ts]=it.moment.split(" "); const s=byId[sid]; const ctx=CTX.teams[tname]||{};
   const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
@@ -974,81 +807,167 @@ ${links}
 
 — 클래리티 리뷰 에이전트 자동 작성`;
 }
+
+// ───── 화면 상태
+const TEAM_NAMES = TEAMS.map(t=>t.name).filter(n=>ISSUES[n]);
 function initTeam(){
-  const q=new URLSearchParams(location.search).get("team")||location.hash.slice(1);
-  const byKey=Object.entries(TKEY).find(([n,k])=>k===q||n===decodeURIComponent(q||""));
-  if(byKey) return byKey[0];
+  const q=new URLSearchParams(location.search).get("team");
+  const hit=Object.entries(TKEY).find(([n,k])=>k===q);
+  if(hit && ISSUES[hit[0]]) return hit[0];
   try{const v=localStorage.getItem("team"); if(v&&ISSUES[v]) return v;}catch(e){}
-  return null;
+  return TEAM_NAMES[0];
 }
-let curTeam = initTeam();
-function renderTabs(){
-  const names=TEAMS.map(t=>t.name).filter(n=>ISSUES[n]);
-  document.getElementById("tabs").innerHTML = names.map(n=>{const m=ISSUES[n].filter(it=>!isObserve(it)).length,o=ISSUES[n].filter(isObserve).length;
-    return `<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<small>${m?`문제 ${m}`:"문제 없음"}${o?` · 관찰 ${o}`:""}</small></button>`}).join("");
-  document.getElementById("teamMsg").innerHTML = curTeam ? teamMessage(curTeam)
-    : `<div class="report pickfirst"><p style="font-size:17px;font-weight:700">👆 위에서 내 팀을 골라 주세요</p><p class="muted small">팀을 고르면 그 팀 PO가 오늘 아침 받을 보고가 열려요. 다음에 들어오면 고른 팀이 바로 열립니다.</p></div>`;
+let curTeam=initTeam(), curIdx=null, curRec=null;
+const P={s:null,n:0,timer:null,key:""};
+
+function ordered(tname){ // 문제 → 관찰 순, 같은 그룹 안에서는 심각도·반복 순
+  const sv={"높음":0,"중간":1,"낮음":2};
+  return (ISSUES[tname]||[]).map((it,i)=>({it,i,obs:isObserve(it)}))
+    .sort((a,b)=>a.obs-b.obs || (b.it.repeat&&!b.it.repeat.jira?1:0)-(a.it.repeat&&!a.it.repeat.jira?1:0) || sv[a.it.severity]-sv[b.it.severity]);
 }
-let P={s:null,n:0,timer:null};
-function openDrawer(sid,ts){
-  const s=byId[sid]; if(!s) return; stopPlay();
-  const sel=select()[sid]; P.s=s; P.n=ts?sec(ts):0; P.mark=ts||"";
-  const marks=s.timeline.filter(l=>SIG_RE.test(l)).map(l=>`<span class="mk" style="left:${sec(l.slice(0,5))/s.durationSec*100}%" title="${esc(l)}"></span>`).join("");
-  document.getElementById("dbody").innerHTML = `
-    <h2>${esc(screenName(s.exit))} 녹화 <span class="muted mono" style="font-size:13px;font-weight:400">${sid} · ${esc(sel?.team||"")} · ${esc(s.device)}</span></h2>
-    <div class="player">
-      <div class="screen" id="pscreen"></div>
-      <div class="pbar"><button id="pplay">▶ 재생</button>
-        <div class="scrub">${marks}<input type="range" id="pscrub" min="0" max="${s.durationSec}" value="${P.n}" aria-label="재생 위치"></div>
-        <span class="mono" id="ptime"></span></div>
-      <p class="muted" style="font-size:12px">빨간 눈금 = 문제 신호. 체험판 재생기는 행동 기록을 10배속으로 보여 줍니다. 실제 운영에서는 클래리티 원본 녹화가 이 시각부터 열립니다.</p>
-      <a href="${esc(srcUrl(s,mmss(P.n)))}" id="psrc" data-src="1" target="_blank" rel="noopener" style="font-size:13px;color:var(--mention-fg)">클래리티 원본을 이 시각부터 열기 ↗</a>
+function statusTxt(k){const a=getFb(k+":act");return a==="send"?"전달함":a==="known"?"이미 앎":a==="jira"?"지라 만듦":"";}
+
+function renderTeams(){
+  document.getElementById("teams").innerHTML=TEAM_NAMES.map(n=>{const m=ISSUES[n].filter(it=>!isObserve(it)).length;
+    return `<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<span class="n">${m}</span></button>`}).join("");
+}
+function renderList(){
+  const ctx=CTX.teams[curTeam]||{}; const o=ordered(curTeam);
+  const main=o.filter(x=>!x.obs), obs=o.filter(x=>x.obs);
+  const row=({it,i,obs})=>{const k=fbKey(curTeam,i);const st=statusTxt(k);
+    const rp=it.repeat;
+    const tag=obs?`<span class="badge b-obs">관찰</span>`:rp?(rp.jira?`<span class="badge b-jira">${esc(rp.jira)} 진행 중</span>`:`<span class="badge b-rep">🔁 ${rp.days}일째 미처리</span>`):`<span class="badge b-new">🆕 오늘 처음</span>`;
+    const pct=it.similar!=null&&ctx.pageSessions?` (${Math.round(it.similar/ctx.pageSessions*1000)/10}%)`:"";
+    return `<button class="row" role="option" aria-selected="${i===curIdx}" data-issue="${i}">
+      <span class="dot ${obs?"obs":esc(it.severity)}" aria-label="심각도 ${esc(it.severity)}"></span>
+      <span><span class="t">${esc(ko(it.title))}</span>
+      <span class="m">${tag}<span>${it.similar!=null?`녹화 ${it.similar}개${pct}`:"녹화 1개"}</span>${st?`<span class="done">✓ ${st}</span>`:""}</span></span></button>`};
+  document.getElementById("list").innerHTML=`
+    <div class="lhead"><h2>${esc(curTeam)} · 어제 녹화 판독 결과</h2>
+      <div class="kpi">${esc(ctx.metric||"")} 어제 <b>${esc(ctx.value||"-")}</b> (7일 평균 ${esc(ctx.avg7||"-")}) · 녹화 ${ctx.pageSessions?.toLocaleString()||"-"}개</div></div>
+    <div role="listbox" aria-label="문제 목록">
+    <div class="group">오늘 볼 문제 ${main.length}</div>${main.map(row).join("")||`<p class="lfoot">오늘은 바로 볼 문제가 없어요.</p>`}
+    ${obs.length?`<div class="group">관찰 ${obs.length} · 겪은 녹화가 3개 미만</div>${obs.map(row).join("")}`:""}
     </div>
-    <dl class="kv"><dt>길이</dt><dd class="mono">${fmt(s.durationSec)}</dd><dt>기기</dt><dd>${esc(s.device)} · ${esc(s.os||"")} · ${esc(s.browser||"")}</dd>
-    <dt>들어온 화면</dt><dd class="mono">${esc(s.entry)}</dd><dt>나간 화면</dt><dd class="mono">${esc(s.exit)}</dd>
-    ${s.signals.jsErrors.length?`<dt>JS 오류</dt><dd class="mono" style="word-break:break-all">${esc(s.signals.jsErrors.join(", "))}</dd>`:""}</dl>
-    <h3>행동 기록 <span class="muted" style="font-weight:400">· 줄을 누르면 그 시각으로 이동</span></h3>
-    <ol class="tl" id="ptl">${s.timeline.map(l=>{const t=l.slice(0,5);return `<li data-seek="${sec(t)}" class="${P.mark&&t===P.mark?"hit":""}"><span class="ts">${t}</span><span>${esc(ko(l.slice(6)))}</span></li>`}).join("")}</ol>`;
+    <p class="lfoot"><span class="kbd">↑</span> <span class="kbd">↓</span> 문제 이동 · <span class="kbd">Space</span> 재생 · <span class="kbd">J</span> 지라 초안</p>`;
+}
+function renderDetail(){
+  const it=ISSUES[curTeam][curIdx]; const ctx=CTX.teams[curTeam]||{}; const obs=isObserve(it); const k=fbKey(curTeam,curIdx); const f=getFb(k);
+  const [sid,ts]=it.moment.split(" "); const order=[sid,...it.sessions.filter(x=>x!==sid)].filter(x=>byId[x]);
+  if(!curRec||!order.includes(curRec)) curRec=sid;
+  const rp=it.repeat;
+  const badges=[obs?`<span class="badge b-obs">관찰</span>`:rp?(rp.jira?`<span class="badge b-jira">🔁 ${rp.days}일 연속 · ${esc(rp.jira)} 진행 중</span>`:`<span class="badge b-rep">🔁 ${rp.days}일 연속 보고 · 지라 없음</span>`):`<span class="badge b-new">🆕 오늘 처음</span>`,
+    `<span class="badge b-${esc(it.severity)}">심각도 ${esc(it.severity)}</span>`, it.kind==="탐색"?`<span class="badge b-exp">오류 없이 이탈</span>`:""].join(" ");
+  const pct=it.similar!=null&&ctx.pageSessions?Math.round(it.similar/ctx.pageSessions*1000)/10:null;
+  const imp = it.similar!=null
+    ? `어제 ${esc(TPAGE[curTeam]||"팀 화면")} 녹화 ${ctx.pageSessions.toLocaleString()}개 중 <b>${it.similar}개(${pct}%)</b>에서 같은 문제 · AI가 직접 본 녹화 ${order.length}개`
+    : `오류 신호가 없는 녹화 1개 · 비슷한 녹화가 3개 쌓이면 문제로 올려요`;
+  const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
+  const act=getFb(k+":act");
+  document.getElementById("detail").innerHTML=`
+    <div class="dhead"><div>${badges}</div>
+      ${rp&&!rp.jira&&!obs?`<p class="warn">⚠ ${rp.days}일째 같은 문제가 보고됐는데 아직 처리 전이에요</p>`:""}
+      <h1>${esc(ko(it.title))}</h1><p class="imp">${imp}</p></div>
+    <div class="bar">
+      <button class="primary" data-jira="1">지라 초안 만들기 <span class="kbd" style="color:#fff;border-color:rgba(255,255,255,.5)">J</span></button>
+      <button data-act="send" aria-pressed="${act==="send"}">담당자에게 전달</button>
+      <button data-act="known" aria-pressed="${act==="known"}">이미 아는 문제</button>
+      <span class="judge"><span class="muted small">AI 판독이 맞나요?</span>
+        <button class="yes" data-k="y" aria-pressed="${f==="y"}">✅ 맞음</button>
+        <button class="no" data-k="n" aria-pressed="${f==="n"}">❌ 틀림</button>
+        <select data-why aria-label="틀린 이유" ${f==="n"?"":"hidden"}>${["이유 고르기","원인이 다름","정상 동작임","우리 팀 아님","기록 데이터 오류"].map(o=>`<option ${getFb(k+":why")===o?"selected":""}>${o}</option>`).join("")}</select>
+      </span>
+    </div>
+    <div class="grid2">
+      <div class="pane player">
+        <h3>녹화 재생 · 문제 순간부터</h3>
+        <div class="stage"><div class="phone" id="pscreen"></div><div class="now" id="pnow"></div></div>
+        <div class="ctrl"><button id="pplay">▶ 재생</button><div class="scrub" id="pscrubw"></div><span class="mono small" id="ptime"></span></div>
+        <div class="recs">${order.map((x,j)=>{const s=byId[x];return `<button class="rec" data-rec="${x}" aria-pressed="${x===curRec}">${j===0?"대표 녹화":"녹화 "+(j+1)} · ${esc(s.device)}<small>${x} · ${fmt(s.durationSec)} · ${esc(s.os||"")}</small></button>`}).join("")}</div>
+        <ol class="events" id="pev" aria-label="행동 기록"></ol>
+      </div>
+      <div class="pane ai">
+        <h3>AI 판독</h3>
+        <section><span class="lbl">무슨 일이 있었나</span><p>${esc(it.summary||ko(it.evidence))}</p></section>
+        <section class="fix"><span class="lbl">이렇게 고쳐 보세요</span><p>${esc(s1)}</p></section>
+        ${s2?`<section><span class="lbl">다른 방법</span><p>${esc(s2.replace(/^대안:\s*/,"").replace(/^\(?\d\)\s*/,""))}</p></section>`:""}
+        <section><span class="lbl">원인 가설 · AI 확신 ${unk?"낮음":"중간"}</span><p>${esc(hy)}</p></section>
+        ${unk?`<section><span class="lbl">확인할 것</span><p>${esc(unk)}</p></section>`:""}
+        <section><span class="lbl">행동 기록 원문</span><p class="raw">${esc(ko(it.evidence))}</p></section>
+        <section><span class="lbl">대표 녹화 정보</span><dl>
+          <dt>기기</dt><dd>${esc(byId[sid].device)} · ${esc(byId[sid].os||"")} · ${esc(byId[sid].browser||"")}</dd>
+          <dt>들어온 화면</dt><dd class="mono">${esc(byId[sid].entry)}</dd><dt>나간 화면</dt><dd class="mono">${esc(byId[sid].exit)}</dd>
+          ${byId[sid].signals.jsErrors.length?`<dt>오류 원문</dt><dd class="mono small" style="word-break:break-all">${esc(byId[sid].signals.jsErrors.join(", "))}</dd>`:""}
+        </dl></section>
+      </div>
+    </div>`;
+  loadRec(curRec, curRec===sid?ts:momentOf(byId[curRec],sid,ts));
+}
+function loadRec(rid,ts){
+  stopPlay(); const s=byId[rid]; P.s=s; P.key=ts;
+  document.getElementById("pscrubw").innerHTML = s.timeline.filter(l=>SIG_RE.test(l)).map(l=>`<span class="mk ${/오류/.test(l)?"err":""}" style="left:${sec(l.slice(0,5))/s.durationSec*100}%" title="${esc(ko(l))}"></span>`).join("")
+    + `<input type="range" id="pscrub" min="0" max="${s.durationSec}" value="${sec(ts)}" aria-label="재생 위치">`;
+  document.getElementById("pev").innerHTML = s.timeline.map(l=>{const t=l.slice(0,5);return `<li data-seek="${sec(t)}" class="${SIG_RE.test(l)?"sig":""} ${t===ts?"key":""}"><span class="t">${t}</span><span class="i"></span><span>${esc(ko(l.slice(6)))}</span></li>`}).join("");
   document.getElementById("pscrub").addEventListener("input",e=>{stopPlay();seek(+e.target.value);});
-  document.getElementById("pplay").addEventListener("click",()=>P.timer?stopPlay():startPlay());
-  seek(P.n);
-  const d=document.getElementById("drawer"); d.classList.add("open"); d.setAttribute("aria-hidden","false"); document.getElementById("dx").focus();
+  document.getElementById("pplay").onclick=()=>P.timer?stopPlay():startPlay();
+  document.querySelectorAll("[data-rec]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.rec===rid)));
+  seek(sec(ts));
 }
 function seek(n){
-  const s=P.s; P.n=Math.max(0,Math.min(n,s.durationSec)); const i=idxAt(s,P.n);
+  const s=P.s; P.n=Math.max(0,Math.min(n,s.durationSec)); const i=idxAt(s,P.n); const line=s.timeline[i]; const [,kl]=kindOf(line);
   document.getElementById("pscreen").innerHTML=screen(s,i);
+  document.getElementById("pnow").innerHTML=`<span class="ts">${mmss(P.n)}</span><span class="ev">${esc(ko(line.slice(6)))}</span>
+    ${kl?`<span><span class="badge b-높음">${esc(kl)}</span></span>`:""}<span class="pg">${esc(screenName(pageAt(s,i)))} · ${esc(pageAt(s,i))}</span>
+    <a href="${esc(srcUrl(s,mmss(P.n)))}" data-src="1" target="_blank" rel="noopener">클래리티 원본을 이 시각부터 열기 ↗</a>
+    <span class="muted small">체험판은 행동 기록을 10배속으로 재생해요. 실제로는 클래리티 녹화 화면이 이 자리에 나옵니다.</span>`;
   document.getElementById("pscrub").value=P.n;
   document.getElementById("ptime").textContent=`${mmss(P.n)} / ${mmss(s.durationSec)}`;
-  document.getElementById("psrc").href=srcUrl(s,mmss(P.n));
-  document.querySelectorAll("#ptl li").forEach((li,j)=>li.classList.toggle("cur",j===i));
+  document.querySelectorAll("#pev li").forEach((li,j)=>li.classList.toggle("cur",j===i));
 }
-function startPlay(){const b=document.getElementById("pplay"); if(P.n>=P.s.durationSec) P.n=0; b.textContent="⏸ 멈춤";
-  P.timer=setInterval(()=>{ if(P.n>=P.s.durationSec){stopPlay();return;} seek(P.n+1); },100);}
+function startPlay(){if(P.n>=P.s.durationSec) P.n=0; document.getElementById("pplay").textContent="⏸ 멈춤"; P.timer=setInterval(()=>{if(P.n>=P.s.durationSec){stopPlay();return;} seek(P.n+1);},100);}
 function stopPlay(){clearInterval(P.timer);P.timer=null;const b=document.getElementById("pplay"); if(b) b.textContent="▶ 재생";}
-function closeDrawer(){stopPlay();const d=document.getElementById("drawer");d.classList.remove("open");d.setAttribute("aria-hidden","true");}
+
+function selectIssue(i){curIdx=i; curRec=null; renderList(); renderDetail();
+  const r=document.querySelector(`[data-issue="${i}"]`); r&&r.scrollIntoView({block:"nearest"});}
+function selectTeam(n){curTeam=n; try{localStorage.setItem("team",n)}catch(e){}; history.replaceState(null,"","?team="+TKEY[n]);
+  renderTeams(); selectIssue(ordered(n)[0].i);}
+function openJira(){const ta=document.getElementById("jiraTxt");ta.value=jiraText(curTeam,curIdx);document.getElementById("jira").showModal();ta.scrollTop=0;ta.setSelectionRange(0,0);document.getElementById("jiraCopy").focus();
+  setFb(fbKey(curTeam,curIdx)+":act","jira"); renderList();}
 
 document.addEventListener("click",e=>{
-  const sl=e.target.closest("[data-seek]"); if(sl){stopPlay();seek(+sl.dataset.seek);return;}
-  const sr=e.target.closest("[data-src]"); if(sr){e.preventDefault();toast("체험판 녹화는 가짜라 클래리티 원본이 없습니다. 실제 운영에서는 이 링크가 원본을 그 시각부터 엽니다.");return;}
-  const b=e.target.closest("[data-sid]"); if(b){openDrawer(b.dataset.sid,b.dataset.ts);return;}
-  const tb=e.target.closest("[data-team]"); if(tb){curTeam=tb.dataset.team;try{localStorage.setItem("team",curTeam)}catch(e){};history.replaceState(null,"","?team="+TKEY[curTeam]);renderTabs();return;}
-  const jb=e.target.closest("[data-jira]"); if(jb){const [tn,i]=jb.dataset.jira.split("|");const ta=document.getElementById("jiraTxt");ta.value=jiraText(tn,+i);document.getElementById("jira").showModal();ta.scrollTop=0;ta.setSelectionRange(0,0);document.getElementById("jiraCopy").focus();return;}
-  const ab=e.target.closest("[data-act]"); if(ab){const k=ab.dataset.act+":act";const v=getFb(k)===ab.dataset.v?null:ab.dataset.v;setFb(k,v);
-    ab.parentElement.querySelectorAll("[data-act]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));
-    if(v==="send") toast("실제 운영에서는 이 문제를 스레드로 만들고 담당 디자이너·개발자를 태그합니다.");
-    if(v==="known") toast("내일부터 같은 문제는 접어서 「이미 아는 문제」 한 줄로만 보여 줍니다.");
-    return;}
-  const fb=e.target.closest("[data-k]"); if(fb){const k=fb.dataset.k;const v=getFb(k)===fb.dataset.v?null:fb.dataset.v;setFb(k,v);
-    fb.parentElement.querySelectorAll("[data-k]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));
-    const w=fb.parentElement.querySelector("[data-why]"); if(w) w.hidden = v!=="n";}
+  const t=e.target;
+  const tb=t.closest("[data-team]"); if(tb){selectTeam(tb.dataset.team);return;}
+  const ib=t.closest("[data-issue]"); if(ib){selectIssue(+ib.dataset.issue);return;}
+  const rb=t.closest("[data-rec]"); if(rb){const it=ISSUES[curTeam][curIdx];const [sid,ts]=it.moment.split(" ");curRec=rb.dataset.rec;loadRec(curRec,curRec===sid?ts:momentOf(byId[curRec],sid,ts));return;}
+  const sl=t.closest("[data-seek]"); if(sl){stopPlay();seek(+sl.dataset.seek);return;}
+  const sr=t.closest("[data-src]"); if(sr){e.preventDefault();toast("체험판 녹화는 가짜라 클래리티 원본이 없습니다. 실제로는 원본이 이 시각부터 열립니다.");return;}
+  if(t.closest("[data-jira]")){openJira();return;}
+  const ab=t.closest("[data-act]"); if(ab){const k=fbKey(curTeam,curIdx)+":act";const v=getFb(k)===ab.dataset.act?null:ab.dataset.act;setFb(k,v);
+    document.querySelectorAll("[data-act]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.act===v)));
+    if(v==="send") toast("실제로는 이 문제를 스레드로 만들고 담당 디자이너·개발자를 태그합니다.");
+    if(v==="known") toast("내일부터 같은 문제는 「이미 아는 문제」로 표시하고 맨 아래로 내립니다.");
+    renderList();return;}
+  const fb=t.closest("[data-k]"); if(fb){const k=fbKey(curTeam,curIdx);const v=getFb(k)===fb.dataset.k?null:fb.dataset.k;setFb(k,v);
+    document.querySelectorAll("[data-k]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.k===v)));
+    document.querySelector("[data-why]").hidden = v!=="n"; if(v==="y") toast("고마워요. 비슷한 문제를 더 자신 있게 올릴게요.");return;}
+  const vb=t.closest("[data-view]"); if(vb){const lab=vb.dataset.view==="lab";
+    document.querySelectorAll("[data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===vb)));
+    document.getElementById("reportView").hidden=lab; document.getElementById("labView").hidden=!lab; stopPlay(); return;}
+  const rw=t.closest(".rowbtn"); if(rw){const s=byId[rw.dataset.sid];toast(`${rw.dataset.sid}: ${s.timeline.length}개 행동 · ${fmt(s.durationSec)}`);return;}
 });
-document.getElementById("dx").addEventListener("click",closeDrawer);
-document.addEventListener("change",e=>{const w=e.target.closest("[data-why]"); if(w){setFb(w.dataset.why+":why",w.value); toast("틀린 이유를 다음 판독 기준에 반영합니다.");}});
+document.addEventListener("change",e=>{if(e.target.matches("[data-why]")){setFb(fbKey(curTeam,curIdx)+":why",e.target.value);toast("틀린 이유를 다음 판독 기준에 반영합니다.");}});
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("jira").open||e.target.matches("input,select,textarea")||!document.getElementById("labView").hidden) return;
+  const o=ordered(curTeam).map(x=>x.i); const p=o.indexOf(curIdx);
+  if(e.key==="ArrowDown"||e.key==="j"&&false){e.preventDefault();selectIssue(o[Math.min(p+1,o.length-1)]);}
+  else if(e.key==="ArrowUp"){e.preventDefault();selectIssue(o[Math.max(p-1,0)]);}
+  else if(e.key===" "){e.preventDefault();P.timer?stopPlay():startPlay();}
+  else if(e.key==="j"||e.key==="J"){openJira();}
+});
 document.getElementById("jiraClose").addEventListener("click",()=>document.getElementById("jira").close());
 document.getElementById("jiraCopy").addEventListener("click",async()=>{const ta=document.getElementById("jiraTxt");try{await navigator.clipboard.writeText(ta.value);toast("복사했어요.");}catch(e){ta.select();toast("선택했어요. Cmd+C로 복사하세요.");}});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
 
-renderCtrl(); renderTable(); renderTabs();
+renderCtrl(); renderTable(); renderTeams(); selectIssue(ordered(curTeam)[0].i);
 </script>
 
 </body></html>
