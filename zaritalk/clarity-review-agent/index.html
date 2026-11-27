@@ -141,7 +141,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .badge{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap;vertical-align:1px}
 .b-new{background:var(--brand-soft);color:var(--deep)} .b-rep{background:var(--warn-soft);color:var(--warn)}
 .b-exp{background:var(--idle-soft);color:var(--fg)} .b-obs{background:var(--idle-soft);color:var(--muted)}
-.b-rep-k{background:var(--ok-soft);color:var(--ok)} .b-main{background:var(--fg);color:var(--bg)}
+.b-hot{background:var(--hot-soft);color:var(--hot)} .b-rep-k{background:var(--ok-soft);color:var(--ok)} .b-main{background:var(--fg);color:var(--bg)}
 .impact{font-size:13px;color:var(--muted)}
 .impact b{color:var(--fg);font-variant-numeric:tabular-nums}
 details.more summary{cursor:pointer;color:var(--mention-fg);font-size:13px;width:fit-content}
@@ -163,70 +163,127 @@ dialog textarea{width:100%;min-height:300px;font-family:var(--mono);font-size:12
 dialog .row2{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
 dialog button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:5px 12px;cursor:pointer}
 dialog button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* v4: 팀 고르기 → 보고 카드 중심 */
+.wrap{max-width:860px}
+.small{font-size:13px}
+.guide{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
+.guide li{display:flex;align-items:center;gap:8px}
+.guide b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-family:var(--mono)}
+.main{display:grid;gap:12px}
+.picker{display:flex;flex-wrap:wrap;gap:6px}
+.picker button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:10px;padding:8px 14px;cursor:pointer;display:grid;gap:0;text-align:left;line-height:1.3}
+.picker button small{font-size:11.5px;color:var(--muted)}
+.picker button[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.picker button[aria-selected="true"] small{color:#fff;opacity:.85}
+.report{background:var(--slack);color:var(--slack-fg);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
+.rhead{display:flex;gap:12px;align-items:flex-start}
+.rhead .ava{width:36px;height:36px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.rhead h2{font-size:18px}
+.rhead .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.rhead .sub b{color:var(--fg)}
+.card{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
+.card.sev-높음{border-left-color:var(--hot)} .card.sev-중간{border-left-color:var(--warn)} .card.sev-낮음{border-left-color:var(--idle)}
+@media (max-width:600px){.card{grid-template-columns:1fr}.card .shot{max-width:170px}}
+.shot{position:relative;display:block;width:100%;border:0;padding:0;background:none;cursor:pointer;border-radius:14px}
+.shot svg{display:block;width:100%;height:auto}
+.shot .play{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:rgba(0,0,0,.72);color:#fff;font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 12px;white-space:nowrap;font-family:var(--mono)}
+.shot:hover svg,.shot:focus-visible svg{filter:drop-shadow(0 0 0 2px var(--brand))}
+.shot:hover .play{background:var(--brand)}
+.card .body{display:grid;gap:8px;align-content:start;min-width:0}
+.card h3{font-size:16px;line-height:1.4}
+.card .impact{font-size:13px;color:var(--muted)}
+.card .impact b{color:var(--fg)}
+.facts{display:grid;gap:6px;margin:0}
+.facts div{display:grid;gap:1px}
+.facts dt{font-size:12px;font-weight:700;color:var(--muted)}
+.facts dd{margin:0;font-size:14px}
+.facts dd.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fix{background:var(--ok-soft);border-radius:8px;padding:8px 10px}
+.fix dt{color:var(--ok)}
+.card details.more>summary{cursor:pointer;color:var(--mention-fg);font-size:13px;width:fit-content}
+.card details.more[open]>summary{margin-bottom:8px}
+.minis{display:flex;flex-wrap:wrap;gap:10px}
+.mini{display:grid;gap:4px;width:110px;font-size:12px}
+.mini .shot .play{font-size:11px;padding:2px 8px;bottom:6px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acts .q{font-size:12px;color:var(--muted);margin-left:auto}
+.extra{display:grid;gap:10px}
+details.fold{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 16px}
+details.fold>summary{cursor:pointer;font-weight:700;font-size:15px}
+details.fold[open]>summary{margin-bottom:12px}
+ul.diff{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.obs2{border-top:1px dashed var(--line);padding-top:10px}
+.obs2>summary{cursor:pointer;font-weight:700;font-size:14px}
+.obs2>summary span{font-weight:400;color:var(--muted);font-size:13px}
+.obs2[open]>summary{margin-bottom:10px}
+.obs2 .card{opacity:.92}
+
+.badges{display:flex;flex-wrap:wrap;gap:4px}
+.b-obs-o{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.sev-b-높음{background:var(--hot-soft);color:var(--hot)} .sev-b-중간{background:var(--warn-soft);color:var(--warn)} .sev-b-낮음{background:var(--idle-soft);color:var(--idle)}
+.warn{font-size:13px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:4px 8px;width:fit-content}
+.judge{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center;margin-left:auto}
+details.known{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px 14px}
+details.known>summary{cursor:pointer;font-size:14px;font-weight:700}
+details.known[open]>summary{margin-bottom:10px}
+details.known .card{border:0;padding:0;border-left:0}
+.pickfirst{text-align:center;padding:36px 18px}
 footer{font-size:13px;color:var(--muted);display:grid;gap:4px}
 </style>
 </head><body>
 
 <div class="wrap">
   <header>
-    <span class="tag">체험판 · 가짜 녹화 10개로 돌린 결과</span>
+    <span class="tag">체험판 · 가짜 녹화 10개</span>
     <h1>클래리티 리뷰 에이전트</h1>
-    <p class="muted">매일 아침 녹화 링크 10개를 보내던 데일리 리뷰를, AI가 먼저 보고 「무엇이 왜 문제인지」까지 보내는 방식으로 바꾸는 시제품입니다.</p>
-    <div class="steps" aria-label="처리 순서">
-      <span class="step"><b>1</b>문제 신호로 녹화 받기</span>
-      <span class="step"><b>2</b>점수 매기기</span>
-      <span class="step"><b>3</b>신호 상위 + 탐색 몫 고르기</span>
-      <span class="step"><b>4</b>AI가 행동 기록 판독</span>
-      <span class="step"><b>5</b>팀 담당자에게 보고</span>
-    </div>
+    <p class="muted">매일 아침 9시, AI가 어제 녹화를 먼저 보고 <b style="color:var(--fg)">「어디서 왜 막혔는지」</b>만 골라 팀 PO에게 보냅니다.</p>
+    <ol class="guide" aria-label="써 보는 순서">
+      <li><b>1</b>내 팀 고르기</li><li><b>2</b>폰 화면을 누르면 그 순간부터 재생</li><li><b>3</b>맞으면 지라 초안 만들기</li>
+    </ol>
   </header>
 
-  <section>
-    <div class="sec-head"><h2>지금 리포트와 바뀐 리포트</h2>
-      <p class="muted">같은 자리페이팀 기준입니다. 왼쪽은 2026-11-27 실제 리포트 형식, 오른쪽은 에이전트 결과입니다.</p></div>
-    <div class="cmp">
-      <div><div class="label">지금</div>
-        <div class="slack">
-          <div class="who"><div class="ava">콜</div><div><span class="name">콜독(리포팅)</span> <span class="time">오전 9:00</span></div></div>
-          <div><b>[자리페이팀]</b> <span class="mention">@블루</span> · <span class="mention">@자리페이팀</span></div>
-          <ol>
-            <li><a>보기</a> (6분15초 · 경로: /pay)</li><li><a>보기</a> (4분42초 · 경로: /pay)</li><li><a>보기</a> (15분01초 · 경로: /pay)</li>
-            <li><a>보기</a> (14분46초 · 경로: /pay)</li><li><a>보기</a> (6분34초 · 경로: /pay)</li><li class="muted">… 10개까지</li>
-          </ol>
-          <div>확인해주셨으면 쓰레드에 확인했음을 남겨주세요.</div>
-        </div>
-        <p class="muted" style="font-size:13px;margin-top:8px">왜 봐야 하는지 없음 · 10개를 처음부터 재생해야 함</p>
-      </div>
-      <div><div class="label">바뀐 뒤</div><div id="cmpNew"></div>
-        <p class="muted" style="font-size:13px;margin-top:8px">같은 원인 녹화를 묶음 · 문제 순간부터 재생 · 개선안까지</p></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head"><h2>어떤 녹화를 AI에게 보낼지 직접 조절해 보기</h2>
-      <p class="muted">가중치를 바꾸면 점수와 선별 결과가 바로 바뀝니다. 행을 누르면 그 녹화의 행동 기록이 열립니다.</p></div>
-    <div class="lab">
-      <div class="panel ctrl" id="ctrl"></div>
-      <div class="panel" style="min-width:0">
-        <div class="summary" id="sum"></div>
-        <div class="note" id="note" hidden>설정이 기본값과 달라요. 아래 팀별 보고는 기본값으로 판독한 결과라, 실제 운영에서는 바뀐 선별로 다시 판독합니다.</div>
-        <div class="tblwrap"><table>
-          <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
-          <tbody id="rows"></tbody></table></div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-head"><h2>팀별로 받는 슬랙 보고</h2>
-      <p class="muted">PO 4명(가상) 피드백을 반영한 v3입니다. 맨 위 줄만 보고 볼지 정하고 → 대표 썸네일을 누르면 그 시각부터 재생 → 「지라 초안 만들기」로 바로 넘깁니다. 비슷한 녹화가 3개 미만인 건은 「관찰」로 접어 둡니다. 영향 숫자·반복 이력은 체험용 가짜 값입니다.</p></div>
-    <div class="tabs" role="tablist" id="tabs"></div>
+  <section class="main">
+    <div class="picker" role="tablist" aria-label="팀 고르기" id="tabs"></div>
     <div id="teamMsg"></div>
   </section>
 
+  <section class="extra">
+    <details class="fold"><summary><span>지금 리포트와 무엇이 다른가요?</span></summary>
+      <div class="cmp">
+        <div><div class="label">지금 (링크 10개)</div>
+          <div class="slack">
+            <div class="who"><div class="ava">콜</div><div><span class="name">콜독(리포팅)</span> <span class="time">오전 9:00</span></div></div>
+            <div><b>[자리페이팀]</b> <span class="mention">@블루</span></div>
+            <ol><li><a>보기</a> (6분15초 · /pay)</li><li><a>보기</a> (4분42초 · /pay)</li><li><a>보기</a> (15분01초 · /pay)</li><li class="muted">… 10개까지</li></ol>
+          </div>
+          <p class="muted small">왜 봐야 하는지 없음 · 10개를 처음부터 재생</p></div>
+        <div><div class="label">바뀐 뒤</div>
+          <ul class="diff">
+            <li>같은 원인 녹화를 <b>1건으로 묶음</b> (몇 명이 겪었는지 표시)</li>
+            <li>문제 <b>순간의 화면</b>부터 바로 재생</li>
+            <li>원인 가설·<b>고치는 방법</b>까지 · 지라 초안 1번에</li>
+            <li>어제도 보낸 문제는 <b>🔁 반복</b>으로 표시하고, 지라가 있으면 <b>한 줄로 접음</b></li>
+          </ul></div>
+      </div>
+    </details>
+    <details class="fold"><summary><span>AI에게 보낼 녹화는 어떻게 고르나요? (직접 조절해 보기)</span></summary>
+      <p class="muted small" style="margin:8px 0 12px">문제 신호(분노 클릭·JS 오류 등)에 점수를 매겨 팀마다 상위 녹화 + 신호 없는 「탐색」 녹화를 고릅니다. 10분 넘게 켜 두고 아무것도 안 한 녹화는 뺍니다.</p>
+      <div class="lab">
+        <div class="panel ctrl" id="ctrl"></div>
+        <div class="panel" style="min-width:0">
+          <div class="summary" id="sum"></div>
+          <div class="note" id="note" hidden>설정이 기본값과 달라요. 위 팀 보고는 기본값으로 판독한 결과예요.</div>
+          <div class="tblwrap"><table>
+            <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
+            <tbody id="rows"></tbody></table></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
   <footer>
-    <p>판독 모델: Claude Haiku, 팀당 1회 호출. 녹화 데이터는 실제 자리톡 경로를 본뜬 가짜 데이터입니다.</p>
-    <p>실데이터 연결에 필요한 것: 자리톡 클래리티 프로젝트 멤버 권한, 녹화 목록 API 응답 필드 확인, 실제 녹화 20개를 사람이 본 결과와 비교.</p>
+    <p>판독 모델 Claude Haiku(팀당 1회). 녹화·영향 숫자·반복 이력은 실제 자리톡 화면을 본뜬 가짜 데이터입니다. 폰 화면 그림은 행동 기록으로 그린 것이고, 실제 운영에서는 클래리티 재생 화면 캡처로 바뀝니다.</p>
   </footer>
 </div>
 
@@ -512,7 +569,8 @@ const ISSUES = {
    "suggestion": "「문의하기」 바로 위에 선택한 날짜의 예약 가능 여부와 청소비 포함 총액을 한 줄로 표시. 대안: 사진 상단에 평수·침대 수·층 요약 배지.",
    "kind": "탐색",
    "similar": null,
-   "repeat": null
+   "repeat": null,
+   "summary": "사진 14장을 넘겨 본 뒤 '문의하기' 앞에서 30초 멈췄다가 문의하지 않고 나감"
   }
  ],
  "마스터팀": [
@@ -532,7 +590,8 @@ const ISSUES = {
    "repeat": {
     "days": 3,
     "jira": null
-   }
+   },
+   "summary": "주문 화면에서 '예상 금액'을 3~4번 눌렀지만 반응이 없고, 다음 단계로 갔다가 2~3초 만에 돌아옴 (2명 같은 순서)"
   },
   {
    "title": "/order 「청소 날짜」 입력 방법 불명확, 텍스트 반복 클릭과 위아래 스크롤",
@@ -546,7 +605,8 @@ const ISSUES = {
    "severity": "중간",
    "kind": "신호",
    "similar": 2,
-   "repeat": null
+   "repeat": null,
+   "summary": "'청소 날짜' 글자를 3번 눌렀지만 날짜 선택이 열리지 않아 화면을 위아래로 계속 스크롤함"
   }
  ],
  "그로스팀": [
@@ -562,7 +622,8 @@ const ISSUES = {
    "severity": "높음",
    "kind": "신호",
    "similar": 9,
-   "repeat": null
+   "repeat": null,
+   "summary": "포인트가 부족한데 '교환하기'가 눌리는 것처럼 보여 5번 연타하고, '포인트 부족' 문구까지 눌러 보다 나감"
   }
  ],
  "중개팀": [
@@ -581,7 +642,8 @@ const ISSUES = {
    "repeat": {
     "days": 2,
     "jira": "BRK-118"
-   }
+   },
+   "summary": "보증금 필터를 건 뒤 매물 상세에 들어갔다가 2초 만에 나오기를 3번 반복함"
   },
   {
    "title": "지도 핀 클릭 무반응",
@@ -595,7 +657,8 @@ const ISSUES = {
    "severity": "중간",
    "kind": "신호",
    "similar": 2,
-   "repeat": null
+   "repeat": null,
+   "summary": "지도 핀을 2번 눌렀지만 아무 반응이 없음"
   }
  ],
  "자리페이팀": [
@@ -612,7 +675,8 @@ const ISSUES = {
    "severity": "높음",
    "kind": "신호",
    "similar": 37,
-   "repeat": null
+   "repeat": null,
+   "summary": "카드 등록 화면에서 카드사 목록을 눌러도 열리지 않고 오류가 나서, '다음'도 눌리지 않아 등록을 포기함 (2명 같은 순서)"
   }
  ],
  "코어팀": [
@@ -628,7 +692,8 @@ const ISSUES = {
    "severity": "높음",
    "kind": "신호",
    "similar": 6,
-   "repeat": null
+   "repeat": null,
+   "summary": "PC에서 계약서 파일을 올리자 용량 초과(413) 오류가 2번 나고, 다른 파일로 바꿔도 실패해 업로드를 포기함"
   }
  ]
 };
@@ -710,31 +775,38 @@ function pageAt(s, i){for(let j=i;j>=0;j--){const m=s.timeline[j].match(/\/[a-z]
 // 실제 운영 링크: 시작 시각 파라미터(미확인) — 안 되면 클래리티 공유 창의 「이 시각부터」 링크로 바꾼다
 const srcUrl = (s, ts) => `${s.url}?time=${sec(ts)*1000}`;
 // 화면 그림: 실제 운영에서는 헤드리스 크롬으로 클래리티 재생기를 그 시각에 멈춰 캡처한 이미지로 바꾼다
-function screen(s, i, big, crop){
-  const line=s.timeline[i]; const [k,kl]=kindOf(line); const page=pageAt(s,i);
-  const lab=(line.match(/'([^']+)'/)||[])[1] || (/카드사|드롭다운/.test(line)?"카드사 선택":/필터/.test(line)?"필터":/지도/.test(line)?"지도 핀":/사진/.test(line)?"사진":/업로드|파일/.test(line)?"업로드":/날짜/.test(line)?"날짜 선택":"");
+const SCREEN=[["/pay/card","카드 등록"],["/pay/complete","결제 완료"],["/pay","자리페이"],["/estimate","견적 선택"],["/order","청소 주문"],["/point-shop/exchange","포인트 교환"],["/point-shop","포인트샵"],["/benefit","혜택"],["/vacancy","매물 찾기"],["/real-residence-review","실거주 리뷰"],["/short-term-vacancy","단기 숙소 찾기"],["/stay","숙소 상세"],["/my/room/short-term","내 숙소"],["/host/contract/upload","계약서 업로드"],["/host/contract","계약 관리"],["/host/building","건물 관리"],["/refund","월세 환급"]];
+const TKEY={"중개팀":"brokerage","자리페이팀":"pay","그로스팀":"growth","마스터팀":"master","자리스테이팀":"stay","코어팀":"core","환급팀":"refund"};
+const TPAGE={"중개팀":"매물 화면","자리페이팀":"자리페이 화면","그로스팀":"포인트샵·혜택 화면","마스터팀":"청소 주문 화면","자리스테이팀":"단기 숙소 화면","코어팀":"건물·계약 화면","환급팀":"환급 화면"};
+const screenName = pg => (SCREEN.find(([u])=>pg.startsWith(u))||[,pg])[1];
+// 폰 화면 그림: 실제 운영에서는 헤드리스 크롬으로 클래리티 재생 화면을 그 시각에 멈춰 캡처한 이미지로 바꾼다
+function screen(s, i){
+  const line=s.timeline[i]; const [k,kl]=kindOf(line); const page=pageAt(s,i); const name=screenName(page);
+  const labOf = l => (l.match(/'([^']+)'/)||[])[1] || (/카드사|드롭다운/.test(l)?"카드사 선택":/필터/.test(l)?"보증금 필터":/지도/.test(l)?"지도 핀":/사진/.test(l)?"사진 보기":/업로드|파일 선택/.test(l)?"업로드":/날짜/.test(l)?"날짜 선택":"");
+  const lab = labOf(line) || (k==="err" && i>0 ? labOf(s.timeline[i-1]) : "");
   const rep=+((line.match(/x(\d+)/)||[])[1]||0);
-  let h=0; for(const c of lab) h=(h*31+c.charCodeAt(0))%997; const by=110+(h%5)*26;
   const col = k==="err"||k==="rage"?"var(--hot)":k==="dead"||k==="back"?"var(--warn)":"var(--brand)";
-  const rip = (k==="rage"||k==="dead"||k==="repeat") ? Array.from({length:Math.min(rep||2,5)},(_,j)=>`<circle cx="${140+((j*5)%10)-5}" cy="${by+14+((j*7)%8)-4}" r="${5+j*3}" fill="none" stroke="${col}" stroke-width="1.6" opacity="${1-j*.15}"/>`).join("") : "";
+  const by = 150;
+  const taps = (k==="rage"||k==="dead"||k==="repeat") ? `<circle cx="132" cy="${by+20}" r="16" fill="${col}" fill-opacity=".18"/><circle cx="132" cy="${by+20}" r="7" fill="${col}"/>
+     ${rep?`<rect x="140" y="${by-6}" width="28" height="18" rx="9" fill="${col}"/><text x="154" y="${by+7}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">×${rep}</text>`:""}` : "";
   const extra =
-    k==="err" ? `<rect x="14" y="${crop?by+34:246}" width="152" height="24" rx="6" fill="var(--hot)"/><text x="22" y="${crop?by+50:262}" font-size="10" fill="#fff">⚠ ${esc((s.signals.jsErrors[0]||"오류").slice(0,24))}</text>` :
-    k==="back" ? `<text x="90" y="${by-10}" text-anchor="middle" font-size="22" fill="${col}">↩</text>` :
-    k==="stop" ? `<text x="150" y="${by+20}" text-anchor="middle" font-size="18" fill="${col}">⏸</text>` :
-    k==="scroll" ? `<text x="160" y="160" text-anchor="middle" font-size="18" fill="${col}">⇅</text>` : "";
-  const vb = crop ? `0 ${Math.max(0,Math.min(by-52,300-112))} 180 112` : "0 0 180 300";
-  return `<svg viewBox="${vb}" role="img" aria-label="${esc(page)} ${esc(line.slice(6))}" style="font-family:var(--sans)">
-    <rect x="1" y="1" width="178" height="298" rx="16" fill="var(--panel)" stroke="var(--line)"/>
-    <rect x="12" y="14" width="156" height="20" rx="6" fill="var(--idle-soft)"/>
-    <text x="20" y="28" font-size="10" fill="var(--muted)" font-family="var(--mono)">${esc(page.slice(0,24))}</text>
-    <rect x="14" y="46" width="110" height="10" rx="3" fill="var(--line)"/><rect x="14" y="62" width="150" height="7" rx="3" fill="var(--idle-soft)"/>
-    <rect x="14" y="74" width="132" height="7" rx="3" fill="var(--idle-soft)"/><rect x="14" y="200" width="150" height="7" rx="3" fill="var(--idle-soft)"/>
-    <rect x="14" y="212" width="120" height="7" rx="3" fill="var(--idle-soft)"/>
-    ${lab?`<rect x="30" y="${by}" width="120" height="28" rx="7" fill="${k?col:"var(--brand-soft)"}" fill-opacity="${k?".14":"1"}" stroke="${k?col:"var(--brand)"}" stroke-width="1.4"/>
-      <text x="90" y="${by+18}" text-anchor="middle" font-size="11" font-weight="700" fill="${k?col:"var(--deep)"}">${esc(lab.slice(0,10))}</text>`:""}
-    ${rip}${extra}
-    ${kl&&!crop?`<rect x="12" y="${k==="err"?212:246}" width="${kl.length*11+16}" height="20" rx="10" fill="${col}"/><text x="20" y="${k==="err"?226:260}" font-size="10" font-weight="700" fill="#fff">${kl}${rep?` ×${rep}`:""}</text>`:""}
-    ${big||crop?"":`<rect x="122" y="276" width="46" height="16" rx="8" fill="rgba(0,0,0,.6)"/><text x="145" y="288" text-anchor="middle" font-size="10" fill="#fff" font-family="var(--mono)">${s.timeline[i].slice(0,5)}</text>`}
+    k==="err" ? `<rect x="12" y="236" width="156" height="38" rx="8" fill="var(--hot)"/><text x="22" y="252" font-size="10.5" font-weight="700" fill="#fff">⚠ 오류</text><text x="22" y="266" font-size="9" fill="#fff" font-family="var(--mono)">${esc((s.signals.jsErrors[0]||"").replace(/^\w+:\s*/,"").slice(0,27))}</text>` :
+    k==="back" ? `<path d="M120 ${by-18} q-30 -20 -60 0" stroke="${col}" stroke-width="3" fill="none" marker-end="url(#ar)"/><text x="90" y="${by-30}" text-anchor="middle" font-size="10" font-weight="700" fill="${col}">2초 만에 뒤로</text>` :
+    k==="stop" ? `<rect x="40" y="${by+40}" width="100" height="22" rx="11" fill="var(--warn)"/><text x="90" y="${by+55}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">⏸ 30초 멈춤</text>` :
+    k==="scroll" ? `<text x="160" y="170" text-anchor="middle" font-size="22" fill="${col}">⇅</text>` : "";
+  const label = kl ? `<rect x="12" y="${k==="err"?212:240}" width="${kl.length*11+30}" height="20" rx="10" fill="${col}"/><text x="22" y="${k==="err"?226:254}" font-size="10.5" font-weight="700" fill="#fff">${kl}${rep?` ${rep}번`:""}</text>` : "";
+  return `<svg viewBox="0 0 180 300" role="img" aria-label="${esc(name)} 화면, ${esc(ko(line.slice(6)))}" style="font-family:var(--sans)">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="${col}"/></marker></defs>
+    <rect x="1" y="1" width="178" height="298" rx="18" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/>
+    <rect x="70" y="8" width="40" height="5" rx="2.5" fill="var(--line)"/>
+    <text x="16" y="38" font-size="13" font-weight="700" fill="var(--fg)">‹ ${esc(name)}</text>
+    <text x="16" y="54" font-size="8.5" fill="var(--muted)" font-family="var(--mono)">${esc(page.slice(0,30))}</text>
+    <rect x="14" y="66" width="152" height="40" rx="8" fill="var(--idle-soft)"/>
+    <rect x="22" y="76" width="70" height="7" rx="3" fill="var(--line)"/><rect x="22" y="90" width="110" height="6" rx="3" fill="var(--line)" opacity=".6"/>
+    <rect x="14" y="114" width="152" height="6" rx="3" fill="var(--idle-soft)"/><rect x="14" y="126" width="120" height="6" rx="3" fill="var(--idle-soft)"/>
+    ${lab?`<rect x="20" y="${by}" width="140" height="40" rx="9" fill="${k?col:"var(--brand)"}" fill-opacity="${k?".12":"1"}" stroke="${k?col:"var(--brand)"}" stroke-width="2"/>
+      <text x="${taps?78:90}" y="${by+25}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${k?col:"#fff"}">${esc(lab.slice(0,9))}</text>`:`<rect x="14" y="${by+6}" width="152" height="6" rx="3" fill="var(--idle-soft)"/><rect x="14" y="${by+18}" width="140" height="6" rx="3" fill="var(--idle-soft)"/>`}
+    ${taps}${extra}${label}
   </svg>`;
 }
 function toast(msg){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
@@ -808,66 +880,70 @@ function fbKey(t,i){return `fb:${t}:${i}`}
 function getFb(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function setFb(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
 
+function shotBtn(s,m,cls){const ii=idxAt(s,sec(m));return `<button class="shot ${cls||""}" data-sid="${s.sessionId}" data-ts="${m}" aria-label="${esc(screenName(pageAt(s,ii)))} 화면 ${m}부터 재생">${screen(s,ii)}<span class="play">▶ ${m}부터</span></button>`;}
 function issueBlock(tname,it,i,allIss,obs){
   const [sid,ts]=it.moment.split(" "); const k=fbKey(tname,i); const f=getFb(k);
   const order=[sid,...it.sessions.filter(x=>x!==sid)].filter(x=>byId[x]);
-  const name=x=>`녹화 ${String.fromCharCode(65+order.indexOf(x))}`;
-  const cards=order.map((x,j)=>{const s=byId[x];const m=x===sid?ts:momentOf(s,sid,ts);const ii=idxAt(s,sec(m));
-    const other=allIss.findIndex((o,oi)=>oi!==i&&o.sessions.includes(x));
-    return `<div class="mcard">
-      <button class="thumb" data-sid="${x}" data-ts="${m}" aria-label="${name(x)} ${m}부터 재생">${screen(s,ii,false,true)}
-        <span class="pg mono">${esc(pageAt(s,ii))}</span><span class="play">▶ ${m}부터</span></button>
-      <div class="cap"><span>${j===0?`<span class="badge b-main">대표</span> `:""}<b>${name(x)}</b> <span class="muted mono">${x} · ${fmt(s.durationSec)}</span></span><a class="src" href="${esc(srcUrl(s,m))}" data-src="1" target="_blank" rel="noopener">원본 ↗</a></div>
-      <div class="chips">${sigList(s).map(l=>`<span class="chip on">${l}</span>`).join("")||`<span class="chip">신호 없음</span>`}</div>
-      ${other>=0?`<div class="sametip">같은 녹화가 ${other+1}번 문제에도 있어요</div>`:""}
-    </div>`}).join("");
   const ctx=CTX.teams[tname]||{};
-  const rep=obs?`<span class="badge b-obs">관찰</span>`:it.repeat?`<span class="badge b-rep">🔁 ${it.repeat.days}일째</span>${it.repeat.jira?` <span class="badge b-rep-k">지라 ${esc(it.repeat.jira)} 진행 중</span>`:""}`:`<span class="badge b-new">🆕 새 문제</span>`;
-  const kind=it.kind==="탐색"?` <span class="badge b-exp">탐색 · 신호 없음</span>`:"";
+  const rp=it.repeat;
+  const badge = obs?`<span class="badge b-obs-o">관찰</span>`:rp?`<span class="badge b-rep">🔁 ${rp.days}일 연속 보고${rp.jira?"":" · 아직 지라 없음"}</span>`:`<span class="badge b-new">🆕 오늘 처음</span>`;
+  const kind=it.kind==="탐색"?` <span class="badge b-exp">오류 없이 이탈</span>`:"";
+  const sevB=` <span class="badge sev-b-${esc(it.severity)}">심각도 ${esc(it.severity)}</span>`;
+  const pct = it.similar!=null && ctx.pageSessions ? Math.round(it.similar/ctx.pageSessions*1000)/10 : null;
   const impact = it.similar!=null
-    ? `어제 같은 화면·같은 신호 녹화 <b>${it.similar}개</b> (팀 화면 녹화 ${ctx.pageSessions?.toLocaleString()||"-"}개 중) · AI가 직접 본 녹화 ${order.length}개`
-    : `신호 없는 녹화라 같은 행동 수는 아직 셀 수 없어요 · 비슷한 녹화가 3개 쌓이면 다시 알려요`;
+    ? `어제 ${esc(TPAGE[tname]||"팀 화면")} 녹화 ${ctx.pageSessions?.toLocaleString()}개 중 <b>${it.similar}개(${pct}%)</b>에서 같은 문제 · 그중 ${order.length}개를 AI가 직접 봤어요`
+    : `오류 신호가 없는 녹화 1개라 몇 명이 겪었는지는 아직 몰라요 · 비슷한 녹화가 3개 쌓이면 문제로 올려요`;
   const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
-  const conf = unk ? "낮음" : "중간";
   const pressed=v=>getFb(k+":act")===v;
-  return `<div class="issue sev-${esc(it.severity)} ${obs?"observe":""}">
-    <div class="t">${i+1}. ${rep}${kind} ${esc(ko(it.title))} <span class="muted" style="font-weight:400">(${esc(it.severity)})</span></div>
-    <div class="impact">${impact}</div>
-    <div class="row"><span>무슨 일</span><span>${esc(ko(it.evidence))}</span></div>
-    <div class="row"><span>원인 가설</span><span>${esc(hy)} <span class="badge b-obs">확신 ${conf}</span></span></div>
-    ${unk?`<div class="row"><span>확인할 것</span><span>${esc(unk)}</span></div>`:""}
-    <div class="row"><span>추천 개선안</span><span>${esc(s1)}${s2?`<details class="more"><summary>다른 안 보기</summary><div>${esc(s2)}</div></details>`:""}</span></div>
-    <div class="row"><span>녹화별</span><span class="moments">${cards}</span></div>
-    <div class="acts">
-      <button class="primary" data-jira="${tname}|${i}">지라 초안 만들기</button>
-      <button data-act="${k}" data-v="send" aria-pressed="${pressed("send")}">담당자에게 전달</button>
-      <button data-act="${k}" data-v="known" aria-pressed="${pressed("known")}">이미 아는 문제</button>
-      <span class="sep"></span>
-      <button class="yes" data-k="${k}" data-v="y" aria-pressed="${f==="y"}">✅ 판독 맞음</button>
-      <button class="no" data-k="${k}" data-v="n" aria-pressed="${f==="n"}">❌ 틀림</button>
-      <select data-why="${k}" aria-label="틀린 이유" ${f==="n"?"":"hidden"}>
-        ${["이유 고르기","원인이 다름","정상 동작임","이미 아는 문제","우리 팀 아님","기록 데이터 오류"].map(o=>`<option ${getFb(k+":why")===o?"selected":""}>${o}</option>`).join("")}
-      </select>
+  const minis=order.map((x,j)=>{const s=byId[x];const m=x===sid?ts:momentOf(s,sid,ts);
+    return `<div class="mini">${shotBtn(s,m)}<span><b>${j===0?"대표 녹화":"녹화 "+(j+1)}</b> <span class="muted mono">${fmt(s.durationSec)}</span></span><span class="muted">${esc(s.device)} · ${esc(s.os||"")}</span><a class="src" href="${esc(srcUrl(s,m))}" data-src="1" target="_blank" rel="noopener">클래리티 원본 ↗</a></div>`}).join("");
+  const body=`<article class="card sev-${esc(it.severity)}">
+    ${shotBtn(byId[sid],ts)}
+    <div class="body">
+      <div class="badges">${badge}${sevB}${kind}</div>
+      ${rp&&!rp.jira&&!obs?`<p class="warn">⚠ ${rp.days}일째 같은 문제가 보고됐는데 아직 처리 전이에요</p>`:""}
+      <h3>${esc(ko(it.title))}</h3>
+      <p class="impact">${impact}</p>
+      <dl class="facts">
+        <div><dt>무슨 일이 있었나</dt><dd>${esc(it.summary||ko(it.evidence))}</dd></div>
+        <div class="fix"><dt>이렇게 고쳐 보세요</dt><dd>${esc(s1)}</dd></div>
+      </dl>
+      <div class="acts">
+        <button class="primary" data-jira="${tname}|${i}">지라 초안 만들기</button>
+        <button data-act="${k}" data-v="send" aria-pressed="${pressed("send")}">담당자에게 전달</button>
+        <button data-act="${k}" data-v="known" aria-pressed="${pressed("known")}">이미 아는 문제</button>
+        <span class="judge"><span class="muted small">AI 판독</span>
+          <button class="yes" data-k="${k}" data-v="y" aria-pressed="${f==="y"}" aria-label="AI 판독 맞음">✅ 맞음</button>
+          <button class="no" data-k="${k}" data-v="n" aria-pressed="${f==="n"}" aria-label="AI 판독 틀림">❌ 틀림</button>
+          <select data-why="${k}" aria-label="틀린 이유" ${f==="n"?"":"hidden"}>
+            ${["이유 고르기","원인이 다름","정상 동작임","우리 팀 아님","기록 데이터 오류"].map(o=>`<option ${getFb(k+":why")===o?"selected":""}>${o}</option>`).join("")}
+          </select></span>
+      </div>
+      <details class="more"><summary>자세히 보기 · 원인 가설, 행동 기록, 녹화 ${order.length}개 모두</summary>
+        <dl class="facts">
+          <div><dt>원인 가설 <span class="muted" style="font-weight:400">(AI 확신: ${unk?"낮음":"중간"})</span></dt><dd>${esc(hy)}</dd></div>
+          ${unk?`<div><dt>확인할 것</dt><dd>${esc(unk)}</dd></div>`:""}
+          ${s2?`<div><dt>다른 방법</dt><dd>${esc(s2.replace(/^대안:\s*/,""))}</dd></div>`:""}
+          <div><dt>행동 기록 (원문)</dt><dd class="small">${esc(ko(it.evidence))}</dd></div>
+          <div><dt>녹화별 문제 순간</dt><dd><div class="minis">${minis}</div></dd></div>
+        </dl>
+      </details>
     </div>
-  </div>`;
+  </article>`;
+  if(rp&&rp.jira&&!obs) return `<details class="known"><summary><span class="badge b-rep-k">🔁 ${rp.days}일 연속 · ${esc(rp.jira)} 진행 중</span> ${esc(ko(it.title))} <span class="muted small">· 펼치기</span></summary>${body}</details>`;
+  return body;
 }
 function teamMessage(tname){
   const iss=ISSUES[tname]||[]; const ctx=CTX.teams[tname]||{};
-  const sel=select(); const mine=SESSIONS.filter(s=>sel[s.sessionId]?.team===tname);
-  const nSig=mine.filter(s=>sel[s.sessionId].st==="sig").length, nExp=mine.filter(s=>sel[s.sessionId].st==="exp").length;
   const main=iss.map((it,i)=>[it,i]).filter(([it])=>!isObserve(it)), obs=iss.map((it,i)=>[it,i]).filter(([it])=>isObserve(it));
-  const sev=v=>main.filter(([it])=>it.severity===v).length;
   const nNew=main.filter(([it])=>!it.repeat).length, nRep=main.length-nNew;
-  const sevTxt=[["높음","🔴"],["중간","🟡"],["낮음","⚪"]].filter(([v])=>sev(v)).map(([v,e])=>`${e} ${v} ${sev(v)}`).join(" · ")||"문제 없음";
-  return `<div class="slack">
-    <div class="who"><div class="ava">AI</div><div><span class="name">클래리티 리뷰 에이전트</span> <span class="time">오전 9:00</span></div></div>
-    <div><b>[${esc(tname)}]</b> <span class="mention">@담당자</span></div>
-    <div class="head">
-      <div class="line"><b>${sevTxt}</b>${main.length?` · 🆕 ${nNew} · 🔁 ${nRep}`:""}${obs.length?` · 관찰 ${obs.length}`:""}</div>
-      <div class="line muted">${esc(ctx.metric||"")} 어제 <b style="color:var(--fg)">${esc(ctx.value||"-")}</b> (7일 평균 ${esc(ctx.avg7||"-")}) · AI 판독: 신호 녹화 ${nSig}개 + 탐색 녹화 ${nExp}개</div>
-    </div>
-    ${main.map(([it,i])=>issueBlock(tname,it,i,iss,false)).join("")||`<p class="muted" style="margin:10px 0">오늘은 바로 볼 문제가 없어요. 아래 관찰만 확인하세요.</p>`}
-    ${obs.length?`<details class="obs"><summary>관찰 ${obs.length}건 <span>· 비슷한 녹화가 3개 미만이라 아직 문제로 올리지 않았어요</span></summary>${obs.map(([it,i])=>issueBlock(tname,it,i,iss,true)).join("")}</details>`:""}
+  const head = main.length ? `오늘 볼 문제 ${main.length}건` : `오늘은 바로 볼 문제가 없어요`;
+  const sub = [main.length?`🆕 오늘 처음 ${nNew} · 🔁 반복 ${nRep}`:"", obs.length?`관찰 ${obs.length}`:"", ctx.metric?`${esc(ctx.metric)} 어제 <b>${esc(ctx.value)}</b> (7일 평균 ${esc(ctx.avg7)})`:""].filter(Boolean).join(" · ");
+  return `<div class="report">
+    <div class="rhead"><div class="ava">AI</div><div><div class="muted small">클래리티 리뷰 에이전트 · 오전 9:00 · <span class="mention">@${esc(tname)} PO</span></div>
+      <h2>${esc(tname)} · ${head}</h2><div class="sub">${sub}</div></div></div>
+    ${main.map(([it,i])=>issueBlock(tname,it,i,iss,false)).join("")}
+    ${obs.length?`<details class="obs2" ${main.length?"":"open"}><summary>관찰 ${obs.length}건 <span>· 아직 겪은 사람이 적어 문제로 올리지 않았어요</span></summary><div style="display:grid;gap:12px">${obs.map(([it,i])=>issueBlock(tname,it,i,iss,true)).join("")}</div></details>`:""}
   </div>`;
 }
 function jiraText(tname,i){
@@ -877,7 +953,8 @@ function jiraText(tname,i){
   return `[${tname}] ${ko(it.title)}
 
 ■ 영향
-- 어제 같은 화면·같은 신호 녹화 ${it.similar??"-"}개 / 팀 화면 녹화 ${ctx.pageSessions??"-"}개
+- 어제 ${TPAGE[tname]||"팀 화면"} 녹화 ${ctx.pageSessions??"-"}개 중 ${it.similar??"-"}개에서 같은 문제
+- 요약: ${it.summary||""}
 - ${ctx.metric||""} 어제 ${ctx.value||"-"} (7일 평균 ${ctx.avg7||"-"})
 
 ■ 재현 정보 (대표 녹화 ${sid})
@@ -890,18 +967,27 @@ ${s.timeline.map(l=>"  "+ko(l)).join("\n")}
 ${hy}${unk?`\n- 확인할 것: ${unk}`:""}
 
 ■ 추천 개선안
-${s1}${s2?`\n- 다른 안: ${s2}`:""}
+${s1}${s2?`\n- 다른 안: ${s2.replace(/^대안:\s*/,"")}`:""}
 
 ■ 녹화 (그 시각부터 열기)
 ${links}
 
 — 클래리티 리뷰 에이전트 자동 작성`;
 }
-let curTeam = "자리페이팀";
+function initTeam(){
+  const q=new URLSearchParams(location.search).get("team")||location.hash.slice(1);
+  const byKey=Object.entries(TKEY).find(([n,k])=>k===q||n===decodeURIComponent(q||""));
+  if(byKey) return byKey[0];
+  try{const v=localStorage.getItem("team"); if(v&&ISSUES[v]) return v;}catch(e){}
+  return null;
+}
+let curTeam = initTeam();
 function renderTabs(){
   const names=TEAMS.map(t=>t.name).filter(n=>ISSUES[n]);
-  document.getElementById("tabs").innerHTML = names.map(n=>`<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<span class="n">${ISSUES[n].filter(it=>!isObserve(it)).length}${ISSUES[n].some(isObserve)?`+관찰${ISSUES[n].filter(isObserve).length}`:""}</span></button>`).join("");
-  document.getElementById("teamMsg").innerHTML = teamMessage(curTeam);
+  document.getElementById("tabs").innerHTML = names.map(n=>{const m=ISSUES[n].filter(it=>!isObserve(it)).length,o=ISSUES[n].filter(isObserve).length;
+    return `<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<small>${m?`문제 ${m}`:"문제 없음"}${o?` · 관찰 ${o}`:""}</small></button>`}).join("");
+  document.getElementById("teamMsg").innerHTML = curTeam ? teamMessage(curTeam)
+    : `<div class="report pickfirst"><p style="font-size:17px;font-weight:700">👆 위에서 내 팀을 골라 주세요</p><p class="muted small">팀을 고르면 그 팀 PO가 오늘 아침 받을 보고가 열려요. 다음에 들어오면 고른 팀이 바로 열립니다.</p></div>`;
 }
 let P={s:null,n:0,timer:null};
 function openDrawer(sid,ts){
@@ -909,7 +995,7 @@ function openDrawer(sid,ts){
   const sel=select()[sid]; P.s=s; P.n=ts?sec(ts):0; P.mark=ts||"";
   const marks=s.timeline.filter(l=>SIG_RE.test(l)).map(l=>`<span class="mk" style="left:${sec(l.slice(0,5))/s.durationSec*100}%" title="${esc(l)}"></span>`).join("");
   document.getElementById("dbody").innerHTML = `
-    <h2 class="mono">${sid} <span class="muted" style="font-size:14px;font-weight:400">${esc(sel?.team||"")}</span></h2>
+    <h2>${esc(screenName(s.exit))} 녹화 <span class="muted mono" style="font-size:13px;font-weight:400">${sid} · ${esc(sel?.team||"")} · ${esc(s.device)}</span></h2>
     <div class="player">
       <div class="screen" id="pscreen"></div>
       <div class="pbar"><button id="pplay">▶ 재생</button>
@@ -930,7 +1016,7 @@ function openDrawer(sid,ts){
 }
 function seek(n){
   const s=P.s; P.n=Math.max(0,Math.min(n,s.durationSec)); const i=idxAt(s,P.n);
-  document.getElementById("pscreen").innerHTML=screen(s,i,true);
+  document.getElementById("pscreen").innerHTML=screen(s,i);
   document.getElementById("pscrub").value=P.n;
   document.getElementById("ptime").textContent=`${mmss(P.n)} / ${mmss(s.durationSec)}`;
   document.getElementById("psrc").href=srcUrl(s,mmss(P.n));
@@ -945,8 +1031,8 @@ document.addEventListener("click",e=>{
   const sl=e.target.closest("[data-seek]"); if(sl){stopPlay();seek(+sl.dataset.seek);return;}
   const sr=e.target.closest("[data-src]"); if(sr){e.preventDefault();toast("체험판 녹화는 가짜라 클래리티 원본이 없습니다. 실제 운영에서는 이 링크가 원본을 그 시각부터 엽니다.");return;}
   const b=e.target.closest("[data-sid]"); if(b){openDrawer(b.dataset.sid,b.dataset.ts);return;}
-  const tb=e.target.closest("[data-team]"); if(tb){curTeam=tb.dataset.team;renderTabs();return;}
-  const jb=e.target.closest("[data-jira]"); if(jb){const [tn,i]=jb.dataset.jira.split("|");document.getElementById("jiraTxt").value=jiraText(tn,+i);document.getElementById("jira").showModal();return;}
+  const tb=e.target.closest("[data-team]"); if(tb){curTeam=tb.dataset.team;try{localStorage.setItem("team",curTeam)}catch(e){};history.replaceState(null,"","?team="+TKEY[curTeam]);renderTabs();return;}
+  const jb=e.target.closest("[data-jira]"); if(jb){const [tn,i]=jb.dataset.jira.split("|");const ta=document.getElementById("jiraTxt");ta.value=jiraText(tn,+i);document.getElementById("jira").showModal();ta.scrollTop=0;ta.setSelectionRange(0,0);document.getElementById("jiraCopy").focus();return;}
   const ab=e.target.closest("[data-act]"); if(ab){const k=ab.dataset.act+":act";const v=getFb(k)===ab.dataset.v?null:ab.dataset.v;setFb(k,v);
     ab.parentElement.querySelectorAll("[data-act]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));
     if(v==="send") toast("실제 운영에서는 이 문제를 스레드로 만들고 담당 디자이너·개발자를 태그합니다.");
@@ -962,7 +1048,6 @@ document.getElementById("jiraClose").addEventListener("click",()=>document.getEl
 document.getElementById("jiraCopy").addEventListener("click",async()=>{const ta=document.getElementById("jiraTxt");try{await navigator.clipboard.writeText(ta.value);toast("복사했어요.");}catch(e){ta.select();toast("선택했어요. Cmd+C로 복사하세요.");}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
 
-document.getElementById("cmpNew").innerHTML = teamMessage("자리페이팀");
 renderCtrl(); renderTable(); renderTabs();
 </script>
 
