@@ -232,6 +232,23 @@ dialog button.primary{background:var(--brand);border-color:var(--brand);color:#f
 .sitem .sm{font-size:12px;color:var(--muted)}
 .limits{font-size:12.5px;color:var(--muted);line-height:1.8;margin-top:16px}
 .demo{white-space:normal!important;max-width:100%}
+.app{grid-template-rows:auto auto 1fr!important}
+.gteam{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px max(16px,env(safe-area-inset-left,0px));background:var(--sunk);border-bottom:1px solid var(--line)}
+.gteam .lab2{font-size:12px;font-weight:700;color:var(--muted);margin-right:4px}
+.gteam button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px;white-space:nowrap;color:var(--fg)}
+.gteam button .c{font-family:var(--mono);font-size:11.5px;margin-left:4px;color:var(--muted)}
+.gteam button .c.hot{color:var(--hot);font-weight:700}
+.gteam button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg);font-weight:700}
+.gteam button[aria-pressed="true"] .c{color:var(--bg)}
+.ovgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.ovcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px;text-align:left;cursor:pointer;color:var(--fg);font:inherit}
+.ovcard:hover{border-color:var(--brand)}
+.ovcard h3{font-size:16px}
+.ovcard .sm{font-size:12.5px;color:var(--muted)}
+.ovcard .top1{font-size:13.5px;font-weight:700}
+.crumb{display:flex;gap:8px;align-items:center;font-size:12.5px;margin-bottom:8px;flex-wrap:wrap}
+.crumb button{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:3px 10px;cursor:pointer;font-size:12.5px;color:var(--fg)}
+
 @media (max-width:700px){.views{flex-wrap:wrap}.page{padding:16px}.tbl{display:block;overflow-x:auto}}
 @media (max-width:1000px){.split{grid-template-columns:1fr}.shotview{grid-template-columns:150px minmax(0,1fr)}}
 </style>
@@ -250,13 +267,13 @@ dialog button.primary{background:var(--brand);border-color:var(--brand);color:#f
       <button data-view="rito" aria-pressed="false">리토 신호</button>
     </div>
   </header>
+  <nav class="gteam" id="gteam" aria-label="팀 고르기 (모든 화면에 적용)"></nav>
   <div id="v-issues" class="vw" style="display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr);min-height:0;min-width:0">
     <div class="filters">
       <div class="branch" role="group" aria-label="고객 분기">
         <button data-branch="신규" aria-pressed="true">비로그인 방문자 (에이전트 실주행)</button>
         <button data-branch="기가입" aria-pressed="false">로그인 고객 (실제 로그)</button>
       </div>
-      <select id="teamSel" aria-label="팀"></select>
       <span class="muted small" id="branchNote"></span>
     </div>
     <main class="body"><aside class="list" id="list" aria-label="문제 목록"></aside><section class="detail" id="detail" aria-live="polite"></section></main>
@@ -294,23 +311,23 @@ function spark(vals,{w=260,h=54,mark=null,days=null,color="var(--brand)",partial
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px" role="img" aria-label="일별 추이">${bars}${m}${h>=80?peak:""}${lab}</svg>`;
 }
 // ───── 문제
-let branch="신규", team="전체", curId=null, curShot=0, curAgent=null;
-const ISS = () => (branch==="신규"?D.issuesNew:D.issuesExisting).filter(x=>team==="전체"||x.team.startsWith(team));
-const TEAMS = ["전체",...new Set([...D.issuesNew,...D.issuesExisting].map(x=>x.team.replace(/\(.*$/,"")))];
+let branch="신규", gTeam=null, curView="summary", curId=null, curShot=0, curAgent=null;
+const inTeam = (x,tm) => !tm || x.team.startsWith(tm) || x.team.startsWith(tm.replace("팀",""));
+const ISS = () => (branch==="신규"?D.issuesNew:D.issuesExisting).filter(x=>inTeam(x,gTeam));
+const ALLISS = () => [...D.issuesNew.map(x=>({...x,br:"신규"})),...D.issuesExisting.map(x=>({...x,br:"기가입"}))];
 function renderFilters(){
-  document.getElementById("teamSel").innerHTML=TEAMS.map(t=>`<option ${t===team?"selected":""}>${t}</option>`).join("");
-  document.querySelectorAll("[data-branch]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.branch===branch)));
+  document.querySelectorAll(".branch [data-branch]").forEach(b=>{b.setAttribute("aria-pressed",String(b.dataset.branch===branch));const n=(b.dataset.branch==="신규"?D.issuesNew:D.issuesExisting).filter(x=>inTeam(x,gTeam)).length;b.innerHTML=(b.dataset.branch==="신규"?"비로그인 방문자 (에이전트 실주행)":"로그인 고객 (실제 로그)")+` <span class="mono" style="color:var(--hot);font-weight:700">${n}</span>`;});
   document.getElementById("branchNote").textContent = branch==="신규" ? "고객 에이전트 100명이 실제 자리톡 웹을 로그인 없이 직접 써 본 결과(2026-11-27 주행) · 입구는 실제 비로그인 트래픽 비중" : "로그인 고객 실제 행동 기록 · 최근 7일 = 11/20~11/26(오늘 제외) vs 그 전 7일 · 「신규」는 가입 7일 이내만 뜻함";
 }
 function sevDot(s){return s==="높음"?"높음":s==="중간"?"중간":"obs";}
 function renderList(){
   const L=ISS();
   document.getElementById("list").innerHTML = `<div class="lhead"><h2>${branch==="신규"?"비로그인 방문자가 걸린 곳":"로그인 고객이 겪는 문제"}</h2>
-    <div class="kpi">${branch==="신규"&&team!=="전체"?(()=>{const ids=new Set(L.flatMap(x=>x.agents));const segs=new Set([...ids].map(i=>AG[i].seg));const pool=D.agents.filter(a=>segs.has(a.seg));const c={};pool.forEach(a=>c[a.outcome]=(c[a.outcome]||0)+1);return `${esc(team)} 입구 에이전트 ${pool.length}명 · `+Object.entries(c).map(([k,v])=>`${esc(k)} <b>${v}</b>`).join(" · ");})():branch==="신규"?`에이전트 100명 · 성공 <b>${D.meta.outcomes["성공"]||0}</b> · 로그인 벽 <b>${D.meta.outcomes["로그인 벽"]||0}</b> · 막힘 <b>${D.meta.outcomes["막힘"]||0}</b> · 못 찾음 <b>${D.meta.outcomes["못 찾음"]||0}</b>`:`최근 7일 · 실제 로그 · 겪은 사람 많은 순`}</div></div>
+    <div class="kpi">${branch==="신규"&&gTeam?(()=>{const ids=new Set(L.flatMap(x=>x.agents));const segs=new Set([...ids].map(i=>AG[i].seg));const pool=D.agents.filter(a=>segs.has(a.seg));const c={};pool.forEach(a=>c[a.outcome]=(c[a.outcome]||0)+1);return `${esc(gTeam)} 입구 에이전트 ${pool.length}명 · `+Object.entries(c).map(([k,v])=>`${esc(k)} <b>${v}</b>`).join(" · ");})():branch==="신규"?`에이전트 100명 · 성공 <b>${D.meta.outcomes["성공"]||0}</b> · 로그인 벽 <b>${D.meta.outcomes["로그인 벽"]||0}</b> · 막힘 <b>${D.meta.outcomes["막힘"]||0}</b> · 못 찾음 <b>${D.meta.outcomes["못 찾음"]||0}</b>`:`최근 7일 · 실제 로그 · 겪은 사람 많은 순`}</div></div>
     <div role="listbox">${L.map(x=>{const st=getS("act:"+x.id);
       const right = branch==="신규" ? `<span>100명 중 <b>${x.n}</b>명</span>` : `<span><b>${fmtN(x.n)}</b>명 · 지난주 ${chgBad(x.change)}</span>${x.spike?`<span class="badge b-높음">⚡ 급증</span>`:""}${x.incident?`<span class="badge b-높음">장애</span>`:""}`;
       return `<button class="row" role="option" aria-selected="${x.id===curId}" data-issue="${x.id}"><span class="dot ${sevDot(x.sev)}"></span>
-      <span><span class="t">${esc(x.title)}</span><span class="m"><span class="badge b-${esc(x.sev)}">${esc(x.sev)}</span><span class="badge b-new">🆕 첫 탐지</span><span>${esc(x.team)}</span>${right}${st?`<span class="done">✓ ${st==="jira"?"지라 만듦":st==="send"?"전달함":"이미 앎"}</span>`:""}</span></span></button>`}).join("")||`<p class="lfoot">이 팀 문제 없음</p>`}</div>
+      <span><span class="t">${esc(x.title)}</span><span class="m"><span class="badge b-${esc(x.sev)}">${esc(x.sev)}</span><span class="badge b-new">🆕 첫 탐지</span><span>${esc(x.team)}</span>${right}${st?`<span class="done">✓ ${st==="jira"?"지라 만듦":st==="send"?"전달함":"이미 앎"}</span>`:""}</span></span></button>`}).join("")||(()=>{const other=(branch==="신규"?D.issuesExisting:D.issuesNew).filter(x=>inTeam(x,gTeam)).length;return `<p class="lfoot">${esc(gTeam||"")} ${branch==="신규"?"비로그인":"로그인 고객"} 문제는 이번 탐지에서 없어요.${other?` <button class="linkish" data-branch="${branch==="신규"?"기가입":"신규"}">${branch==="신규"?"로그인 고객":"비로그인"} 문제 ${other}건 보기</button>`:""}</p>`})()}</div>
     <p class="lfoot"><span class="kbd">↑</span> <span class="kbd">↓</span> 이동 · <span class="kbd">J</span> 지라 초안</p>`;
 }
 function bars(pairs,total,hot){const mx=Math.max(1,...pairs.map(p=>p[1]));return `<div class="bars">${pairs.map(([k,v])=>`<div class="bar1"><span>${esc(k)}</span><span class="tr"><i class="${hot?"hot":""}" style="width:${v/mx*100}%"></i></span><span class="v">${v}${total?"명":""}</span></div>`).join("")}</div>`;}
@@ -331,7 +348,7 @@ function renderDetail(){
   if(branch==="신규"){
     const shots=x.shots; const sh=shots[curShot]||shots[0];
     const ag=curAgent&&x.agents.includes(curAgent)?curAgent:(sh?sh.agent:x.agents[0]); const A=AG[ag];
-    el.innerHTML=`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span>${/확인 필요/.test(x.hypothesis)?` <span class="badge b-중간">확신 낮음 · 의도 확인 필요</span>`:` <span class="badge b-obs">확신 중간</span>`} <span class="badge b-new">🆕 ${esc((x.first_seen||"").slice(5).replace("-","/"))} 첫 탐지</span> <span class="badge b-obs">${esc(x.team)}</span>${x.kind?` <span class="badge b-exp">${esc(x.kind)}</span>`:""}</div>
+    el.innerHTML=crumb(x)+`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span>${/확인 필요/.test(x.hypothesis)?` <span class="badge b-중간">확신 낮음 · 의도 확인 필요</span>`:` <span class="badge b-obs">확신 중간</span>`} <span class="badge b-new">🆕 ${esc((x.first_seen||"").slice(5).replace("-","/"))} 첫 탐지</span> <span class="badge b-obs">${esc(x.team)}</span>${x.kind?` <span class="badge b-exp">${esc(x.kind)}</span>`:""}</div>
       <h1>${esc(x.title)}</h1><p class="big">100명 중 <b>${x.n}</b>명 <span class="muted">(이 입구로 들어온 ${x.base}명 중)</span></p>
       ${x.steps?`<div class="bars" style="max-width:560px">${x.steps.map((s,i)=>`<div class="bar1"><span>${["①","②","③"][i]} ${esc(s.name)}</span><span class="tr"><i class="hot" style="width:${s.n/x.base*100}%"></i></span><span class="v">${s.n}명</span></div>`).join("")}</div>`:""}
       ${x.real?`<p class="realbox">실제 트래픽: ${esc(x.real)}</p>`:""}</div>
@@ -348,7 +365,7 @@ function renderDetail(){
           <ol class="journey">${A.timeline.map(l=>{const t=l.slice(0,5);const s=A.signals.find(z=>z.t===t&&z.shot);return `<li class="${/누름 → 변화 없음|가려|팝업|로그인|찾지 못|빈 페이지|연타|개인정보/.test(l)?"sig":""}"><span class="t">${t}</span><span>${esc(l.slice(6))}${s?` <button class="linkish" data-ashot="${esc(s.shot)}">화면</button>`:""}</span></li>`}).join("")}</ol></div>`:""}
       </div>${aiPane(x)}</div>`;
   } else {
-    el.innerHTML=`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span>${/확인 필요/.test(x.hypothesis)?` <span class="badge b-중간">확신 낮음 · 의도 확인 필요</span>`:` <span class="badge b-obs">확신 중간</span>`} <span class="badge b-new">🆕 ${esc((x.first_seen||"").slice(5).replace("-","/"))} 첫 탐지</span> <span class="badge b-obs">${esc(x.team)}</span></div>
+    el.innerHTML=crumb(x)+`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span>${/확인 필요/.test(x.hypothesis)?` <span class="badge b-중간">확신 낮음 · 의도 확인 필요</span>`:` <span class="badge b-obs">확신 중간</span>`} <span class="badge b-new">🆕 ${esc((x.first_seen||"").slice(5).replace("-","/"))} 첫 탐지</span> <span class="badge b-obs">${esc(x.team)}</span></div>
       <h1>${esc(x.title)}</h1><p class="big">최근 7일 <b>${fmtN(x.n)}</b>명 <span class="muted">· 지난주 ${fmtN(x.prev)}명 (${x.change>0?"+":""}${x.change}%)</span></p>
       <p class="imp">${esc(x.where)}</p>
       ${x.spike?`<p class="warn">⚡ 급증: ${esc(x.spike)}</p>`:""}
@@ -359,6 +376,7 @@ function renderDetail(){
         <p class="muted small" style="padding:0 14px 14px">세입자·임대인 합계, 하루 단위 고유 인원. 마지막 막대는 오늘이라 덜 쌓였어요.</p></div>${aiPane(x)}</div>`;
   }
 }
+function crumb(x){const tm=SUM_TEAMS.find(s=>inTeam(x,s));return `<div class="crumb"><button data-view="summary" data-crumbteam="${esc(tm||"")}">← ${esc(tm||"전체")} 제품별 요약</button><span class="muted">${branch==="신규"?"비로그인 방문자 (에이전트 실주행)":"로그인 고객 (실제 로그)"} › ${esc(x.title)}</span></div>`;}
 function selIssue(id){curId=id;curShot=0;curAgent=null;renderList();renderDetail();const r=document.querySelector(`[data-issue="${id}"]`);r&&r.scrollIntoView({block:"nearest"});}
 function jiraText(x){
   const lines=[`[${x.team}] ${x.title}`,"",`■ 영향`, branch==="신규"?`- 고객 에이전트 100명 중 ${x.n}명(이 입구 ${x.base}명 중)`:`- 최근 7일 ${x.n}명 · 지난주 ${x.prev}명 (${x.change}%)`];
@@ -375,18 +393,27 @@ const TEAM_AREA={"자리스테이팀":[["단기임대",["신규","기존"]],["�
  "그로스팀":[["혜택·리워드",["신규","기존","임대인"]]],"중개팀":[["실거주리뷰",["비로그인"]],["전월세 매물",["신규","기존"]]],"코어팀":[["커뮤니티",["임대인"]],["임대관리",["임대인"]]],"마스터팀":[["마스터",["비로그인"]]]};
 const TEAM_FUN={"환급팀":["환급"],"자리페이팀":["자리페이","고지서"],"자리스테이팀":["단기임대"]};
 const SUM_TEAMS=["자리스테이팀","환급팀","자리페이팀","그로스팀","중개팀","코어팀","마스터팀"];
-let sTeam=null;
+function teamStats(tm){const L=ALLISS().filter(x=>inTeam(x,tm));return {n:L.length,hot:L.filter(x=>x.sev==="높음").length,top:L.sort((a,b)=>({"높음":0,"중간":1,"낮음":2}[a.sev]-{"높음":0,"중간":1,"낮음":2}[b.sev]))[0]};}
+function renderTeamBar(){document.getElementById("gteam").innerHTML=`<span class="lab2">팀</span><button data-gteam="" aria-pressed="${!gTeam}">전체<span class="c">${ALLISS().length}</span></button>`+SUM_TEAMS.map(s=>{const st=teamStats(s);return `<button data-gteam="${s}" aria-pressed="${s===gTeam}">${s.replace("팀","")}<span class="c ${st.hot?"hot":""}">${st.n}</span></button>`}).join("");}
+function syncUrl(){try{const q=new URLSearchParams();if(gTeam)q.set("team",gTeam);if(curView!=="summary")q.set("view",curView);if(branch==="기가입")q.set("branch","existing");history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:""));}catch(e){}}
+function renderOverview(){
+  document.getElementById("v-summary").innerHTML=`<h2>제품별 요약 · 전체 팀</h2>
+    <p class="lead">팀 카드를 누르거나 맨 위 팀 버튼을 누르면 그 팀만 모아 봐요. 고른 팀은 「문제」「퍼널」「신규 기능 영향」 화면에도 그대로 적용돼요.</p>
+    <div class="how"><div><b>1. 팀 고르기</b>맨 위 팀 버튼 하나로 모든 화면이 그 팀으로 바뀌어요.</div><div><b>2. 문제 보기</b>「제품별 요약」에서 문제를 누르면 「문제」 화면으로, 문제 화면 왼쪽 위 「← 제품별 요약」으로 다시 돌아와요.</div><div><b>3. 처리하기</b>지라 초안 · 담당자 전달 · 이미 아는 문제 · 판독 ✅/❌</div></div>
+    <div class="ovgrid">${SUM_TEAMS.map(s=>{const st=teamStats(s);const f=D.features.filter(x=>x.team===s).length;return `<button class="ovcard" data-gteam="${s}"><h3>${esc(s)}</h3><span class="sm">문제 ${st.n}건${st.hot?` · <b class="down">높음 ${st.hot}</b>`:""} · 신규 기능 ${f}개</span>${st.top?`<span class="top1">${st.top.sev==="높음"?"🔴":st.top.sev==="중간"?"🟡":"⚪"} ${esc(st.top.title)}</span>`:`<span class="sm">이번 탐지에서 문제 없음</span>`}</button>`}).join("")}</div>`;
+}
 function wk(series,days){const n=days.length;let a=0,b=0;for(let i=n-8;i<n-1;i++)a+=series[i]||0;for(let i=n-15;i<n-8;i++)b+=series[i]||0;return [a,b];}
 function renderSummary(){
-  const t=sTeam||SUM_TEAMS[0]; const T=D.traffic;
+  if(!gTeam){renderOverview();return;}
+  const t=gTeam; const T=D.traffic;
   const iss=[...D.issuesNew.map(x=>({...x,br:"신규"})),...D.issuesExisting.map(x=>({...x,br:"기가입"}))].filter(x=>x.team.startsWith(t.replace("팀",""))||x.team.startsWith(t)).sort((a,b)=>({"높음":0,"중간":1,"낮음":2}[a.sev]-{"높음":0,"중간":1,"낮음":2}[b.sev])||(b.br==="기가입"?b.n:b.n*50)-(a.br==="기가입"?a.n:a.n*50));
   const feats=D.features.filter(f=>f.team===t); const rito=D.rito.items.filter(i=>i.team===t||i.team==="전체");
   const areas=(TEAM_AREA[t]||[]).map(([a,gs])=>{const s=T.days.map((_,i)=>gs.reduce((z,g)=>z+((T.data[g]||{})[a]||[])[i]||0,0));const [now,prev]=wk(s,T.days);return {a,gs,s,now,prev};});
   const funs=(TEAM_FUN[t]||[]).map(k=>({k,st:D.funnels[k]}));
   document.getElementById("v-summary").innerHTML=`<h2>제품별 요약</h2>
     <p class="lead">팀 하나의 문제·트래픽·퍼널·신규 기능·이상 신호를 한 화면에 모았어요. 항목을 누르면 자세한 화면으로 갑니다.</p>
-    <div class="how"><div><b>1. 내 팀 고르기</b>아래 팀 버튼(또는 슬랙의 팀 링크)으로 내 제품만 봐요.</div><div><b>2. 문제부터 보기</b>비로그인 방문자(에이전트가 직접 써 봄)·로그인 고객(실제 로그) 문제를 누르면 실제 화면·근거·개선안이 나와요.</div><div><b>3. 처리하기</b>문제 화면에서 지라 초안 만들기 · 담당자 전달 · 이미 아는 문제 · 판독 ✅/❌를 눌러요.</div></div>
-    <div class="teamtabs" role="group" aria-label="팀">${SUM_TEAMS.map(x=>`<button data-steam="${x}" aria-pressed="${x===t}">${x}</button>`).join("")}</div>
+    <div class="how"><div><b>1. 내 팀 고르기</b>맨 위 팀 버튼(또는 슬랙의 팀 링크)을 누르면 모든 화면이 내 팀으로 바뀌어요.</div><div><b>2. 문제부터 보기</b>비로그인 방문자(에이전트가 직접 써 봄)·로그인 고객(실제 로그) 문제를 누르면 실제 화면·근거·개선안이 나와요.</div><div><b>3. 처리하기</b>문제 화면에서 지라 초안 만들기 · 담당자 전달 · 이미 아는 문제 · 판독 ✅/❌를 눌러요.</div></div>
+    <div class="crumb"><button data-gteam="">← 전체 팀 보기</button><span class="muted">${esc(t)} · 위쪽 팀 버튼으로 다른 팀으로 바로 이동</span></div>
     <div class="sgrid"><div class="sbox"><h3>발견된 문제 ${iss.length}건</h3>
       ${iss.map(x=>`<button class="sitem" data-goissue="${x.id}" data-gobr="${x.br}"><span class="dot ${sevDot(x.sev)}"></span><span><span class="st">${esc(x.title)}</span><br><span class="sm">${x.br==="신규"?`비로그인 · 에이전트 실주행 100명 중 ${x.n}명`:`로그인 고객 · 실제 로그 최근 7일 ${fmtN(x.n)}명 (지난주 ${x.change>0?"+":""}${x.change}%)`}</span></span><span class="badge b-${esc(x.sev)}">${esc(x.sev)}</span></button>`).join("")||`<p class="muted small">이번 탐지에서 이 팀 문제는 없어요.</p>`}
     </div><div style="display:grid;gap:14px">
@@ -397,7 +424,6 @@ function renderSummary(){
     </div></div>
     <div class="limits"><b>이 대시보드가 아직 못 보는 것</b><br>· 로그인한 화면은 에이전트가 직접 들어가 보지 못해요(테스트 계정 또는 리토 Live View 연결 필요) — 로그인 고객 문제는 실제 로그로 봅니다.<br>· 앱 전용 화면, 광고 랜딩(refund-v0, Vercel) 방문은 자리톡 로그에 남지 않아요.<br>· 에이전트 주행은 하루 1회 100명 기준이라 드문 오류는 놓칠 수 있어요. 실제 로그 오류는 모두 잡혀요.<br>· 신규 기능 전후 비교는 인과가 아니에요. 데이터 기준: Redshift account_activity_log(11/13~11/27, 오늘은 부분), 에이전트 주행 2026-11-27.</div>`;
 }
-function teamBar(v){return `<div class="teamtabs" role="group" aria-label="팀 필터"><button data-tf="" data-tv="${v}" aria-pressed="${!sTeam}">전체 팀</button>${SUM_TEAMS.map(x=>`<button data-tf="${x}" data-tv="${v}" aria-pressed="${x===sTeam}">${x}</button>`).join("")}</div>`;}
 // ───── 트래픽
 let tGroup="기존";
 function renderTraffic(){
@@ -414,9 +440,9 @@ function renderTraffic(){
 }
 // ───── 퍼널
 function renderFunnel(){
-  const F=D.funnels, all=["환급","자리페이","단기임대","고지서"]; const order=sTeam&&TEAM_FUN[sTeam]?TEAM_FUN[sTeam]:all;
+  const F=D.funnels, all=["환급","자리페이","단기임대","고지서"]; const order=gTeam?(TEAM_FUN[gTeam]||[]):all;
   document.getElementById("v-funnel").innerHTML=`<h2>로그인 고객 퍼널 · 신규 vs 기존</h2>
-    ${teamBar("funnel")}<p class="lead">각 단계에 도달한 사람 수(이번 주 = 최근 7일, 오늘 일부 포함). 막대는 1단계 대비 비율, 괄호는 바로 앞 단계 대비 전환율, 화살표는 지난주 대비 변화예요. 신규 = 가입 7일 이내.</p>
+    <p class="lead">${gTeam?`<b>${esc(gTeam)}</b> 퍼널만 보여요(위쪽 「전체」로 모두 보기). `:""}${gTeam&&!TEAM_FUN[gTeam]?"이 팀은 로그로 묶은 퍼널이 아직 없어요. ":""}각 단계에 도달한 사람 수(이번 주 = 최근 7일, 오늘 일부 포함). 막대는 1단계 대비 비율, 괄호는 바로 앞 단계 대비 전환율, 화살표는 지난주 대비 변화예요. 신규 = 가입 7일 이내.</p>
     <div class="legend"><span><i style="background:var(--warn)"></i>신규</span><span><i style="background:var(--brand)"></i>기존</span></div>
     <div class="funnels">${order.map(k=>{const st=F[k];const s1n=st[0]["이번주_신규"]||1,s1e=st[0]["이번주_기존"]||1;
       return `<div class="fun"><h3>${esc(k)}</h3>${st.map((s,i)=>{const p=st[i-1];
@@ -428,9 +454,9 @@ function renderFunnel(){
 }
 // ───── 신규 기능
 function renderFeatures(){
-  const F=sTeam?D.features.filter(f=>f.team===sTeam):D.features;
+  const F=gTeam?D.features.filter(f=>f.team===gTeam):D.features;
   document.getElementById("v-features").innerHTML=`<h2>제품별 신규 기능과 영향 (최근 30일)</h2>
-    ${teamBar("features")}<p class="lead">최근 30일 안에 로그에 처음 나타난 행동 기록으로 새로 배포된 기능을 찾았어요. 11/19에 행동 종류가 701 → 749개로 늘어 큰 배포가 있었어요. 연결 지표는 도입 전 7일 평균 vs 도입 후 평균(오늘 제외)이고, 다른 변화와 겹치면 주의 문구를 붙였어요. <b>전후 비교는 인과가 아니에요.</b></p>
+    <p class="lead">${gTeam?`<b>${esc(gTeam)}</b> 기능 ${F.length}개만 보여요(위쪽 「전체」로 모두 보기). `:""}최근 30일 안에 로그에 처음 나타난 행동 기록으로 새로 배포된 기능을 찾았어요. 11/19에 행동 종류가 701 → 749개로 늘어 큰 배포가 있었어요. 연결 지표는 도입 전 7일 평균 vs 도입 후 평균(오늘 제외)이고, 다른 변화와 겹치면 주의 문구를 붙였어요. <b>전후 비교는 인과가 아니에요.</b></p>
     <div class="cards">${F.map(f=>{const i=f.days.indexOf(f.launch);const m=f.metric;
       return `<article class="fcard"><div class="meta">${f.launch.slice(5).replace("-","/")} 도입 · ${esc(f.team)}</div><h3>${esc(f.name)}</h3>
         <div class="kv3"><div><small>${esc(f.labels[0]||"본 사람")}(누적)</small><b>${fmtN(f.view_sum)}</b></div>${f.click_sum!=null&&f.labels[1]!==""?`<div><small>${esc(f.labels[1]||"누른 사람")}</small><b>${fmtN(f.click_sum)}</b></div><div><small>${esc(f.labels[2]||"누른 비율")}</small><b>${f.ctr!=null?f.ctr+"%":"-"}</b></div>`:""}</div>
@@ -466,15 +492,16 @@ function renderRito(){
     <ul class="small" style="line-height:1.8">${R.next.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
 }
 // ───── 공통
-function setView(v){document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));
+function setView(v){curView=v;syncUrl();document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));
   document.querySelectorAll(".vw").forEach(s=>{const on=s.id==="v-"+v; s.hidden=!on; if(s.id==="v-issues") s.style.display=on?"grid":"none";});
   ({summary:renderSummary,traffic:renderTraffic,funnel:renderFunnel,features:renderFeatures,agents:renderAgents,rito:renderRito})[v]?.();}
 document.addEventListener("click",e=>{const t=e.target;
-  const vb=t.closest("[data-view]"); if(vb){setView(vb.dataset.view);return;}
-  const tfb=t.closest("[data-tf]"); if(tfb){sTeam=tfb.dataset.tf||null;setView(tfb.dataset.tv);return;}
-  const stb=t.closest("[data-steam]"); if(stb){sTeam=stb.dataset.steam;try{history.replaceState(null,"","?team="+encodeURIComponent(sTeam))}catch(e){};renderSummary();return;}
-  const gi=t.closest("[data-goissue]"); if(gi){branch=gi.dataset.gobr;team="전체";renderFilters();setView("issues");selIssue(gi.dataset.goissue);return;}
-  const bb=t.closest("[data-branch]"); if(bb){branch=bb.dataset.branch;renderFilters();selIssue(ISS()[0]?.id);return;}
+  const vb=t.closest("[data-view]"); if(vb){if(vb.dataset.crumbteam){gTeam=vb.dataset.crumbteam;renderTeamBar();}setView(vb.dataset.view);return;}
+  const gtb=t.closest("[data-gteam]"); if(gtb){gTeam=gtb.dataset.gteam||null;renderTeamBar();curId=null;
+    if(!ISS().length){const o=branch==="신규"?"기가입":"신규";if((o==="신규"?D.issuesNew:D.issuesExisting).some(x=>inTeam(x,gTeam))){branch=o;}}
+    renderFilters();selIssue(ISS()[0]?.id);setView(curView);return;}
+  const gi=t.closest("[data-goissue]"); if(gi){branch=gi.dataset.gobr;renderFilters();setView("issues");selIssue(gi.dataset.goissue);return;}
+  const bb=t.closest("[data-branch]"); if(bb){branch=bb.dataset.branch;renderFilters();selIssue(ISS()[0]?.id);syncUrl();return;}
   const ib=t.closest("[data-issue]"); if(ib){selIssue(ib.dataset.issue);return;}
   const sb=t.closest("[data-shot]"); if(sb){curShot=+sb.dataset.shot;curAgent=ISS().find(y=>y.id===curId).shots[curShot].agent;renderDetail();return;}
   const ab=t.closest("[data-agent]"); if(ab){curAgent=ab.dataset.agent;const x=ISS().find(y=>y.id===curId);const k=x.shots.findIndex(s=>s.agent===curAgent);if(k>=0)curShot=k;renderDetail();return;}
@@ -485,7 +512,6 @@ document.addEventListener("click",e=>{const t=e.target;
   const ac=t.closest("[data-act]"); if(ac){const k="act:"+curId;const v=getS(k)===ac.dataset.act?null:ac.dataset.act;setS(k,v);renderList();renderDetail();if(v==="send")toast("실제로는 담당 팀 채널에 스레드로 올리고 담당자를 태그합니다.");if(v==="known")toast("내일부터 이 문제는 「이미 앎」으로 아래로 내립니다.");return;}
   const fb=t.closest("[data-k]"); if(fb){const k="fb:"+curId;const v=getS(k)===fb.dataset.k?null:fb.dataset.k;setS(k,v);renderDetail();toast(v==="n"?"틀린 판독은 다음 판독 기준에 반영합니다.":"고마워요.");return;}
 });
-document.getElementById("teamSel").addEventListener("change",e=>{team=e.target.value;selIssue(ISS()[0]?.id);});
 document.addEventListener("keydown",e=>{if(document.getElementById("jira").open||(e.target.matches&&e.target.matches("input,select,textarea"))||document.getElementById("v-issues").hidden) return;
   const L=ISS().map(x=>x.id),p=L.indexOf(curId);
   if(e.key==="ArrowDown"){e.preventDefault();selIssue(L[Math.min(p+1,L.length-1)]);} else if(e.key==="ArrowUp"){e.preventDefault();selIssue(L[Math.max(p-1,0)]);}
@@ -494,7 +520,8 @@ document.getElementById("jiraClose").addEventListener("click",()=>document.getEl
 document.getElementById("jiraCopy").addEventListener("click",async()=>{const ta=document.getElementById("jiraTxt");try{await navigator.clipboard.writeText(ta.value);toast("복사했어요.");}catch(e){ta.select();toast("선택했어요. Cmd+C로 복사하세요.");}});
 document.getElementById("stamp").textContent=D.meta.stamp;
 const q=new URLSearchParams(location.search); if(q.get("branch")==="existing") branch="기가입";
-const qt=q.get("team"); if(qt){ const m=SUM_TEAMS.find(x=>x===qt||x.startsWith(qt)); if(m) sTeam=m; }
-renderFilters(); selIssue(ISS()[0]?.id); setView(q.get("view")|| (qt?"summary":"summary"));
+const qt=q.get("team"); if(qt){ const m=SUM_TEAMS.find(x=>x===qt||x.startsWith(qt)); if(m) gTeam=m; }
+if(gTeam&&!ISS().length&&D.issuesExisting.some(x=>inTeam(x,gTeam))&&branch==="신규") branch="기가입";
+renderTeamBar(); renderFilters(); selIssue(ISS()[0]?.id); setView(q.get("view")||"summary");
 </script>
 </body></html>
