@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
+<title>클래리티 리뷰 에이전트</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 레이아웃: 위에서 아래로 「지금 → 선별 실험 → 팀별 보고」 3단, 오른쪽에 녹화 기록 서랍 */
+:root{
+  --bg:#f5f7fb; --panel:#ffffff; --line:#dfe3ec; --fg:#1d2230; --muted:#6b7385;
+  --brand:#2c7fff; --brand-soft:#e6efff; --deep:#1e45ac;
+  --hot:#d6453d; --hot-soft:#fde9e7; --warn:#b7791f; --warn-soft:#fdf3dc; --ok:#2f9e4f; --ok-soft:#e3f6e8; --idle:#8a90a0; --idle-soft:#eef0f4;
+  --slack:#ffffff; --slack-fg:#1d1c1d; --mention:#e8f5fa; --mention-fg:#1264a3;
+  --sans:"Pretendard Variable",Pretendard,"Noto Sans KR",-apple-system,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151c; --panel:#1a1e27; --line:#2c3240; --fg:#e7eaf1; --muted:#9aa2b4;
+  --brand:#5b9bff; --brand-soft:#1f2c47; --deep:#9ec0ff;
+  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#262b36;
+  --slack:#1a1d21; --slack-fg:#d1d2d3; --mention:#1d3a4d; --mention-fg:#7fc3ec; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151c; --panel:#1a1e27; --line:#2c3240; --fg:#e7eaf1; --muted:#9aa2b4;
+  --brand:#5b9bff; --brand-soft:#1f2c47; --deep:#9ec0ff;
+  --hot:#ff7a70; --hot-soft:#3a1f1f; --warn:#e6b75a; --warn-soft:#3a2f17; --ok:#5cc97a; --ok-soft:#1b3324; --idle:#8a90a0; --idle-soft:#262b36;
+  --slack:#1a1d21; --slack-fg:#d1d2d3; --mention:#1d3a4d; --mention-fg:#7fc3ec; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:36px}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:28px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:20px;font-weight:700;letter-spacing:-.01em}
+h3{font-size:15px;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{display:grid;gap:10px}
+.tag{display:inline-flex;align-items:center;gap:6px;width:fit-content;font-size:12px;font-weight:500;letter-spacing:.02em;
+  padding:3px 10px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.step{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.step b{font-family:var(--mono);color:var(--brand);font-weight:500}
+section{display:grid;gap:14px}
+.sec-head{display:grid;gap:4px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.cmp{grid-template-columns:1fr}}
+.cmp .label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+/* 슬랙 미리보기 */
+.slack{background:var(--slack);color:var(--slack-fg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.55;min-width:0}
+.slack .who{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.slack .ava{width:32px;height:32px;border-radius:6px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.slack .name{font-weight:700}
+.slack .time{font-size:12px;color:var(--muted)}
+.slack a,.linkish{color:var(--mention-fg);text-decoration:none;cursor:pointer;background:none;border:0;padding:0;font:inherit}
+.slack a:hover,.linkish:hover{text-decoration:underline}
+.mention{background:var(--mention);color:var(--mention-fg);border-radius:3px;padding:0 2px}
+.slack ol{margin:6px 0;padding-left:22px}
+.issue{border-left:3px solid var(--line);padding:6px 0 6px 12px;margin:12px 0;display:grid;gap:3px}
+.issue.sev-높음{border-left-color:var(--hot)} .issue.sev-중간{border-left-color:var(--warn)} .issue.sev-낮음{border-left-color:var(--idle)}
+.issue .t{font-weight:700}
+.issue .row{display:grid;grid-template-columns:72px 1fr;gap:6px}
+.issue .row span:first-child{color:var(--muted);font-size:13px}
+.fb{display:flex;gap:6px;margin-top:6px}
+.fb button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:2px 10px;cursor:pointer}
+.fb button[aria-pressed="true"].yes{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.fb button[aria-pressed="true"].no{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+/* 조절판 */
+.lab{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
+@media (max-width:860px){.lab{grid-template-columns:1fr}}
+.ctrl{display:grid;gap:14px}
+.ctrl .item{display:grid;gap:4px}
+.ctrl label{display:flex;justify-content:space-between;font-size:13px}
+.ctrl input[type=range]{width:100%;accent-color:var(--brand)}
+.ctrl .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px}
+.ctrl button.reset{font:inherit;font-size:13px;border:1px solid var(--line);background:none;color:var(--fg);border-radius:8px;padding:6px 10px;cursor:pointer;width:fit-content}
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-sig{background:var(--hot-soft);color:var(--hot)} .p-exp{background:var(--brand-soft);color:var(--deep)}
+.p-idle{background:var(--idle-soft);color:var(--idle)} .p-low{background:var(--idle-soft);color:var(--idle)}
+.tblwrap{overflow-x:auto;min-width:0}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.02em}
+td.mono,th{white-space:nowrap}
+td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:11px;padding:1px 6px;border-radius:4px;background:var(--idle-soft);color:var(--fg);font-family:var(--mono)}
+.chip.on{background:var(--hot-soft);color:var(--hot)}
+.rowbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--mention-fg);cursor:pointer;padding:0;font-family:var(--mono)}
+.note{font-size:13px;padding:8px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn)}
+/* 팀 탭 */
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:5px 14px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.tabs .n{font-family:var(--mono);font-size:12px;opacity:.8;margin-left:4px}
+/* 서랍 */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--panel);border-left:1px solid var(--line);
+  padding:calc(20px + env(safe-area-inset-top,0px)) calc(20px + env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) 20px;
+  overflow-y:auto;box-shadow:-12px 0 32px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .2s ease;z-index:20;display:grid;gap:14px;align-content:start;visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+.drawer .x{justify-self:end;font:inherit;border:1px solid var(--line);background:none;color:var(--fg);border-radius:8px;padding:4px 10px;cursor:pointer}
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.tl li{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:6px 8px;border-radius:6px;font-size:13px}
+.tl li .ts{font-family:var(--mono);color:var(--muted)}
+.tl li.hit{background:var(--hot-soft)}
+.tl li.hit .ts{color:var(--hot);font-weight:500}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+footer{font-size:13px;color:var(--muted);display:grid;gap:4px}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header>
+    <span class="tag">체험판 · 가짜 녹화 10개로 돌린 결과</span>
+    <h1>클래리티 리뷰 에이전트</h1>
+    <p class="muted">매일 아침 녹화 링크 10개를 보내던 데일리 리뷰를, AI가 먼저 보고 「무엇이 왜 문제인지」까지 보내는 방식으로 바꾸는 시제품입니다.</p>
+    <div class="steps" aria-label="처리 순서">
+      <span class="step"><b>1</b>문제 신호로 녹화 받기</span>
+      <span class="step"><b>2</b>점수 매기기</span>
+      <span class="step"><b>3</b>신호 상위 + 탐색 몫 고르기</span>
+      <span class="step"><b>4</b>AI가 행동 기록 판독</span>
+      <span class="step"><b>5</b>팀 담당자에게 보고</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>지금 리포트와 바뀐 리포트</h2>
+      <p class="muted">같은 자리페이팀 기준입니다. 왼쪽은 2026-11-27 실제 리포트 형식, 오른쪽은 에이전트 결과입니다.</p></div>
+    <div class="cmp">
+      <div><div class="label">지금</div>
+        <div class="slack">
+          <div class="who"><div class="ava">콜</div><div><span class="name">콜독(리포팅)</span> <span class="time">오전 9:00</span></div></div>
+          <div><b>[자리페이팀]</b> <span class="mention">@블루</span> · <span class="mention">@자리페이팀</span></div>
+          <ol>
+            <li><a>보기</a> (6분15초 · 경로: /pay)</li><li><a>보기</a> (4분42초 · 경로: /pay)</li><li><a>보기</a> (15분01초 · 경로: /pay)</li>
+            <li><a>보기</a> (14분46초 · 경로: /pay)</li><li><a>보기</a> (6분34초 · 경로: /pay)</li><li class="muted">… 10개까지</li>
+          </ol>
+          <div>확인해주셨으면 쓰레드에 확인했음을 남겨주세요.</div>
+        </div>
+        <p class="muted" style="font-size:13px;margin-top:8px">왜 봐야 하는지 없음 · 10개를 처음부터 재생해야 함</p>
+      </div>
+      <div><div class="label">바뀐 뒤</div><div id="cmpNew"></div>
+        <p class="muted" style="font-size:13px;margin-top:8px">같은 원인 녹화를 묶음 · 문제 순간부터 재생 · 개선안까지</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>어떤 녹화를 AI에게 보낼지 직접 조절해 보기</h2>
+      <p class="muted">가중치를 바꾸면 점수와 선별 결과가 바로 바뀝니다. 행을 누르면 그 녹화의 행동 기록이 열립니다.</p></div>
+    <div class="lab">
+      <div class="panel ctrl" id="ctrl"></div>
+      <div class="panel" style="min-width:0">
+        <div class="summary" id="sum"></div>
+        <div class="note" id="note" hidden>설정이 기본값과 달라요. 아래 팀별 보고는 기본값으로 판독한 결과라, 실제 운영에서는 바뀐 선별로 다시 판독합니다.</div>
+        <div class="tblwrap"><table>
+          <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
+          <tbody id="rows"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>팀별로 받는 슬랙 보고</h2>
+      <p class="muted">「부터 보기」를 누르면 실제로는 클래리티 녹화가 그 시각부터 열립니다. 체험판에서는 행동 기록에서 그 순간을 빨갛게 보여 줍니다. ✅/❌ 는 다음 판독 기준에 쓰는 피드백입니다.</p></div>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="teamMsg"></div>
+  </section>
+
+  <footer>
+    <p>판독 모델: Claude Haiku, 팀당 1회 호출. 녹화 데이터는 실제 자리톡 경로를 본뜬 가짜 데이터입니다.</p>
+    <p>실데이터 연결에 필요한 것: 자리톡 클래리티 프로젝트 멤버 권한, 녹화 목록 API 응답 필드 확인, 실제 녹화 20개를 사람이 본 결과와 비교.</p>
+  </footer>
+</div>
+
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="녹화 행동 기록">
+  <button class="x" id="dx">닫기</button>
+  <div id="dbody"></div>
+</aside>
+
+<script>
+const SESSIONS = [{"sessionId": "m01", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m01", "durationSec": 372, "device": "Mobile", "entry": "/pay", "exit": "/pay/card", "signals": {"rage": 2, "dead": 5, "quickback": 0, "jsErrors": ["TypeError: Cannot read properties of undefined (reading 'cardCompany')"], "clickErrors": 1}, "timeline": ["00:00 /pay 진입", "00:41 '카드 등록' 클릭", "00:43 /pay/card", "01:10 카드사 선택 드롭다운 클릭 x4 (rage)", "01:12 JS 오류 cardCompany undefined", "01:30 '다음' 버튼 클릭 반응 없음 (dead) x3", "02:05 뒤로가기", "06:12 이탈"]}, {"sessionId": "m02", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m02", "durationSec": 290, "device": "Mobile", "entry": "/pay", "exit": "/pay/card", "signals": {"rage": 1, "dead": 3, "quickback": 0, "jsErrors": ["TypeError: Cannot read properties of undefined (reading 'cardCompany')"], "clickErrors": 1}, "timeline": ["00:00 /pay 진입", "00:30 '카드 등록' 클릭", "00:31 /pay/card", "00:55 카드사 선택 클릭 x3 (rage)", "00:56 JS 오류 cardCompany undefined", "01:20 '다음' 클릭 반응 없음 (dead) x2", "04:50 이탈"]}, {"sessionId": "m03", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m03", "durationSec": 410, "device": "Mobile", "entry": "/pay", "exit": "/pay/complete", "signals": {"rage": 0, "dead": 0, "quickback": 0, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /pay 진입", "00:20 '카드 등록' 클릭", "01:40 카드 정보 입력", "03:10 결제", "06:50 /pay/complete 완료"]}, {"sessionId": "m04", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m04", "durationSec": 615, "device": "Mobile", "entry": "/order", "exit": "/order", "signals": {"rage": 0, "dead": 6, "quickback": 2, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /order 진입", "00:30 '청소 날짜' 텍스트 클릭 (dead) x3", "01:10 스크롤 위아래 반복 (excessive scroll)", "02:00 '예상 금액' 라벨 클릭 (dead) x3", "02:40 /estimate/select-service 갔다가 3초 만에 뒤로 (quickback) x2", "10:15 이탈"]}, {"sessionId": "m05", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m05", "durationSec": 540, "device": "Mobile", "entry": "/order", "exit": "/order", "signals": {"rage": 0, "dead": 4, "quickback": 1, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /order 진입", "00:45 '예상 금액' 라벨 클릭 (dead) x4", "01:30 /estimate/select-service 갔다가 2초 만에 뒤로 (quickback)", "09:00 이탈"]}, {"sessionId": "m06", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m06", "durationSec": 968, "device": "Mobile", "entry": "/point-shop", "exit": "/point-shop", "signals": {"rage": 0, "dead": 0, "quickback": 0, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /point-shop 진입", "00:10 상품 목록 스크롤", "16:08 이탈 (입력·클릭 거의 없음, 화면 켜둔 채 방치 추정)"]}, {"sessionId": "m07", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m07", "durationSec": 180, "device": "Mobile", "entry": "/point-shop", "exit": "/point-shop/exchange", "signals": {"rage": 3, "dead": 2, "quickback": 0, "jsErrors": [], "clickErrors": 2}, "timeline": ["00:00 /point-shop 진입", "00:40 '교환하기' 클릭", "00:41 /point-shop/exchange", "00:50 '교환하기' 클릭 x5 (rage), 클릭 오류 2회", "01:05 '포인트 부족' 문구 위 클릭 (dead) x2", "03:00 이탈"]}, {"sessionId": "m08", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m08", "durationSec": 730, "device": "Mobile", "entry": "/vacancy", "exit": "/vacancy", "signals": {"rage": 0, "dead": 2, "quickback": 3, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /vacancy 진입", "00:20 필터 '보증금' 클릭", "00:25 매물 상세 → 2초 만에 뒤로 (quickback) x3", "01:40 지도 핀 클릭 (dead) x2", "12:10 이탈"]}, {"sessionId": "m09", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m09", "durationSec": 1120, "device": "PC", "entry": "/host/building/", "exit": "/host/contract/upload", "signals": {"rage": 1, "dead": 1, "quickback": 0, "jsErrors": ["Error: upload failed 413"], "clickErrors": 1}, "timeline": ["00:00 /host/building/ 진입", "02:00 /host/contract/upload", "02:30 계약서 파일 선택", "02:31 JS 오류 upload failed 413", "02:40 '업로드' 클릭 x3 (rage)", "03:10 다른 파일 선택", "03:11 JS 오류 upload failed 413", "18:40 이탈"]}, {"sessionId": "m10", "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m10", "durationSec": 600, "device": "Mobile", "entry": "/short-term-vacancy", "exit": "/stay", "signals": {"rage": 0, "dead": 0, "quickback": 0, "jsErrors": [], "clickErrors": 0}, "timeline": ["00:00 /short-term-vacancy 진입", "00:30 날짜 선택", "01:10 /stay 상세", "02:00 사진 넘김 x14", "04:00 '문의하기' 위치까지 스크롤 후 멈춤 30초", "10:00 이탈 (문의 미클릭)"]}];
+const ISSUES = {"자리스테이팀": [{"title": "문의하기 버튼 앞에서 30초 멈춘 뒤 문의 없이 이탈", "sessions": ["m10"], "moment": "m10 04:00", "evidence": "'문의하기' 위치까지 스크롤 후 멈춤 30초 → 10:00 이탈(문의 미클릭). 신호 rage 0, dead 0, quickback 0, JS 오류 없음. 04:30~10:00 기록 없음(확인 필요).", "hypothesis": "문의 전에 판단할 정보가 부족해 망설였을 가능성. 예: 가격, 계약 조건, 입주 가능 여부. 버튼 문구나 문의 후 절차가 불명확했을 수도 있음. 확인 필요: 기록만으로 원인을 특정할 수 없음.", "suggestion": "문의하기 버튼 근처(하단 고정 바 포함)에 가격·입주 조건·문의 후 응답 시간을 한 줄로 표시. 버튼 문구를 행동이 드러나는 말로 변경(예: '입주 조건 문의하기'). A/B 테스트로 검증.", "severity": "중간"}, {"title": "사진 14장 연속 넘김, 공간 정보 반복 탐색", "sessions": ["m10"], "moment": "m10 02:00", "evidence": "02:00 사진 넘김 x14. 상세 진입(01:10) 약 50초 뒤 시작. 신호 없음. 여러 장을 반복해서 보는 탐색 행동.", "hypothesis": "사진만으로 공간 크기·구성·위치를 알기 어려워 여러 장을 반복해서 본 것으로 보임. 확인 필요: 사진 순서나 설명 문구 부족이 원인인지 기록으로는 확인 불가.", "suggestion": "사진 상단에 공간 요약(평수·방 수·침대 형태·층) 고정 표시. 사진 순서를 외관→내부→주변 순으로 재배열. 사진마다 짧은 캡션 추가.", "severity": "낮음"}], "마스터팀": [{"title": "/order 「예상 금액」 라벨 무반응 후 다음 단계에서 즉시 복귀", "sessions": ["m04", "m05"], "moment": "m05 00:45", "evidence": "m05 00:45 '예상 금액' 라벨 클릭 (dead) x4 → 01:30 /estimate/select-service 진입 후 2초 만에 뒤로 (quickback). m04 02:00 '예상 금액' 라벨 클릭 (dead) x3 → 02:40 /estimate/select-service 3초 만에 뒤로 (quickback) x2.", "hypothesis": "사용자는 /order에서 예상 금액을 보려 했으나 라벨이 탭에 반응하지 않았고, 금액 확인 경로가 보이지 않아 다음 단계로 넘어갔다가 기대와 달라 되돌아온 것으로 보임. 확인 필요: 금액이 /order 화면에 표시되는지, select-service 화면에서 금액을 볼 수 있는지는 기록만으로 판단할 수 없음.", "suggestion": "'예상 금액' 자리에 현재 계산 금액을 직접 노출하고, 금액이 없을 때는 '청소 날짜와 서비스를 고르면 표시돼요' 문구를 표시한다. 라벨 탭 시 금액 산출 기준을 펼쳐 보여주는 영역으로 바꾼다. 탭 반응이 없는 라벨은 비활성 스타일로 바꾸거나 버튼 형태로 바꾼다.", "severity": "높음"}, {"title": "/order 「청소 날짜」 입력 방법 불명확, 텍스트 반복 클릭과 위아래 스크롤", "sessions": ["m04"], "moment": "m04 00:30", "evidence": "00:30 '청소 날짜' 텍스트 클릭 (dead) x3 → 01:10 스크롤 위아래 반복 (excessive scroll).", "hypothesis": "날짜 선택 컨트롤이 '청소 날짜' 텍스트와 떨어져 있거나 탭 영역이 작아 사용자가 입력 위치를 찾지 못한 것으로 보임. 확인 필요: 단일 세션 기록이라 날짜 컨트롤의 위치와 크기를 화면에서 직접 확인해야 함.", "suggestion": "'청소 날짜' 라벨 전체 영역을 탭 가능하게 만들고, 우측에 캘린더 아이콘과 '날짜를 선택해 주세요' placeholder를 함께 표시한다.", "severity": "중간"}], "그로스팀": [{"title": "포인트 부족인데 교환 버튼이 눌려서 반복 클릭 후 이탈", "sessions": ["m07"], "moment": "m07 00:50", "evidence": "00:50 '교환하기' 클릭 x5 (rage), 클릭 오류 2회 / 01:05 '포인트 부족' 문구 위 클릭 (dead) x2 / 03:00 이탈 (JS 오류 없음)", "hypothesis": "교환 버튼이 포인트 부족 상태에서도 활성처럼 보인다. 사용자는 누르면 진행될 것으로 보고 반복 클릭한다. 반응이 없으니 '포인트 부족' 문구를 누르지만 문구는 링크가 아니다. 클릭 오류 2회의 원인은 확인 필요(버튼 비활성 처리 누락 또는 서버 검증 실패 가능).", "suggestion": "교환 화면 문구·상태 수정: (1) 보유 포인트가 필요 포인트보다 적으면 '교환하기' 버튼을 회색 비활성으로 바꾼다. (2) 버튼 바로 위에 '필요 ○P · 보유 ○P · ○P 더 필요해요' 문구를 표시한다(○는 화면 데이터로 채움). (3) 같은 문구를 탭하면 포인트 적립 화면으로 가는 링크로 만든다.", "severity": "높음"}], "중개팀": [{"title": "보증금 필터 후 매물 상세 2초 내 이탈 반복", "sessions": ["m08"], "moment": "m08 00:25", "evidence": "매물 상세 → 2초 만에 뒤로 (quickback) x3 (필터 '보증금' 클릭 00:20 직후)", "hypothesis": "필터 결과 카드의 보증금 정보와 상세 페이지 내용이 달라 기대와 어긋남. 확인 필요: 상세 로딩 지연 여부는 기록에 없음", "suggestion": "필터 결과 카드에 보증금 금액을 크게 표시하고, 상세 상단에 '보증금 ○○만원 · 필터 조건 일치' 한 줄을 고정 노출", "severity": "높음"}, {"title": "지도 핀 클릭 무반응", "sessions": ["m08"], "moment": "m08 01:40", "evidence": "지도 핀 클릭 (dead) x2", "hypothesis": "핀이 탭 가능해 보이나 클릭이 상세·목록과 연결되지 않음. 확인 필요: 핀 클릭 핸들러 존재 여부는 기록으로 판단 불가", "suggestion": "핀 탭 시 하단에 미니 매물 카드를 띄우고, 카드 탭 시 상세로 이동. 탭한 핀은 선택 색으로 바꿔 반응을 보여줌", "severity": "중간"}], "자리페이팀": [{"title": "카드사 선택 드롭다운 무반응으로 카드 등록 중 이탈 (JS 오류 cardCompany undefined)", "sessions": ["m01", "m02"], "moment": "m01 01:10", "evidence": "m01: 01:10 카드사 드롭다운 클릭 x4(rage) → 01:12 JS 오류 'cardCompany undefined' → 01:30 '다음' 클릭 반응 없음(dead) x3 → 02:05 뒤로가기 → 06:12 이탈. m02: 00:55 카드사 선택 클릭 x3(rage) → 00:56 동일 JS 오류 → 01:20 '다음' 반응 없음(dead) x2 → 04:50 이탈. 두 녹화 모두 /pay/card에서 같은 오류, 같은 순서로 막힘.", "hypothesis": "카드사 목록 데이터(cardCompany)가 로드되지 않았거나 undefined 상태에서 드롭다운이 열려 선택이 저장되지 않는 것으로 보임. 그 결과 카드사가 선택되지 않아 '다음'이 동작하지 않음. 오류와 rage 클릭의 시간 순서는 일치하나 인과 관계는 코드·네트워크 기록으로 확인 필요.", "suggestion": "(1) 카드사 목록 로딩 전·실패 시 드롭다운 자리에 '카드사 목록을 불러오는 중' 표시 후, 실패하면 '카드사 목록을 불러오지 못했어요. 다시 시도' 버튼 노출. (2) 카드사 미선택 상태에서는 '다음'을 비활성화하고 그 아래에 '카드사를 선택해 주세요' 안내 문구 표시. (3) 실패 시 오류 수집 도구로 cardCompany 접근 지점 확인 (확인 필요).", "severity": "높음"}], "코어팀": [{"title": "계약서 업로드 실패(413) 후 재시도 불가·이탈", "sessions": ["m09"], "moment": "m09 02:40", "evidence": "02:31 JS 오류 'upload failed 413' → 02:40 '업로드' 클릭 x3 (rage) → 03:10 다른 파일 선택 → 03:11 같은 JS 오류 'upload failed 413' → 18:40 이탈. 02:31과 03:11 사이 클릭 외 행동 없음. 03:11 이후 15분 40초 동안 기록 없음. 녹화 1개만 있어 묶인 녹화 수는 1개.", "hypothesis": "파일 크기가 서버·게이트웨이 업로드 한도(413 Payload Too Large)를 넘는 것으로 보임. 클라이언트가 선택 시점에 용량을 검사하지 않아 사용자는 업로드 버튼을 반복 클릭하고 다른 파일로 재시도함. 화면에 실패 사유가 표시됐는지는 기록으로 알 수 없음. 확인 필요: 실제 허용 용량 한도, 413을 내는 계층(앱 서버·프록시·CDN), 실패 시 화면 메시지 노출 여부, 03:11~18:40 사이 행동.", "suggestion": "1) 파일 선택 직후 용량·형식을 검사하고, 한도를 넘으면 '최대 ○MB까지 업로드할 수 있어요. 파일을 줄이거나 사진으로 올려 주세요'를 버튼 옆에 표시. 2) 업로드 중에는 버튼을 비활성화하고 진행률 표시(중복 클릭 차단). 3) 413 등 실패 시 '업로드에 실패했어요. 다시 시도하거나 고객센터에 문의해 주세요' 문구와 문의 경로 노출. 4) 계약서 PDF 용량 한도 상향 또는 용량 가이드 문구를 업로드 화면 상단에 미리 안내.", "severity": "높음"}]};
+const TEAMS = [{"name": "중개팀", "urls": ["/vacancy", "/real-residence-review"]}, {"name": "자리페이팀", "urls": ["/pay"]}, {"name": "그로스팀", "urls": ["/point-shop", "/benefit"]}, {"name": "마스터팀", "urls": ["/order", "/estimate"]}, {"name": "자리스테이팀", "urls": ["/short-term-vacancy", "/my/room/short-term", "/stay"]}, {"name": "환급팀", "urls": ["/refund"]}, {"name": "코어팀", "urls": ["/host/building", "/host/contract"]}];
+const DEF = {rage:3, dead:1, quickback:2, jsErrors:5, clickErrors:2, top:8, explore:2, idle:true};
+let cfg = {...DEF};
+const LABEL = {rage:"분노 클릭", dead:"반응 없는 클릭", quickback:"바로 뒤로가기", jsErrors:"JS 오류", clickErrors:"클릭 오류"};
+const byId = Object.fromEntries(SESSIONS.map(s=>[s.sessionId,s]));
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = sec => `${Math.floor(sec/60)}분${String(sec%60).padStart(2,"0")}초`;
+
+function team(s){const p=[s.entry,s.exit,...s.timeline].join(" ");return TEAMS.find(t=>t.urls.some(u=>p.includes(u)));}
+function cnt(s,k){const v=s.signals[k];return Array.isArray(v)?v.length:v;}
+function score(s){
+  let b=0; for(const k of Object.keys(LABEL)) b+=cfg[k]*cnt(s,k);
+  const idle = s.durationSec>600 && s.timeline.length<=3;
+  if(cfg.idle && idle) b-=5;
+  return {v:b, idle};
+}
+function select(){
+  const out={}; // id -> {status, score}
+  const groups={};
+  for(const s of SESSIONS){const t=team(s); if(!t) continue; (groups[t.name] ||= []).push(s);}
+  for(const [name,ss] of Object.entries(groups)){
+    const ranked=ss.map(s=>({s,...score(s)})).sort((a,b)=>b.v-a.v);
+    const hot=ranked.filter(r=>r.v>0).slice(0,cfg.top);
+    const calm=ranked.filter(r=>r.v<=0 && !r.s.exit.includes("complete") && r.s.timeline.length>3).slice(0,cfg.explore);
+    for(const r of ranked){
+      let st="low";
+      if(hot.includes(r)) st="sig"; else if(calm.includes(r)) st="exp"; else if(r.idle && cfg.idle) st="idle";
+      else if(r.s.exit.includes("complete")) st="done";
+      out[r.s.sessionId]={st,v:r.v,team:name};
+    }
+  }
+  return out;
+}
+const ST = {sig:["p-sig","신호로 선별"],exp:["p-exp","탐색 몫"],idle:["p-idle","제외: 방치"],done:["p-low","제외: 완료"],low:["p-low","제외: 신호 없음"]};
+
+function renderCtrl(){
+  const c=document.getElementById("ctrl");
+  c.innerHTML = `<h3>점수 가중치</h3>` + Object.keys(LABEL).map(k=>`
+    <div class="item"><label for="w-${k}"><span>${LABEL[k]}</span><span class="mono" id="v-${k}">×${cfg[k]}</span></label>
+    <input type="range" id="w-${k}" min="0" max="10" step="1" value="${cfg[k]}"></div>`).join("") + `
+    <h3>고르는 수 (팀당)</h3>
+    <div class="item"><label for="w-top"><span>신호 상위</span><span class="mono" id="v-top">${cfg.top}개</span></label><input type="range" id="w-top" min="1" max="10" value="${cfg.top}"></div>
+    <div class="item"><label for="w-explore"><span>탐색 몫</span><span class="mono" id="v-explore">${cfg.explore}개</span></label><input type="range" id="w-explore" min="0" max="3" value="${cfg.explore}"></div>
+    <label class="chk" for="w-idle"><input type="checkbox" id="w-idle" ${cfg.idle?"checked":""}><span>10분 넘게 켜두고 행동이 3개 이하인 녹화 감점 (방치 녹화)</span></label>
+    <button class="reset" id="reset">기본값으로</button>`;
+  for(const k of [...Object.keys(LABEL),"top","explore"]){
+    document.getElementById("w-"+k).addEventListener("input",e=>{cfg[k]=+e.target.value;
+      document.getElementById("v-"+k).textContent = (k==="top"||k==="explore")?`${cfg[k]}개`:`×${cfg[k]}`; renderTable();});
+  }
+  document.getElementById("w-idle").addEventListener("change",e=>{cfg.idle=e.target.checked;renderTable();});
+  document.getElementById("reset").addEventListener("click",()=>{cfg={...DEF};renderCtrl();renderTable();});
+}
+function renderTable(){
+  const sel=select();
+  const rows=SESSIONS.filter(s=>sel[s.sessionId]).sort((a,b)=>sel[a.sessionId].team.localeCompare(sel[b.sessionId].team,"ko")||sel[b.sessionId].v-sel[a.sessionId].v);
+  document.getElementById("rows").innerHTML = rows.map(s=>{const r=sel[s.sessionId];const [cls,txt]=ST[r.st];
+    const chips=Object.keys(LABEL).map(k=>{const n=cnt(s,k);return `<span class="chip ${n?"on":""}">${LABEL[k]} ${n}</span>`}).join("");
+    return `<tr><td>${esc(r.team)}</td><td><button class="rowbtn" data-sid="${s.sessionId}">${s.sessionId}</button></td><td class="mono">${fmt(s.durationSec)}</td>
+      <td><div class="chips">${chips}</div></td><td class="num">${r.v}</td><td><span class="pill ${cls}">${txt}</span></td></tr>`}).join("");
+  const c={sig:0,exp:0,out:0}; for(const r of Object.values(sel)){ if(r.st==="sig")c.sig++; else if(r.st==="exp")c.exp++; else c.out++; }
+  document.getElementById("sum").innerHTML = `<span class="pill p-sig">신호로 선별 ${c.sig}</span><span class="pill p-exp">탐색 몫 ${c.exp}</span><span class="pill p-low">제외 ${c.out}</span><span class="muted" style="font-size:13px">전체 ${SESSIONS.length}개 중 AI에게 ${c.sig+c.exp}개 보냄</span>`;
+  document.getElementById("note").hidden = JSON.stringify(cfg)===JSON.stringify(DEF);
+}
+
+function fbKey(t,i){return `fb:${t}:${i}`}
+function getFb(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function setFb(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
+
+function teamMessage(tname){
+  const t=TEAMS.find(x=>x.name===tname); const iss=ISSUES[tname]||[];
+  const total=SESSIONS.filter(s=>team(s)?.name===tname).length;
+  const items=iss.map((it,i)=>{const [sid,ts]=it.moment.split(" ");const k=fbKey(tname,i);const f=getFb(k);
+    return `<div class="issue sev-${esc(it.severity)}">
+      <div class="t">${i+1}. ${esc(it.title)} <span class="muted" style="font-weight:400">(${esc(it.severity)} · 녹화 ${it.sessions.length}개)</span></div>
+      <div class="row"><span>문제 순간</span><span><button class="linkish" data-sid="${sid}" data-ts="${ts}">${ts} 부터 보기</button></span></div>
+      <div class="row"><span>근거</span><span>${esc(it.evidence)}</span></div>
+      <div class="row"><span>원인 가설</span><span>${esc(it.hypothesis)}</span></div>
+      <div class="row"><span>개선안</span><span>${esc(it.suggestion)}</span></div>
+      <div class="row"><span>같은 문제</span><span>${it.sessions.map((x,j)=>`<button class="linkish" data-sid="${x}">녹화 ${j+1}</button>`).join(" · ")}</span></div>
+      <div class="fb"><button class="yes" data-k="${k}" data-v="y" aria-pressed="${f==="y"}">✅ 맞아요</button><button class="no" data-k="${k}" data-v="n" aria-pressed="${f==="n"}">❌ 틀려요</button></div>
+    </div>`}).join("");
+  return `<div class="slack">
+    <div class="who"><div class="ava">AI</div><div><span class="name">클래리티 리뷰 에이전트</span> <span class="time">오전 9:00</span></div></div>
+    <div><b>[${esc(tname)}]</b> <span class="mention">@담당자</span></div>
+    <div class="muted" style="font-style:italic">어제 녹화 ${total}개 중 문제 신호 녹화를 AI가 먼저 봤어요. 문제 ${iss.length}건으로 묶었어요.</div>
+    ${items}
+  </div>`;
+}
+let curTeam = "자리페이팀";
+function renderTabs(){
+  const names=TEAMS.map(t=>t.name).filter(n=>ISSUES[n]);
+  document.getElementById("tabs").innerHTML = names.map(n=>`<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<span class="n">${ISSUES[n].length}</span></button>`).join("");
+  document.getElementById("teamMsg").innerHTML = teamMessage(curTeam);
+}
+function openDrawer(sid,ts){
+  const s=byId[sid]; if(!s) return;
+  const sel=select()[sid];
+  document.getElementById("dbody").innerHTML = `
+    <h2 class="mono">${sid}</h2>
+    <dl class="kv"><dt>팀</dt><dd>${esc(sel?.team||"-")}</dd><dt>길이</dt><dd class="mono">${fmt(s.durationSec)}</dd><dt>기기</dt><dd>${esc(s.device)}</dd>
+    <dt>들어온 화면</dt><dd class="mono">${esc(s.entry)}</dd><dt>나간 화면</dt><dd class="mono">${esc(s.exit)}</dd>
+    ${s.signals.jsErrors.length?`<dt>JS 오류</dt><dd class="mono" style="word-break:break-all">${esc(s.signals.jsErrors.join(", "))}</dd>`:""}</dl>
+    <h3>행동 기록 ${ts?`<span class="muted" style="font-weight:400">· ${ts} 문제 순간 표시</span>`:""}</h3>
+    <ol class="tl">${s.timeline.map(l=>{const t=l.slice(0,5);return `<li class="${ts&&t===ts?"hit":""}"><span class="ts">${t}</span><span>${esc(l.slice(6))}</span></li>`}).join("")}</ol>
+    <p class="muted" style="font-size:13px">AI는 영상 대신 이 기록을 읽고 판독합니다. 실제로는 이 자리에 클래리티 녹화 링크가 열립니다.</p>`;
+  const d=document.getElementById("drawer"); d.classList.add("open"); d.setAttribute("aria-hidden","false"); document.getElementById("dx").focus();
+}
+function closeDrawer(){const d=document.getElementById("drawer");d.classList.remove("open");d.setAttribute("aria-hidden","true");}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-sid]"); if(b){openDrawer(b.dataset.sid,b.dataset.ts);return;}
+  const tb=e.target.closest("[data-team]"); if(tb){curTeam=tb.dataset.team;renderTabs();return;}
+  const fb=e.target.closest("[data-k]"); if(fb){const k=fb.dataset.k;const v=getFb(k)===fb.dataset.v?null:fb.dataset.v;setFb(k,v);
+    fb.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));}
+});
+document.getElementById("dx").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
+
+document.getElementById("cmpNew").innerHTML = teamMessage("자리페이팀");
+renderCtrl(); renderTable(); renderTabs();
+</script>
+
+</body></html>
