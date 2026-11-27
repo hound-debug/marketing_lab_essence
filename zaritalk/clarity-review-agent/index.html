@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
-<title>클래리티 리뷰 에이전트</title>
+<title>실서비스 문제 탐지</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -158,816 +158,282 @@ dialog button.primary{background:var(--brand);border-color:var(--brand);color:#f
   .labgrid{grid-template-columns:1fr}
   .views{margin-left:0}
 }
+</style><style>
+.branch{display:flex;gap:2px;background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:3px}
+.branch button{border:0;background:none;border-radius:7px;padding:5px 12px;cursor:pointer;font-size:13px;white-space:nowrap}
+.branch button[aria-pressed="true"]{background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.filters select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;background:var(--panel);color:var(--fg)}
+.big{font-size:15px} .big b{font-size:20px;font-family:var(--mono)}
+.bars{display:grid;gap:4px;margin-top:4px}
+.bar1{display:grid;grid-template-columns:minmax(120px,190px) 1fr 44px;gap:8px;align-items:center;font-size:12.5px}
+.bar1 .tr{height:10px;background:var(--sunk);border-radius:5px;overflow:hidden}
+.bar1 .tr i{display:block;height:100%;background:var(--brand);border-radius:5px}
+.bar1 .tr i.hot{background:var(--hot)}
+.bar1 .v{text-align:right;font-family:var(--mono)}
+.chips2{display:flex;flex-wrap:wrap;gap:4px}
+.chip2{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);cursor:pointer;font-family:var(--mono)}
+.chip2[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--brand);color:var(--deep)}
+.realbox{font-size:13px;background:var(--brand-soft);color:var(--deep);border-radius:8px;padding:8px 10px}
+.shotview{display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;padding:14px;align-items:start}
+.shotview img{width:100%;border:1px solid var(--line);border-radius:14px;display:block;background:var(--sunk)}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 12px}
+.thumbs button{border:2px solid transparent;padding:0;border-radius:8px;cursor:pointer;background:none;width:56px}
+.thumbs button[aria-pressed="true"]{border-color:var(--brand)}
+.thumbs img{width:100%;display:block;border-radius:6px}
+.journey{list-style:none;margin:0;padding:0;display:grid;gap:2px;font-size:13px}
+.journey li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;padding:4px 6px;border-radius:6px}
+.journey li .t{font-family:var(--mono);color:var(--muted);font-size:12px}
+.journey li.sig{background:var(--hot-soft)}
+.journey li.sig .t{color:var(--hot)}
+.page{padding:20px 22px 48px;overflow-y:auto;min-height:0}
+.page h2{font-size:18px} .page .lead{color:var(--muted);margin:4px 0 14px;font-size:13.5px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{background:var(--sunk);font-size:12px;color:var(--muted);font-weight:500}
+.tbl td.n{text-align:right;font-family:var(--mono);white-space:nowrap}
+.up{color:var(--ok)} .down{color:var(--hot)} .flat{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.fcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start}
+.fcard h3{font-size:15px;line-height:1.4}
+.fcard .meta{font-size:12px;color:var(--muted)}
+.kv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kv3 div{background:var(--sunk);border-radius:8px;padding:6px 8px;display:grid}
+.kv3 small{font-size:11px;color:var(--muted)} .kv3 b{font-family:var(--mono);font-size:15px}
+.cav{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:3px 8px;width:fit-content}
+.funnels{display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:12px}
+.fun{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.fun h3{font-size:15px;margin-bottom:8px}
+.frow{display:grid;grid-template-columns:120px 1fr 1fr;gap:10px;align-items:center;font-size:12.5px;padding:4px 0;border-bottom:1px solid var(--line)}
+.frow .cell{display:grid;gap:2px}
+.frow .tr{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.frow .tr i{display:block;height:100%;background:var(--brand)}
+.frow .tr i.new{background:var(--warn)}
+.frow small{font-family:var(--mono);color:var(--muted)}
+.split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,1fr);gap:14px;align-items:start}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+@media (max-width:1000px){.split{grid-template-columns:1fr}.shotview{grid-template-columns:150px minmax(0,1fr)}}
 </style>
 </head><body>
-
 <div class="app">
   <header class="top">
-    <div class="brand"><span class="logo">AI</span>클래리티 리뷰 에이전트</div>
-    <span class="demo">체험판 · 가짜 녹화</span>
-    <nav class="teams" role="tablist" aria-label="팀" id="teams"></nav>
-    <div class="views" aria-label="보기">
-      <button data-view="report" aria-pressed="true">오늘의 보고</button>
-      <button data-view="lab" aria-pressed="false">녹화 고르는 기준</button>
+    <div class="brand"><span class="logo">AI</span>자리톡 실서비스 문제 탐지</div>
+    <span class="demo" id="stamp"></span>
+    <div class="views" aria-label="보기" style="margin-left:auto">
+      <button data-view="issues" aria-pressed="true">문제</button>
+      <button data-view="traffic" aria-pressed="false">7일 트래픽</button>
+      <button data-view="funnel" aria-pressed="false">퍼널</button>
+      <button data-view="features" aria-pressed="false">신규 기능 영향</button>
+      <button data-view="agents" aria-pressed="false">고객 100명 여정</button>
+      <button data-view="rito" aria-pressed="false">리토 신호</button>
     </div>
   </header>
-  <main class="body" id="reportView">
-    <aside class="list" id="list" aria-label="문제 목록"></aside>
-    <section class="detail" id="detail" aria-live="polite"></section>
-  </main>
-  <main class="lab" id="labView" hidden>
-    <h2 style="font-size:18px">AI에게 보낼 녹화는 이렇게 고릅니다</h2>
-    <p class="muted" style="margin-top:4px">문제 신호(분노 클릭·JS 오류 등)에 점수를 매겨 팀마다 상위 녹화와, 신호 없이 이탈한 「탐색」 녹화를 고릅니다. 10분 넘게 켜 두고 아무것도 안 한 녹화는 뺍니다. 가중치를 움직여 보세요.</p>
-    <div class="labgrid">
-      <div class="panel ctrlp" id="ctrl"></div>
-      <div class="panel" style="min-width:0">
-        <div class="summary" id="sum"></div>
-        <div class="note" id="note" hidden>설정이 기본값과 달라요. 오늘의 보고는 기본값으로 판독한 결과예요.</div>
-        <div class="tblwrap"><table>
-          <thead><tr><th>팀</th><th>녹화</th><th>길이</th><th>문제 신호</th><th style="text-align:right">점수</th><th>결과</th></tr></thead>
-          <tbody id="rows"></tbody></table></div>
+  <div id="v-issues" class="vw" style="display:grid;grid-template-rows:auto 1fr;min-height:0">
+    <div class="filters">
+      <div class="branch" role="group" aria-label="고객 분기">
+        <button data-branch="신규" aria-pressed="true">신규 방문자 (비로그인)</button>
+        <button data-branch="기가입" aria-pressed="false">기가입 고객 (로그인)</button>
       </div>
+      <select id="teamSel" aria-label="팀"></select>
+      <span class="muted small" id="branchNote"></span>
     </div>
-  </main>
+    <main class="body"><aside class="list" id="list" aria-label="문제 목록"></aside><section class="detail" id="detail" aria-live="polite"></section></main>
+  </div>
+  <section id="v-traffic" class="vw page" hidden></section>
+  <section id="v-funnel" class="vw page" hidden></section>
+  <section id="v-features" class="vw page" hidden></section>
+  <section id="v-agents" class="vw page" hidden></section>
+  <section id="v-rito" class="vw page" hidden></section>
 </div>
-
 <dialog id="jira" aria-label="지라 초안">
   <h3 style="margin-bottom:6px">지라 초안</h3>
-  <p class="muted small" style="margin-bottom:8px">실제 운영에서는 이 내용으로 지라 이슈가 바로 만들어지고, 다음 날 같은 문제는 「🔁 반복 · 지라 키」로 표시됩니다. 체험판에서는 복사만 됩니다.</p>
+  <p class="muted small" style="margin-bottom:8px">실제 운영에서는 이 내용으로 지라 이슈가 만들어지고, 다음 날 같은 문제는 「🔁 반복 · 지라 키」로 표시됩니다. 지금은 복사만 됩니다.</p>
   <textarea id="jiraTxt" aria-label="지라 초안 내용"></textarea>
   <div class="row2"><button id="jiraClose">닫기</button><button class="primary" id="jiraCopy">복사</button></div>
 </dialog>
-
 <script>
-const SESSIONS = [
- {
-  "sessionId": "m01",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m01",
-  "durationSec": 372,
-  "device": "Mobile",
-  "entry": "/pay",
-  "exit": "/pay/card",
-  "signals": {
-   "rage": 2,
-   "dead": 5,
-   "quickback": 0,
-   "jsErrors": [
-    "TypeError: Cannot read properties of undefined (reading 'cardCompany')"
-   ],
-   "clickErrors": 1
-  },
-  "timeline": [
-   "00:00 /pay 진입",
-   "00:41 '카드 등록' 클릭",
-   "00:43 /pay/card",
-   "01:10 카드사 선택 드롭다운 클릭 x4 (rage)",
-   "01:12 JS 오류 cardCompany undefined",
-   "01:30 '다음' 버튼 클릭 반응 없음 (dead) x3",
-   "02:05 뒤로가기",
-   "06:12 이탈"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- },
- {
-  "sessionId": "m02",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m02",
-  "durationSec": 290,
-  "device": "Mobile",
-  "entry": "/pay",
-  "exit": "/pay/card",
-  "signals": {
-   "rage": 1,
-   "dead": 3,
-   "quickback": 0,
-   "jsErrors": [
-    "TypeError: Cannot read properties of undefined (reading 'cardCompany')"
-   ],
-   "clickErrors": 1
-  },
-  "timeline": [
-   "00:00 /pay 진입",
-   "00:30 '카드 등록' 클릭",
-   "00:31 /pay/card",
-   "00:55 카드사 선택 클릭 x3 (rage)",
-   "00:56 JS 오류 cardCompany undefined",
-   "01:20 '다음' 클릭 반응 없음 (dead) x2",
-   "04:50 이탈"
-  ],
-  "browser": "Safari 18",
-  "os": "iOS 18.1"
- },
- {
-  "sessionId": "m03",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m03",
-  "durationSec": 410,
-  "device": "Mobile",
-  "entry": "/pay",
-  "exit": "/pay/complete",
-  "signals": {
-   "rage": 0,
-   "dead": 0,
-   "quickback": 0,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /pay 진입",
-   "00:20 '카드 등록' 클릭",
-   "01:40 카드 정보 입력",
-   "03:10 결제",
-   "06:50 /pay/complete 완료"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- },
- {
-  "sessionId": "m04",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m04",
-  "durationSec": 615,
-  "device": "Mobile",
-  "entry": "/order",
-  "exit": "/order",
-  "signals": {
-   "rage": 0,
-   "dead": 6,
-   "quickback": 2,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /order 진입",
-   "00:30 '청소 날짜' 텍스트 클릭 (dead) x3",
-   "01:10 스크롤 위아래 반복 (excessive scroll)",
-   "02:00 '예상 금액' 라벨 클릭 (dead) x3",
-   "02:40 /estimate/select-service 갔다가 3초 만에 뒤로 (quickback) x2",
-   "10:15 이탈"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- },
- {
-  "sessionId": "m05",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m05",
-  "durationSec": 540,
-  "device": "Mobile",
-  "entry": "/order",
-  "exit": "/order",
-  "signals": {
-   "rage": 0,
-   "dead": 4,
-   "quickback": 1,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /order 진입",
-   "00:45 '예상 금액' 라벨 클릭 (dead) x4",
-   "01:30 /estimate/select-service 갔다가 2초 만에 뒤로 (quickback)",
-   "09:00 이탈"
-  ],
-  "browser": "Safari 18",
-  "os": "iOS 18.1"
- },
- {
-  "sessionId": "m06",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m06",
-  "durationSec": 968,
-  "device": "Mobile",
-  "entry": "/point-shop",
-  "exit": "/point-shop",
-  "signals": {
-   "rage": 0,
-   "dead": 0,
-   "quickback": 0,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /point-shop 진입",
-   "00:10 상품 목록 스크롤",
-   "16:08 이탈 (입력·클릭 거의 없음, 화면 켜둔 채 방치 추정)"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- },
- {
-  "sessionId": "m07",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m07",
-  "durationSec": 180,
-  "device": "Mobile",
-  "entry": "/point-shop",
-  "exit": "/point-shop/exchange",
-  "signals": {
-   "rage": 3,
-   "dead": 2,
-   "quickback": 0,
-   "jsErrors": [],
-   "clickErrors": 2
-  },
-  "timeline": [
-   "00:00 /point-shop 진입",
-   "00:40 '교환하기' 클릭",
-   "00:41 /point-shop/exchange",
-   "00:50 '교환하기' 클릭 x5 (rage), 클릭 오류 2회",
-   "01:05 '포인트 부족' 문구 위 클릭 (dead) x2",
-   "03:00 이탈"
-  ],
-  "browser": "Samsung Internet 26",
-  "os": "Android 14"
- },
- {
-  "sessionId": "m08",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m08",
-  "durationSec": 730,
-  "device": "Mobile",
-  "entry": "/vacancy",
-  "exit": "/vacancy",
-  "signals": {
-   "rage": 0,
-   "dead": 2,
-   "quickback": 3,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /vacancy 진입",
-   "00:20 필터 '보증금' 클릭",
-   "00:25 매물 상세 → 2초 만에 뒤로 (quickback) x3",
-   "01:40 지도 핀 클릭 (dead) x2",
-   "12:10 이탈"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- },
- {
-  "sessionId": "m09",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m09",
-  "durationSec": 1120,
-  "device": "PC",
-  "entry": "/host/building/",
-  "exit": "/host/contract/upload",
-  "signals": {
-   "rage": 1,
-   "dead": 1,
-   "quickback": 0,
-   "jsErrors": [
-    "Error: upload failed 413"
-   ],
-   "clickErrors": 1
-  },
-  "timeline": [
-   "00:00 /host/building/ 진입",
-   "02:00 /host/contract/upload",
-   "02:30 계약서 파일 선택",
-   "02:31 JS 오류 upload failed 413",
-   "02:40 '업로드' 클릭 x3 (rage)",
-   "03:10 다른 파일 선택",
-   "03:11 JS 오류 upload failed 413",
-   "18:40 이탈"
-  ],
-  "browser": "Chrome 131",
-  "os": "Windows 11"
- },
- {
-  "sessionId": "m10",
-  "url": "https://clarity.microsoft.com/player/smte2s3mpd/mock/m10",
-  "durationSec": 600,
-  "device": "Mobile",
-  "entry": "/short-term-vacancy",
-  "exit": "/stay",
-  "signals": {
-   "rage": 0,
-   "dead": 0,
-   "quickback": 0,
-   "jsErrors": [],
-   "clickErrors": 0
-  },
-  "timeline": [
-   "00:00 /short-term-vacancy 진입",
-   "00:30 날짜 선택",
-   "01:10 /stay 상세",
-   "02:00 사진 넘김 x14",
-   "04:00 '문의하기' 위치까지 스크롤 후 멈춤 30초",
-   "10:00 이탈 (문의 미클릭)"
-  ],
-  "browser": "Chrome 131",
-  "os": "Android 15"
- }
-];
-const ISSUES = {
- "자리스테이팀": [
-  {
-   "title": "사진 14장 넘김 → 「문의하기」 앞 30초 멈춤 → 문의 없이 이탈",
-   "sessions": [
-    "m10"
-   ],
-   "moment": "m10 04:00",
-   "severity": "중간",
-   "evidence": "02:00 사진 14장 넘김 → 04:00 「문의하기」 위치까지 스크롤 후 30초 멈춤 → 문의하지 않고 이탈. 문제 신호(분노 클릭·오류)는 없음.",
-   "hypothesis": "문의 전에 판단할 정보(날짜 가능 여부·청소비 포함 총액)가 부족해 망설였을 가능성. 확인 필요: 04:30~10:00 기록이 비어 있어 화면을 켜 둔 채 방치했을 수도 있음.",
-   "suggestion": "「문의하기」 바로 위에 선택한 날짜의 예약 가능 여부와 청소비 포함 총액을 한 줄로 표시. 대안: 사진 상단에 평수·침대 수·층 요약 배지.",
-   "kind": "탐색",
-   "similar": null,
-   "repeat": null,
-   "summary": "사진 14장을 넘겨 본 뒤 '문의하기' 앞에서 30초 멈췄다가 문의하지 않고 나감"
-  }
- ],
- "마스터팀": [
-  {
-   "title": "/order 「예상 금액」 라벨 무반응 후 다음 단계에서 즉시 복귀",
-   "sessions": [
-    "m04",
-    "m05"
-   ],
-   "moment": "m05 00:45",
-   "evidence": "m05 00:45 '예상 금액' 라벨 클릭 (dead) x4 → 01:30 /estimate/select-service 진입 후 2초 만에 뒤로 (quickback). m04 02:00 '예상 금액' 라벨 클릭 (dead) x3 → 02:40 /estimate/select-service 3초 만에 뒤로 (quickback) x2.",
-   "hypothesis": "사용자는 /order에서 예상 금액을 보려 했으나 라벨이 탭에 반응하지 않았고, 금액 확인 경로가 보이지 않아 다음 단계로 넘어갔다가 기대와 달라 되돌아온 것으로 보임. 확인 필요: 금액이 /order 화면에 표시되는지, select-service 화면에서 금액을 볼 수 있는지는 기록만으로 판단할 수 없음.",
-   "suggestion": "'예상 금액' 자리에 지금 계산된 금액을 바로 표시하고, 금액이 없으면 '청소 날짜와 서비스를 고르면 표시돼요'를 표시. 대안: 탭하면 금액 산출 기준을 펼쳐 보여 주는 영역으로 변경.",
-   "severity": "높음",
-   "kind": "신호",
-   "similar": 18,
-   "repeat": {
-    "days": 3,
-    "jira": null
-   },
-   "summary": "주문 화면에서 '예상 금액'을 3~4번 눌렀지만 반응이 없고, 다음 단계로 갔다가 2~3초 만에 돌아옴 (2명 같은 순서)"
-  },
-  {
-   "title": "/order 「청소 날짜」 입력 방법 불명확, 텍스트 반복 클릭과 위아래 스크롤",
-   "sessions": [
-    "m04"
-   ],
-   "moment": "m04 00:30",
-   "evidence": "00:30 '청소 날짜' 텍스트 클릭 (dead) x3 → 01:10 스크롤 위아래 반복 (excessive scroll).",
-   "hypothesis": "날짜 선택 컨트롤이 '청소 날짜' 텍스트와 떨어져 있거나 탭 영역이 작아 사용자가 입력 위치를 찾지 못한 것으로 보임. 확인 필요: 단일 세션 기록이라 날짜 컨트롤의 위치와 크기를 화면에서 직접 확인해야 함.",
-   "suggestion": "'청소 날짜' 라벨 전체를 눌러도 날짜 선택이 열리게 하고, 오른쪽에 달력 아이콘과 '날짜를 선택해 주세요' 안내를 표시. 대안: 날짜 칸을 버튼 모양으로 변경.",
-   "severity": "중간",
-   "kind": "신호",
-   "similar": 2,
-   "repeat": null,
-   "summary": "'청소 날짜' 글자를 3번 눌렀지만 날짜 선택이 열리지 않아 화면을 위아래로 계속 스크롤함"
-  }
- ],
- "그로스팀": [
-  {
-   "title": "포인트 부족인데 교환 버튼이 눌려서 반복 클릭 후 이탈",
-   "sessions": [
-    "m07"
-   ],
-   "moment": "m07 00:50",
-   "evidence": "00:50 '교환하기' 클릭 x5 (rage), 클릭 오류 2회 / 01:05 '포인트 부족' 문구 위 클릭 (dead) x2 / 03:00 이탈 (JS 오류 없음)",
-   "hypothesis": "교환 버튼이 포인트 부족 상태에서도 활성처럼 보인다. 사용자는 누르면 진행될 것으로 보고 반복 클릭한다. 반응이 없으니 '포인트 부족' 문구를 누르지만 문구는 링크가 아니다. 클릭 오류 2회의 원인은 확인 필요(버튼 비활성 처리 누락 또는 서버 검증 실패 가능).",
-   "suggestion": "교환 화면 문구·상태 수정: (1) 보유 포인트가 필요 포인트보다 적으면 '교환하기' 버튼을 회색 비활성으로 바꾼다. (2) 버튼 바로 위에 '필요 ○P · 보유 ○P · ○P 더 필요해요' 문구를 표시한다(○는 화면 데이터로 채움). (3) 같은 문구를 탭하면 포인트 적립 화면으로 가는 링크로 만든다.",
-   "severity": "높음",
-   "kind": "신호",
-   "similar": 9,
-   "repeat": null,
-   "summary": "포인트가 부족한데 '교환하기'가 눌리는 것처럼 보여 5번 연타하고, '포인트 부족' 문구까지 눌러 보다 나감"
-  }
- ],
- "중개팀": [
-  {
-   "title": "보증금 필터 후 매물 상세 2초 내 이탈 반복",
-   "sessions": [
-    "m08"
-   ],
-   "moment": "m08 00:25",
-   "evidence": "매물 상세 → 2초 만에 뒤로 (quickback) x3 (필터 '보증금' 클릭 00:20 직후)",
-   "hypothesis": "필터 결과 카드의 보증금 정보와 상세 페이지 내용이 달라 기대와 어긋남. 확인 필요: 상세 로딩 지연 여부는 기록에 없음",
-   "suggestion": "필터 결과 카드에 보증금 금액을 크게 표시하고, 상세 상단에 '보증금 ○○만원 · 필터 조건 일치' 한 줄을 고정 노출",
-   "severity": "높음",
-   "kind": "신호",
-   "similar": 24,
-   "repeat": {
-    "days": 2,
-    "jira": "BRK-118"
-   },
-   "summary": "보증금 필터를 건 뒤 매물 상세에 들어갔다가 2초 만에 나오기를 3번 반복함"
-  },
-  {
-   "title": "지도 핀 클릭 무반응",
-   "sessions": [
-    "m08"
-   ],
-   "moment": "m08 01:40",
-   "evidence": "지도 핀 클릭 (dead) x2",
-   "hypothesis": "핀이 탭 가능해 보이나 클릭이 상세·목록과 연결되지 않음. 확인 필요: 핀 클릭 핸들러 존재 여부는 기록으로 판단 불가",
-   "suggestion": "핀 탭 시 하단에 미니 매물 카드를 띄우고, 카드 탭 시 상세로 이동. 탭한 핀은 선택 색으로 바꿔 반응을 보여줌",
-   "severity": "중간",
-   "kind": "신호",
-   "similar": 2,
-   "repeat": null,
-   "summary": "지도 핀을 2번 눌렀지만 아무 반응이 없음"
-  }
- ],
- "자리페이팀": [
-  {
-   "title": "카드사 선택 드롭다운 무반응으로 카드 등록 중 이탈 (JS 오류 cardCompany undefined)",
-   "sessions": [
-    "m01",
-    "m02"
-   ],
-   "moment": "m01 01:12",
-   "evidence": "m01: 01:10 카드사 드롭다운 클릭 x4(rage) → 01:12 JS 오류 'cardCompany undefined' → 01:30 '다음' 클릭 반응 없음(dead) x3 → 02:05 뒤로가기 → 06:12 이탈. m02: 00:55 카드사 선택 클릭 x3(rage) → 00:56 동일 JS 오류 → 01:20 '다음' 반응 없음(dead) x2 → 04:50 이탈. 두 녹화 모두 /pay/card에서 같은 오류, 같은 순서로 막힘.",
-   "hypothesis": "카드사 목록 데이터(cardCompany)가 로드되지 않았거나 undefined 상태에서 드롭다운이 열려 선택이 저장되지 않는 것으로 보임. 그 결과 카드사가 선택되지 않아 '다음'이 동작하지 않음. 오류와 rage 클릭의 시간 순서는 일치하나 인과 관계는 코드·네트워크 기록으로 확인 필요.",
-   "suggestion": "(1) 카드사 목록 로딩 전·실패 시 드롭다운 자리에 '카드사 목록을 불러오는 중' 표시 후, 실패하면 '카드사 목록을 불러오지 못했어요. 다시 시도' 버튼 노출. (2) 카드사 미선택 상태에서는 '다음'을 비활성화하고 그 아래에 '카드사를 선택해 주세요' 안내 문구 표시. (3) 실패 시 오류 수집 도구로 cardCompany 접근 지점 확인 (확인 필요).",
-   "severity": "높음",
-   "kind": "신호",
-   "similar": 37,
-   "repeat": null,
-   "summary": "카드 등록 화면에서 카드사 목록을 눌러도 열리지 않고 오류가 나서, '다음'도 눌리지 않아 등록을 포기함 (2명 같은 순서)"
-  }
- ],
- "코어팀": [
-  {
-   "title": "계약서 업로드 413 오류 2회 → 업로드 화면에서 이탈",
-   "sessions": [
-    "m09"
-   ],
-   "moment": "m09 02:31",
-   "evidence": "02:31 JS 오류 'upload failed 413' → 02:40 '업로드' 클릭 x3 (rage) → 03:10 다른 파일 선택 → 03:11 같은 JS 오류 'upload failed 413' → 18:40 이탈. 02:31과 03:11 사이 클릭 외 행동 없음. 03:11 이후 15분 40초 동안 기록 없음. 녹화 1개만 있어 묶인 녹화 수는 1개.",
-   "hypothesis": "파일 크기가 서버·게이트웨이 업로드 한도(413 Payload Too Large)를 넘는 것으로 보임. 클라이언트가 선택 시점에 용량을 검사하지 않아 사용자는 업로드 버튼을 반복 클릭하고 다른 파일로 재시도함. 화면에 실패 사유가 표시됐는지는 기록으로 알 수 없음. 확인 필요: 실제 허용 용량 한도, 413을 내는 계층(앱 서버·프록시·CDN), 실패 시 화면 메시지 노출 여부, 03:11~18:40 사이 행동.",
-   "suggestion": "1) 파일 선택 직후 용량·형식을 검사하고, 한도를 넘으면 '최대 ○MB까지 업로드할 수 있어요. 파일을 줄이거나 사진으로 올려 주세요'를 버튼 옆에 표시. 2) 업로드 중에는 버튼을 비활성화하고 진행률 표시(중복 클릭 차단). 3) 413 등 실패 시 '업로드에 실패했어요. 다시 시도하거나 고객센터에 문의해 주세요' 문구와 문의 경로 노출. 4) 계약서 PDF 용량 한도 상향 또는 용량 가이드 문구를 업로드 화면 상단에 미리 안내.",
-   "severity": "높음",
-   "kind": "신호",
-   "similar": 6,
-   "repeat": null,
-   "summary": "PC에서 계약서 파일을 올리자 용량 초과(413) 오류가 2번 나고, 다른 파일로 바꿔도 실패해 업로드를 포기함"
-  }
- ]
-};
-const TEAMS = [{"name": "중개팀", "urls": ["/vacancy", "/real-residence-review"]}, {"name": "자리페이팀", "urls": ["/pay"]}, {"name": "그로스팀", "urls": ["/point-shop", "/benefit"]}, {"name": "마스터팀", "urls": ["/order", "/estimate"]}, {"name": "자리스테이팀", "urls": ["/short-term-vacancy", "/my/room/short-term", "/stay"]}, {"name": "환급팀", "urls": ["/refund"]}, {"name": "코어팀", "urls": ["/host/building", "/host/contract"]}];
-const CTX = {
- "_note": "체험용 가짜 숫자. 실제는 클래리티 필터 건수·지표 DB·지난 보고 기록(out/history.json)에서 채움.",
- "teams": {
-  "자리페이팀": {
-   "pageSessions": 1240,
-   "metric": "카드 등록 완료율",
-   "value": "61%",
-   "avg7": "68%"
-  },
-  "마스터팀": {
-   "pageSessions": 388,
-   "metric": "주문 완료율",
-   "value": "22%",
-   "avg7": "24%"
-  },
-  "그로스팀": {
-   "pageSessions": 2110,
-   "metric": "포인트 교환 완료율",
-   "value": "74%",
-   "avg7": "75%"
-  },
-  "중개팀": {
-   "pageSessions": 5320,
-   "metric": "매물 상세→문의 전환율",
-   "value": "3.1%",
-   "avg7": "3.4%"
-  },
-  "자리스테이팀": {
-   "pageSessions": 640,
-   "metric": "상세→문의 전환율",
-   "value": "5.8%",
-   "avg7": "6.0%"
-  },
-  "코어팀": {
-   "pageSessions": 930,
-   "metric": "계약 등록 완료율",
-   "value": "81%",
-   "avg7": "86%"
-  }
- }
-};
-const DEF = {rage:3, dead:1, quickback:2, jsErrors:5, clickErrors:2, top:8, explore:2, idle:true};
-let cfg = {...DEF};
-const LABEL = {rage:"분노 클릭", dead:"반응 없는 클릭", quickback:"바로 뒤로가기", jsErrors:"JS 오류", clickErrors:"클릭 오류"};
-const byId = Object.fromEntries(SESSIONS.map(s=>[s.sessionId,s]));
-const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fmt = sec => `${Math.floor(sec/60)}분${String(sec%60).padStart(2,"0")}초`;
-
-
-const sec = ts => {const [m,s]=ts.split(":").map(Number);return m*60+s;};
-const mmss = n => `${String(Math.floor(n/60)).padStart(2,"0")}:${String(n%60).padStart(2,"0")}`;
-const SIG_RE = /rage|dead|오류|quickback|멈춤|반복|반응 없음/;
-function kindOf(line){
-  if(/JS 오류|upload failed/.test(line)) return ["err","JS 오류"];
-  if(/rage/.test(line)) return ["rage","분노 클릭"];
-  if(/dead|반응 없음/.test(line)) return ["dead","반응 없는 클릭"];
-  if(/quickback|만에 뒤로/.test(line)) return ["back","바로 뒤로가기"];
-  if(/멈춤/.test(line)) return ["stop","멈춤"];
-  if(/스크롤/.test(line)) return ["scroll","스크롤 반복"];
-  if(/x\d+/.test(line)) return ["repeat","반복 행동"];
-  return ["", ""];
+const D = {"issuesNew": [{"id": "n1", "team": "중개팀", "sev": "높음", "n": 34, "base": 40, "agents": ["c003", "c006", "c008", "c010", "c011", "c012", "c013", "c014", "c015", "c016", "c017", "c018", "c019", "c020", "c021", "c022", "c023", "c024", "c025", "c026", "c027", "c028", "c029", "c030", "c031", "c032", "c033", "c034", "c035", "c036", "c037", "c038", "c039", "c040"], "shots": [{"agent": "c003", "shot": "c003_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c006", "shot": "c006_1.jpg", "t": "00:04", "type": "반응 없는 클릭"}, {"agent": "c008", "shot": "c008_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c010", "shot": "c010_1.jpg", "t": "00:04", "type": "반응 없는 클릭"}, {"agent": "c011", "shot": "c011_1.jpg", "t": "00:04", "type": "반응 없는 클릭"}, {"agent": "c012", "shot": "c012_1.jpg", "t": "00:04", "type": "반응 없는 클릭"}], "title": "실거주리뷰: 후기는 흐리게, 누르는 버튼마다 가입 선택창", "page": "tenant.zaritalk.com/real-residence-review/residence/building/{id}", "summary": "실거주리뷰 건물 페이지에 들어온 40명 중 34명이 후기·치안·계약 가능한 방을 보려다 막혔어요. 후기는 흐리게 가려져 있고, 「동네 후기 전체 보기」 등을 눌러도 「이 집 후기, 무료로 확인하기 — 내가 누군지 선택」 창만 떠요.", "real": "실제 비로그인 방문 1위 화면(7일 10.8만 회). 같은 기간 로그인 유도 창 노출 6.1만 회 중 4.3만 회(71%)가 닫힘(EXPOSURE·CLOSE/SEO_LOGIN_OVERLAY).", "hypothesis": "검색 유입을 가입으로 바꾸려는 의도된 가림막입니다. 다만 무엇을 볼 수 있는지 맛보기 없이 막아 71%가 창을 닫고 나가는 것으로 보입니다.", "suggestion": "후기 1개와 치안·소음 점수는 가리지 않고 보여 주고, 두 번째 후기부터 「카카오로 3초 만에 전체 보기」로 막습니다.", "alt": "역할 선택(임대인·임차인…)을 빼고 카카오 버튼 하나로 줄여 단계 수를 줄입니다.", "goals": [["이 건물 살아본 후기 더 읽기", 12], ["이 동네 계약 가능한 방 보기", 12], ["치안·소음·주차 후기 찾기", 9], ["건물 실제 모습(로드뷰) 보기", 1]], "devices": [["Android", 16], ["iPhone", 13], ["PC", 5]], "outcomes": [["막힘", 34]], "branch": "신규"}, {"id": "n2", "team": "자리스테이팀", "sev": "높음", "n": 16, "base": 20, "agents": ["c056", "c057", "c058", "c059", "c060", "c062", "c063", "c064", "c065", "c066", "c067", "c069", "c072", "c073", "c074", "c075"], "shots": [{"agent": "c056", "shot": "c056_1.jpg", "t": "00:07", "type": "가리는 팝업"}, {"agent": "c057", "shot": "c057_1.jpg", "t": "00:07", "type": "가리는 팝업"}, {"agent": "c058", "shot": "c058_1.jpg", "t": "00:07", "type": "가리는 팝업"}, {"agent": "c059", "shot": "c059_1.jpg", "t": "00:07", "type": "가리는 팝업"}, {"agent": "c060", "shot": "c060_1.jpg", "t": "00:06", "type": "가리는 팝업"}, {"agent": "c062", "shot": "c062_1.jpg", "t": "00:06", "type": "가리는 팝업"}], "title": "단기임대 첫 화면 팝업에 닫기 버튼 없음", "page": "tenant.zaritalk.com/stay · zaristay.zaritalk.com/guest", "summary": "단기 숙소를 찾던 20명 중 16명이 첫 화면 팝업(「잠깐 살 집, 지금 바로 찾아보세요」)에 가려 메뉴를 누르지 못했어요. 닫기 버튼이 없어 바깥을 눌러 닫거나 팝업 버튼을 따라갔어요.", "real": "실제 비로그인 /stay 방문 7일 9,731회.", "hypothesis": "첫 방문자를 이벤트·카카오 인증으로 보내려는 의도로 보이지만, 닫기 버튼이 없어 둘러보려는 사람이 막힙니다.", "suggestion": "팝업 오른쪽 위에 닫기(X)와 「둘러보고 할게요」를 둡니다.", "alt": "숙소를 1개 이상 본 뒤에 이벤트 팝업을 띄웁니다.", "goals": [["부산 출장 숙소 찾기", 5], ["서울 1주 숙소 찾기", 4], ["지역 검색으로 숙소 찾기", 3], ["제주 한달살기 숙소 찾기", 3], ["환불·보증금 규정 확인", 1]], "devices": [["Android", 10], ["iPhone", 4], ["PC", 2]], "outcomes": [["로그인 벽", 16]], "branch": "신규"}, {"id": "n3", "team": "자리스테이팀", "sev": "높음", "n": 17, "base": 20, "agents": ["c056", "c057", "c058", "c059", "c060", "c062", "c063", "c064", "c065", "c066", "c067", "c068", "c069", "c072", "c073", "c074", "c075"], "shots": [{"agent": "c056", "shot": "c056_2.jpg", "t": "00:10", "type": "로그인 벽"}, {"agent": "c057", "shot": "c057_2.jpg", "t": "00:10", "type": "로그인 벽"}, {"agent": "c058", "shot": "c058_2.jpg", "t": "00:10", "type": "로그인 벽"}, {"agent": "c059", "shot": "c059_2.jpg", "t": "00:10", "type": "로그인 벽"}, {"agent": "c060", "shot": "c060_2.jpg", "t": "00:10", "type": "로그인 벽"}, {"agent": "c062", "shot": "c062_2.jpg", "t": "00:08", "type": "로그인 벽"}], "title": "숙소 목록을 보기 전에 카카오 로그인 요구", "page": "tenant.zaritalk.com/stay", "summary": "단기 숙소를 찾던 20명 중 17명이 지역·목적·검색·문의를 누르자 숙소 목록을 보기 전에 카카오 로그인 화면이 나와 멈췄어요.", "real": "리토 이상 신호: 자리스테이 「검색→예약→확정」 취소·거절이 최근 2주 +703.7%.", "hypothesis": "둘러보기 단계부터 로그인을 요구하는 설계로 보입니다(의도 확인 필요). 가격·사진을 보기 전 로그인이라 이탈이 큽니다.", "suggestion": "지역을 고르면 숙소 목록·가격까지는 로그인 없이 보여 주고, 문의·예약 때 카카오 로그인을 요청합니다.", "alt": "로그인 화면에 「로그인하면 바로 볼 수 있는 숙소 N개」 미리보기를 띄웁니다.", "goals": [["부산 출장 숙소 찾기", 5], ["서울 1주 숙소 찾기", 4], ["지역 검색으로 숙소 찾기", 3], ["제주 한달살기 숙소 찾기", 3], ["환불·보증금 규정 확인", 1], ["숙소 가격·조건 보고 문의하기", 1]], "devices": [["Android", 10], ["iPhone", 5], ["PC", 2]], "outcomes": [["로그인 벽", 17]], "branch": "신규"}, {"id": "n4", "team": "환급팀", "sev": "높음", "n": 10, "base": 10, "agents": ["c076", "c077", "c078", "c079", "c080", "c081", "c082", "c083", "c084", "c085"], "shots": [{"agent": "c076", "shot": "c076_1.jpg", "t": "00:04", "type": "로그인 벽"}, {"agent": "c077", "shot": "c077_1.jpg", "t": "00:04", "type": "로그인 벽"}, {"agent": "c078", "shot": "c078_1.jpg", "t": "00:04", "type": "로그인 벽"}, {"agent": "c079", "shot": "c079_1.jpg", "t": "00:04", "type": "로그인 벽"}, {"agent": "c080", "shot": "c080_1.jpg", "t": "00:04", "type": "로그인 벽"}, {"agent": "c081", "shot": "c081_1.jpg", "t": "00:04", "type": "로그인 벽"}], "title": "「1분 만에 환급액 확인」 누르면 카카오 로그인부터", "page": "refund-v0.zaritalk.com/b9 (광고 랜딩)", "summary": "월세 환급액을 확인하려던 10명 전원이 「내 환급액 확인하기」를 누르자 환급액 대신 카카오 로그인 화면을 만났어요(PC는 새 창).", "real": "광고 랜딩(Vercel)이라 이 화면 방문은 자리톡 로그에 남지 않음. 로그인 뒤 퍼널은 「기가입 고객」의 환급 퍼널 참고.", "hypothesis": "환급액 계산에 본인 정보가 필요해 로그인을 먼저 받는 설계로 보입니다. 「1분 만에 확인」 약속과 첫 단계가 어긋납니다.", "suggestion": "로그인 전에 월세 금액만 고르면 「예상 환급액 약 OO원」을 먼저 보여 주고, 정확한 조회·신청 때 로그인합니다.", "alt": "버튼을 「카카오로 1분 만에 환급액 확인」으로 바꿔 로그인이 필요함을 미리 알립니다.", "goals": [["내 월세 환급액 확인하기", 10]], "devices": [["iPhone", 4], ["Android", 4], ["PC", 2]], "outcomes": [["로그인 벽", 10]], "branch": "신규"}, {"id": "n5", "team": "코어팀(커뮤니티, 확인 필요)", "sev": "중간", "n": 2, "base": 2, "agents": ["c050", "c054"], "shots": [{"agent": "c050", "shot": "c050_1.jpg", "t": "00:04", "type": "사이트 이탈"}, {"agent": "c054", "shot": "c054_1.jpg", "t": "00:06", "type": "사이트 이탈"}], "title": "커뮤니티 글 「글 목록으로」 누르면 빈 페이지", "page": "zaritalk.com/community/post/{id}", "summary": "다른 글을 보려던 2명 중 2명이 「글 목록으로」를 누르자 빈 페이지(about:blank)로 나가 사이트를 벗어났어요. 목록을 거쳐 들어온 경우에도 커뮤니티가 아니라 홈으로 갑니다(직접 확인).", "real": "이 버튼이 있는 글 144871 하나만 7일 비로그인 방문 7,646회. 검색·공유 링크로 바로 들어온 사람은 모두 같은 상황.", "hypothesis": "「글 목록으로」가 브라우저 뒤로가기로 동작해, 이전 기록이 없으면 빈 페이지로 나갑니다.", "suggestion": "이전 기록이 없으면 커뮤니티 목록(/community)으로 이동하게 바꿉니다.", "alt": "비로그인이면 목록 대신 「인기 글 5개」 미리보기를 보여 주고 가입을 유도합니다.", "goals": [["다른 임대인 글 더 보기", 2]], "devices": [["Android", 2]], "outcomes": [["막힘", 2]], "branch": "신규"}, {"id": "n6", "team": "자리페이팀", "sev": "높음", "n": 5, "base": 5, "agents": ["c087", "c088", "c090", "c094", "c095"], "shots": [{"agent": "c087", "shot": "c087_1.jpg", "t": "00:03", "type": "못 찾음"}, {"agent": "c088", "shot": "c088_1.jpg", "t": "00:03", "type": "못 찾음"}, {"agent": "c090", "shot": "c090_1.jpg", "t": "00:03", "type": "못 찾음"}, {"agent": "c094", "shot": "c094_1.jpg", "t": "00:05", "type": "못 찾음"}], "title": "자리페이 랜딩에 이용료·수수료 안내 없음", "page": "refund-v0.zaritalk.com/zaripay1 · tenant /pay/landing", "summary": "월세 카드결제 이용료를 확인하려던 5명 모두 이용료를 찾지 못했어요. 랜딩 2곳 원문 전체에 「이용료」「수수료」가 0번 나옵니다(직접 확인).", "real": "", "hypothesis": "혜택(17% 환급·무이자) 위주 구성이라 비용 정보가 빠졌습니다. 카드결제 이용자는 결제 전에 이용료부터 봅니다.", "suggestion": "혜택 바로 아래에 「이용료: 결제 금액의 O% · 결제 전 총액으로 먼저 보여드려요」 한 줄을 넣습니다.", "alt": "자주 묻는 질문 맨 위에 「이용료는 얼마인가요?」를 둡니다.", "goals": [["월세 카드결제 이용료 확인", 5]], "devices": [["Android", 4], ["iPhone", 1]], "outcomes": [["못 찾음", 4], ["막힘", 1]], "branch": "신규"}, {"id": "n7", "team": "자리페이팀", "sev": "중간", "n": 10, "base": 10, "agents": ["c086", "c087", "c088", "c089", "c090", "c091", "c092", "c093", "c094", "c095"], "shots": [], "kind": "검증 중 발견", "title": "자리페이 랜딩마다 할부 개월 수가 다름", "page": "자리페이 랜딩 2곳", "summary": "같은 서비스인데 랜딩마다 할부 숫자가 달라요: 「최대 7개월 무이자 할부」(첫 화면) · 「모든 카드사에서 최대 12개월 할부」(/pay/landing 본문) · 「24개월 할부 가능」(zaripay1).", "real": "", "hypothesis": "랜딩을 따로 만들며 문구가 맞춰지지 않은 것으로 보입니다(무이자와 일반 할부를 섞어 쓴 것일 수 있음, 확인 필요).", "suggestion": "모든 랜딩에 같은 문구: 「무이자 최대 7개월(카드사별) · 일반 할부 최대 OO개월」.", "alt": "카드사별 개월 표를 한 곳에 두고 링크로 연결합니다.", "goals": [["무이자 할부 조건 확인", 5], ["월세 카드결제 이용료 확인", 5]], "devices": [["Android", 7], ["iPhone", 2], ["PC", 1]], "outcomes": [["막힘", 6], ["못 찾음", 4]], "branch": "신규"}, {"id": "n8", "team": "자리페이팀", "sev": "낮음", "n": 6, "base": 10, "agents": ["c086", "c089", "c091", "c092", "c093", "c095"], "shots": [{"agent": "c086", "shot": "c086_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c089", "shot": "c089_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c091", "shot": "c091_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c092", "shot": "c092_1.jpg", "t": "00:04", "type": "반응 없는 클릭"}, {"agent": "c093", "shot": "c093_1.jpg", "t": "00:05", "type": "반응 없는 클릭"}, {"agent": "c095", "shot": "c095_1.jpg", "t": "00:06", "type": "반응 없는 클릭"}], "title": "자리페이 혜택 문구를 눌러도 반응 없음", "page": "tenant /pay/landing", "summary": "할부·이용료 조건을 알아보려던 6명이 위쪽 혜택 문구(「카드사 포인트 적립」 등)를 눌렀지만 반응이 없었어요. 자세한 조건은 페이지 아래에만 있어요.", "real": "", "hypothesis": "굵은 혜택 문구가 버튼처럼 보이지만 눌리지 않는 글자입니다.", "suggestion": "혜택 문구를 누르면 아래 해당 조건 설명으로 스크롤되게 연결합니다.", "alt": "혜택 문구 옆에 「자세히 ›」를 붙입니다.", "goals": [["무이자 할부 조건 확인", 5], ["월세 카드결제 이용료 확인", 1]], "devices": [["Android", 4], ["PC", 1], ["iPhone", 1]], "outcomes": [["막힘", 6]], "branch": "신규"}], "issuesExisting": [{"id": "x1", "team": "환급팀", "sev": "높음", "ev": ["VIEW_HOMETAX_SERVICE_UNAVAILABLE_ALERT_DIALOG/INCOME_INQUIRY"], "n": 953, "prev": 215, "title": "11/26 오전 3시간, 홈택스 「서비스 이용 불가」 953명", "where": "월세환급 › 소득 조회(홈택스 인증) · 11/26 10~13시 집중", "summary": "11/26(목) 10~13시에만 953명이 환급 조회 중 「홈택스 서비스 이용 불가」 창을 봤어요(10시 193명 · 11시 419명 · 12시 423명). 11/17에도 하루 215명이 있었고, 다른 날은 0명이에요.", "hypothesis": "홈택스 쪽 점검·장애 시간대로 보입니다(확인 필요: 홈택스 공지와 우리 쪽 오류 코드). 이 시간에 들어온 사람은 다시 돌아오지 않았을 수 있습니다.", "suggestion": "이 창에 「복구되면 알려드릴게요(알림 받기)」 버튼을 넣고, 같은 오류가 10분에 50명을 넘으면 개발팀·환급팀 채널로 바로 알립니다.", "alt": "장애 시간에 창을 본 953명에게 다음 날 「다시 조회해 보세요」 알림톡을 보냅니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [0, 0, 0, 0, 0, 0, 0, 215, 0, 0, 0, 0, 0, 0, 0, 0, 953, 0], "change": 343, "branch": "기가입"}, {"id": "x2", "team": "그로스팀", "sev": "높음", "ev": ["VIEW_AD_ERROR/BENEFIT"], "n": 994, "prev": 139, "title": "혜택 리워드 광고 오류, 개편 뒤 매일 100~300명", "where": "혜택 › 운세·타로·포인트 복권(광고 보고 리워드 받기)", "summary": "11/19 리워드 개편 전에는 0명이던 광고 오류가 개편 뒤 매일 108~293명(세입자·임대인) 나와요. 최근 7일 994명.", "hypothesis": "리워드 광고 요청이 크게 늘며(광고 요청 7일 약 2.8만 명) 광고 채우기 실패(no-fill)가 오류로 보이는 것으로 보입니다(확인 필요).", "suggestion": "광고가 없을 때 오류 대신 「오늘은 광고 없이 바로 받기」로 리워드를 주거나 다른 미션을 보여 줍니다.", "alt": "광고 네트워크를 1개 더 붙여 채우기 실패 때 대체 광고를 씁니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [0, 0, 0, 0, 0, 0, 0, 0, 0, 139, 293, 131, 141, 166, 134, 131, 108, 160], "change": 615, "branch": "기가입"}, {"id": "x3", "team": "환급팀", "sev": "높음", "ev": ["VIEW_HOMETAX_AUTH_ERROR_ALERT_DIALOG/INCOME_INQUIRY"], "n": 2537, "prev": 2480, "title": "홈택스 인증 오류 · 신규는 인증 뒤 71%가 멈춤", "where": "월세환급 › 홈택스 인증 → 신청 결제", "summary": "최근 7일 2,537명이 홈택스 인증 오류 창을 봤어요. 인증까지 간 신규 1,018명 중 신청 결제 화면에 간 사람은 292명(29%)뿐이에요. 기존 고객은 75%. 하루 140~280명이던 오류가 11/25 740명, 11/26 559명으로 튀었어요.", "hypothesis": "처음 쓰는 사람은 간편인증 앱 전환·인증서 선택에서 많이 실패하는 것으로 보입니다(확인 필요: 오류 창의 사유별 비율).", "suggestion": "인증 화면에 「카카오·토스·PASS 중 평소 쓰는 앱」 선택을 먼저 묻고, 실패하면 다른 앱으로 바로 바꾸는 버튼을 둡니다.", "alt": "신규에게만 인증 전 30초 안내 화면(무엇을 누르면 되는지)을 보여 줍니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [206, 197, 185, 301, 257, 585, 477, 445, 277, 222, 248, 201, 140, 244, 144, 740, 559, 373], "change": 2, "branch": "기가입"}, {"id": "x4", "team": "자리스테이팀", "sev": "중간", "ev": ["CLICK_UNAVAILABLE_SHORT_TERM_VACANCY_CARD/SHORT_TERM_VACANCY", "CLICK_UNAVAILABLE_RECOMMENDED_SHORT_TERM_VACANCY_CARD/HOME"], "n": 1067, "prev": 659, "title": "예약 안 되는 숙소를 누르는 사람이 62% 늘어남", "where": "단기임대 목록 · 홈 추천", "summary": "최근 7일 1,067명이 단기임대 목록에서 예약 불가 숙소 카드를 눌렀어요(지난주 659명, +62%). 홈 추천에서도 743명(지난주 492명).", "hypothesis": "예약 불가 숙소가 목록·추천 위쪽에 계속 노출되는 것으로 보입니다. 리토도 자리스테이 취소·거절 급증(+703.7%)을 잡았습니다.", "suggestion": "고른 날짜에 예약 불가인 숙소는 목록 맨 아래로 내리고 「이 날짜엔 예약 불가」를 카드에 표시합니다.", "alt": "홈 추천에서는 예약 가능한 숙소만 보여 줍니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [167, 167, 162, 168, 139, 183, 198, 188, 191, 165, 204, 220, 260, 272, 277, 254, 263, 236], "change": 62, "branch": "기가입"}, {"id": "x5", "team": "자리스테이팀", "sev": "중간", "ev": ["CLICK_GO_BACK_RESERVATION_PAYMENT/SHORT_TERM_VACANCY_PAYMENT"], "n": 1074, "prev": 1058, "title": "단기임대 결제 화면에서 절반이 뒤로가기", "where": "단기임대 › 결제 화면", "summary": "최근 7일 결제 화면에 온 2,273명 중 1,074명(약 47%)이 뒤로가기를 눌렀어요. 11/25부터 이탈자에게 추천 팝업을 띄우는 중이에요.", "hypothesis": "결제 화면에서 처음 보는 총액(보증금·관리비·이용료)이 상세 화면 가격과 달라 놀라는 것으로 보입니다(확인 필요).", "suggestion": "상세 화면 예약 버튼 위에 「총 결제 금액 OO원(보증금 포함)」을 미리 보여 줍니다.", "alt": "결제 화면 맨 위에 금액 구성 표를 펼쳐 둡니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [180, 178, 175, 161, 167, 157, 205, 191, 207, 160, 179, 134, 146, 196, 183, 169, 154, 137], "change": 2, "branch": "기가입"}, {"id": "x6", "team": "자리페이팀", "sev": "중간", "ev": ["PAYMENT_ATTEMPT/PAY"], "n": 822, "prev": 679, "title": "신규 고객 자리페이 결제, 시도 10명 중 6명 실패·포기", "where": "자리페이 › 결제 시도 → 완료", "summary": "가입 7일 이내 신규 822명이 결제를 시도해 325명(40%)만 완료했어요. 기존 고객은 73%.", "hypothesis": "첫 결제 때 카드 등록·본인 인증·한도 문제에서 많이 빠지는 것으로 보입니다(확인 필요: 실패 사유 코드).", "suggestion": "결제 실패 사유를 화면에 보여 주고(한도·인증·카드사) 사유별로 바로 해결할 버튼을 둡니다.", "alt": "첫 결제자에게 소액 테스트 결제 또는 카드 등록 미리 하기를 안내합니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [3561, 2261, 2064, 2125, 1473, 1878, 2829, 2314, 2015, 1776, 2813, 1391, 1436, 2554, 2146, 3679, 2767, 2389], "change": 21, "branch": "기가입", "seriesLabel": "일별 자리페이 결제 시도한 사람(신규+기존 전체, 실제 로그)"}, {"id": "x7", "team": "환급팀", "sev": "낮음", "ev": ["CLICK_TRY_CANCEL_BUTTON/TAX_FILING_APPLICATIONS"], "n": 1566, "prev": 1514, "title": "환급 신청 취소 시도 주 1,500명대", "where": "월세환급 › 신청 내역", "summary": "최근 7일 1,566명이 환급 신청 내역에서 취소를 시도했어요(지난주 1,514명). 리토 지표 「INIT 정체」 62.6%와 함께 봐야 해요.", "hypothesis": "신청 뒤 진행 상황이 안 보여 불안해서 취소를 누르는 것으로 보입니다(확인 필요).", "suggestion": "취소 버튼 위에 「지금 단계: 세무서 접수 대기 · 예상 OO일」 진행 상황을 먼저 보여 줍니다.", "alt": "취소 전 「이유 선택」을 받아 이유별로 안내합니다.", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "series": [205, 196, 150, 198, 128, 224, 362, 260, 224, 175, 201, 126, 119, 221, 173, 248, 326, 200], "change": 3, "branch": "기가입"}], "agents": [{"id": "c001", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.5초)", "00:05 '연남동 계약 가능한 방 보기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '월세'"], "signals": []}, {"id": "c002", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "건물 실제 모습(로드뷰) 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "성공", "durationSec": 6, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.5초)", "00:05 '실제 모습 보기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '로드뷰'", "00:06 2초 만에 뒤로가기"], "signals": [{"type": "바로 뒤로가기", "t": "00:06", "shot": "", "detail": "확인하자마자 2초 만에 뒤로", "element": "건물 실제 모습(로드뷰) 보기"}]}, {"id": "c003", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "60대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.5초)", "00:05 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c003_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c003_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c003_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c003_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c004", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.4초)", "00:05 '동네 후기 전체 보기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '살아본'"], "signals": []}, {"id": "c005", "seg": "실거주리뷰 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "1회", "월세환급": "시작만 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.4초)", "00:05 '동네 후기 전체 보기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '살아본'"], "signals": []}, {"id": "c006", "seg": "실거주리뷰 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "60대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "시작만 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.3초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c006_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c006_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c006_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c006_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c007", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "40대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.3초)", "00:04 '치안 · 소음 · 주차' 누름 → 화면 바뀜", "00:04 찾던 정보 확인: '소음'"], "signals": []}, {"id": "c008", "seg": "실거주리뷰 방문자", "device": "PC", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.3초)", "00:05 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c008_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c008_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c008_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}]}, {"id": "c009", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "성공", "durationSec": 6, "timeline": ["00:03 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (3.6초)", "00:06 '치안 · 소음 · 주차' 누름 → 화면 바뀜", "00:06 찾던 정보 확인: '소음'"], "signals": []}, {"id": "c010", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "40대", "가입기간": "1년 미만", "가입경로": "자리페이", "자리페이결제": "1회", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.3초)", "00:04 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '도마동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '도마동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c010_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c010_2.jpg", "detail": "'도마동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c010_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c010_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "도마동 계약 가능한 방 보기"}]}, {"id": "c011", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:08 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c011_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c011_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c011_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c011_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c012", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.2초)", "00:04 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c012_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c012_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c012_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}]}, {"id": "c013", "seg": "실거주리뷰 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "1회", "월세환급": "계좌 등록(결제 전)"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.2초)", "00:04 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:04 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c013_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:04", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c013_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c013_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}]}, {"id": "c014", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "검색·기타", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.3초)", "00:04 '경동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '경동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '경동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '경동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c014_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "경동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c014_2.jpg", "detail": "'경동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c014_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "경동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c014_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "경동 계약 가능한 방 보기"}]}, {"id": "c015", "seg": "실거주리뷰 방문자", "device": "PC", "style": "탐색", "persona": {"연령대": "70대 이상", "가입기간": "1년 미만", "가입경로": "자리페이", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.2초)", "00:04 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:08 '우만동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '우만동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c015_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c015_2.jpg", "detail": "'우만동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c015_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c015_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "우만동 계약 가능한 방 보기"}]}, {"id": "c016", "seg": "실거주리뷰 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "집주인 초대", "자리페이결제": "12회 이상", "월세환급": "소득 조회함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/7359", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/7359 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:08 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c016_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c016_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c016_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c016_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c017", "seg": "실거주리뷰 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "자리페이", "자리페이결제": "2~3회", "월세환급": "시작만 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.3초)", "00:04 '연남동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 '연남동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:15 '연남동 계약 가능한 방 보기' 누름 → 변화 없음", "00:20 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:24 '연남동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c017_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "연남동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c017_2.jpg", "detail": "'연남동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "반응 없는 클릭", "t": "00:15", "shot": "c017_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "연남동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c017_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "연남동 계약 가능한 방 보기"}]}, {"id": "c018", "seg": "실거주리뷰 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "12회 이상", "월세환급": "계좌 등록(결제 전)"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.2초)", "00:04 '연남동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 '연남동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:15 '연남동 계약 가능한 방 보기' 누름 → 변화 없음", "00:20 '연남동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:24 '연남동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c018_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "연남동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c018_2.jpg", "detail": "'연남동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "반응 없는 클릭", "t": "00:15", "shot": "c018_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "연남동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "연남동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c018_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "연남동 계약 가능한 방 보기"}]}, {"id": "c019", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.3초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c019_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c019_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c019_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c019_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c020", "seg": "실거주리뷰 방문자", "device": "PC", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.3초)", "00:04 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c020_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c020_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c020_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c021", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.2초)", "00:04 '경동 계약 가능한 방 보기' 누름 → 변화 없음", "00:08 '경동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:08 팝업의 '닫기' 눌러 닫음", "00:11 '경동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '경동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c021_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "경동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c021_2.jpg", "detail": "'경동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c021_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "경동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c021_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "경동 계약 가능한 방 보기"}]}, {"id": "c022", "seg": "실거주리뷰 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:08 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c022_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c022_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c022_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c022_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c023", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "1회", "월세환급": "소득 조회함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.3초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c023_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c023_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c023_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c023_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c024", "seg": "실거주리뷰 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.2초)", "00:04 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '도마동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 '도마동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '도마동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:15 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:20 '도마동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:24 '도마동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c024_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "도마동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c024_2.jpg", "detail": "'도마동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "도마동 계약 가능한 방 보기"}, {"type": "반응 없는 클릭", "t": "00:15", "shot": "c024_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "도마동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c024_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "도마동 계약 가능한 방 보기"}]}, {"id": "c025", "seg": "실거주리뷰 방문자", "device": "PC", "style": "급함", "persona": {"연령대": "20대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/7359", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/7359 진입 (2.5초)", "00:05 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:13 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:16 '동네 후기 전체 보기' 누름 → 변화 없음", "00:20 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:24 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c025_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c025_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "반응 없는 클릭", "t": "00:16", "shot": "c025_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c025_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c026", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:13 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:15 '동네 후기 전체 보기' 누름 → 변화 없음", "00:20 '동네 후기 전체 보기' 연타 x3 (분노 클릭)", "00:24 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c026_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c026_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "반응 없는 클릭", "t": "00:15", "shot": "c026_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c026_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c027", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "자리페이", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "건물 실제 모습(로드뷰) 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/7359", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/7359 진입 (2.3초)", "00:04 '실제 모습 보기' 누름 → 변화 없음", "00:09 '실제 모습 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '실제 모습 보기' 누름 → 변화 없음", "00:15 '실제 모습 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c027_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "실제 모습 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c027_2.jpg", "detail": "'실제 모습 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c027_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "실제 모습 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c027_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "실제 모습 보기"}]}, {"id": "c028", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "60대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/7359", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/7359 진입 (2.3초)", "00:05 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c028_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c028_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c028_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}]}, {"id": "c029", "seg": "실거주리뷰 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "70대 이상", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/7359", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/7359 진입 (2.3초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c029_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c029_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c029_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c029_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c030", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "70대 이상", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.2초)", "00:04 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c030_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c030_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c030_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}]}, {"id": "c031", "seg": "실거주리뷰 방문자", "device": "PC", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "1회", "월세환급": "시작만 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:08 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:08 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c031_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c031_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c031_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c031_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c032", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 10, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.2초)", "00:04 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:05 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)", "00:09 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:09 '치안 · 소음 · 주차' 연타 x3 (분노 클릭)"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c032_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:05", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c032_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c032_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "분노 클릭", "t": "00:10", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "치안 · 소음 · 주차"}]}, {"id": "c033", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "60대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1661928", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1661928 진입 (2.3초)", "00:04 '구기동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '구기동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '구기동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '구기동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c033_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "구기동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c033_2.jpg", "detail": "'구기동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c033_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "구기동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c033_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "구기동 계약 가능한 방 보기"}]}, {"id": "c034", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/2033897", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/2033897 진입 (2.2초)", "00:04 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:08 '도마동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:08 팝업의 '닫기' 눌러 닫음", "00:11 '도마동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '도마동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c034_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c034_2.jpg", "detail": "'도마동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c034_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "도마동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c034_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "도마동 계약 가능한 방 보기"}]}, {"id": "c035", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 건물 살아본 후기 더 읽기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1661928", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1661928 진입 (2.3초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:09 '동네 후기 전체 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '동네 후기 전체 보기' 누름 → 변화 없음", "00:15 '동네 후기 전체 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c035_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c035_2.jpg", "detail": "'동네 후기 전체 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c035_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c035_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c036", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1147680", "outcome": "막힘", "durationSec": 13, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1147680 진입 (2.2초)", "00:04 '동네 후기 전체 보기' 누름 → 변화 없음", "00:08 '치안 · 소음 · 주차' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:08 팝업의 '닫기' 눌러 닫음", "00:11 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:13 '동네 후기 전체 보기' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c036_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c036_2.jpg", "detail": "'치안 · 소음 · 주차'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c036_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:13", "shot": "c036_4.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "동네 후기 전체 보기"}]}, {"id": "c037", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "치안·소음·주차 후기 찾기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/558197", "outcome": "막힘", "durationSec": 10, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/558197 진입 (2.5초)", "00:05 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:07 '치안 · 소음 · 주차' 누름 → 변화 없음", "00:10 '치안 · 소음 · 주차' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c037_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c037_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}, {"type": "반응 없는 클릭", "t": "00:10", "shot": "c037_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "치안 · 소음 · 주차"}]}, {"id": "c038", "seg": "실거주리뷰 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "1년 미만", "가입경로": "검색·기타", "자리페이결제": "없음", "월세환급": "시작만 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/1661928", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/1661928 진입 (2.2초)", "00:04 '구기동 계약 가능한 방 보기' 누름 → 변화 없음", "00:08 '구기동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:08 팝업의 '닫기' 눌러 닫음", "00:11 '구기동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '구기동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c038_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "구기동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:08", "shot": "c038_2.jpg", "detail": "'구기동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c038_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "구기동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c038_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "구기동 계약 가능한 방 보기"}]}, {"id": "c039", "seg": "실거주리뷰 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "70대 이상", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 15, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.3초)", "00:04 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '우만동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:09 팝업의 '닫기' 눌러 닫음", "00:11 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:15 '우만동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c039_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:09", "shot": "c039_2.jpg", "detail": "'우만동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "반응 없는 클릭", "t": "00:11", "shot": "c039_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:15", "shot": "c039_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "우만동 계약 가능한 방 보기"}]}, {"id": "c040", "seg": "실거주리뷰 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "이 동네 계약 가능한 방 보기", "entry": "https://tenant.zaritalk.com/real-residence-review/residence/building/112863", "outcome": "막힘", "durationSec": 24, "timeline": ["00:02 tenant.zaritalk.com/real-residence-review/residence/building/112863 진입 (2.3초)", "00:04 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:09 '우만동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 '우만동 계약 가능한 방 보기' 누르려는데 팝업이 화면을 덮음 (홈 집구하기 환급 사는이야기 비교견적)", "00:13 '우만동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:13 팝업의 '닫기' 눌러 닫음", "00:15 '우만동 계약 가능한 방 보기' 누름 → 변화 없음", "00:20 '우만동 계약 가능한 방 보기' 연타 x3 (분노 클릭)", "00:24 '우만동 계약 가능한 방 보기' 누름 → 다른 요소에 가려져 눌리지 않음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c040_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:09", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "우만동 계약 가능한 방 보기"}, {"type": "가리는 팝업", "t": "00:13", "shot": "c040_2.jpg", "detail": "'우만동 계약 가능한 방 보기'을(를) 누르려는데 팝업이 화면을 덮음 · '닫기' 버튼으로 닫음", "element": "홈 집구하기 환급 사는이야기 비교견적"}, {"type": "분노 클릭", "t": "00:13", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "우만동 계약 가능한 방 보기"}, {"type": "반응 없는 클릭", "t": "00:15", "shot": "c040_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "우만동 계약 가능한 방 보기"}, {"type": "분노 클릭", "t": "00:20", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "우만동 계약 가능한 방 보기"}, {"type": "가려진 버튼", "t": "00:24", "shot": "c040_4.jpg", "detail": "다른 요소가 버튼을 덮고 있어 눌리지 않음", "element": "우만동 계약 가능한 방 보기"}]}, {"id": "c041", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/110634", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/110634 진입 (2.4초)", "00:05 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/110634", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c042", "seg": "커뮤니티 방문자", "device": "PC", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/144871", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/144871 진입 (2.3초)", "00:04 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/144871", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c043", "seg": "커뮤니티 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/146007", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/146007 진입 (2.3초)", "00:04 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/146007", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c044", "seg": "커뮤니티 방문자", "device": "PC", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1년 미만", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/110634", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/110634 진입 (2.3초)", "00:04 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/110634", "00:04 찾던 정보 확인: '댓글'", "00:05 2초 만에 뒤로가기"], "signals": [{"type": "바로 뒤로가기", "t": "00:05", "shot": "", "detail": "확인하자마자 2초 만에 뒤로", "element": "글 읽고 댓글 보기"}]}, {"id": "c045", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/146007", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/146007 진입 (2.3초)", "00:04 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/146007", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c046", "seg": "커뮤니티 방문자", "device": "PC", "style": "탐색", "persona": {"연령대": "60대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/110634", "outcome": "로그인 벽", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/110634 진입 (2.3초)", "00:04 '대댓글 ・ 2개' 누름 → zaritalk.com/", "00:05 로그인·가입 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c046_1.jpg", "detail": "'대댓글 ・ 2개'을(를) 누르자 '글 읽고 댓글 보기' 전에 로그인·가입을 요구", "element": "대댓글 ・ 2개"}]}, {"id": "c047", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "60대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/146007", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/146007 진입 (2.4초)", "00:05 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/146007", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c048", "seg": "커뮤니티 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "70대 이상", "가입기간": "1년 미만"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/146007", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/146007 진입 (2.3초)", "00:05 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/146007", "00:05 찾던 정보 확인: '댓글'", "00:05 2초 만에 뒤로가기"], "signals": [{"type": "바로 뒤로가기", "t": "00:05", "shot": "", "detail": "확인하자마자 2초 만에 뒤로", "element": "글 읽고 댓글 보기"}]}, {"id": "c049", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/126040", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/126040 진입 (2.3초)", "00:05 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/126040", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c050", "seg": "커뮤니티 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "60대", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "다른 임대인 글 더 보기", "entry": "https://zaritalk.com/community/post/110634", "outcome": "막힘", "durationSec": 4, "timeline": ["00:02 zaritalk.com/community/post/110634 진입 (2.3초)", "00:04 '글 목록으로' 누름 → about:blank", "00:04 빈 페이지로 나가 사이트를 벗어남"], "signals": [{"type": "사이트 이탈", "t": "00:04", "shot": "c050_1.jpg", "detail": "'글 목록으로'을(를) 누르자 빈 페이지(about:blank)로 나가 사이트를 벗어남", "element": "글 목록으로"}]}, {"id": "c051", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "탐색", "persona": {"연령대": "70대 이상", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/146007", "outcome": "성공", "durationSec": 4, "timeline": ["00:02 zaritalk.com/community/post/146007 진입 (2.3초)", "00:04 '댓글 달고 모든 댓글 보기 👆' 누름 → zaritalk.com/community/post/146007", "00:04 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c052", "seg": "커뮤니티 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/144871", "outcome": "성공", "durationSec": 6, "timeline": ["00:03 zaritalk.com/community/post/144871 진입 (3.6초)", "00:06 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/144871", "00:06 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c053", "seg": "커뮤니티 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/126040", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 zaritalk.com/community/post/126040 진입 (2.5초)", "00:05 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/126040", "00:05 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c054", "seg": "커뮤니티 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "60대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "다른 임대인 글 더 보기", "entry": "https://zaritalk.com/community/post/144871", "outcome": "막힘", "durationSec": 6, "timeline": ["00:03 zaritalk.com/community/post/144871 진입 (3.4초)", "00:06 '글 목록으로' 누름 → about:blank", "00:06 빈 페이지로 나가 사이트를 벗어남"], "signals": [{"type": "사이트 이탈", "t": "00:06", "shot": "c054_1.jpg", "detail": "'글 목록으로'을(를) 누르자 빈 페이지(about:blank)로 나가 사이트를 벗어남", "element": "글 목록으로"}]}, {"id": "c055", "seg": "커뮤니티 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "70대 이상", "가입기간": "1~3년", "가입경로": "세입자 월세 고지서"}, "goal": "글 읽고 댓글 보기", "entry": "https://zaritalk.com/community/post/126040", "outcome": "성공", "durationSec": 6, "timeline": ["00:03 zaritalk.com/community/post/126040 진입 (3.6초)", "00:06 '댓글을 남겨보세요! (영향력 +3 획득)' 누름 → zaritalk.com/community/post/126040", "00:06 찾던 정보 확인: '댓글'"], "signals": []}, {"id": "c056", "seg": "단기임대 게스트", "device": "iPhone", "style": "탐색", "persona": {"연령대": "20대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "부산 출장 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.9초)", "00:07 '출장/업무' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:08 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '출장/업무' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c056_1.jpg", "detail": "'출장/업무'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "로그인 벽", "t": "00:10", "shot": "c056_2.jpg", "detail": "'출장/업무'을(를) 누르자 '부산 출장 숙소 찾기' 전에 카카오 로그인을 요구", "element": "출장/업무"}]}, {"id": "c057", "seg": "단기임대 게스트", "device": "PC", "style": "급함", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "4~11회", "월세환급": "소득 조회함"}, "goal": "서울 1주 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.8초)", "00:07 '서울' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 '서울' 연타 x3 (분노 클릭)", "00:08 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '서울' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c057_1.jpg", "detail": "'서울'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "서울"}, {"type": "로그인 벽", "t": "00:10", "shot": "c057_2.jpg", "detail": "'서울'을(를) 누르자 '서울 1주 숙소 찾기' 전에 카카오 로그인을 요구", "element": "서울"}]}, {"id": "c058", "seg": "단기임대 게스트", "device": "PC", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "12회 이상", "월세환급": "소득 조회함"}, "goal": "지역 검색으로 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.8초)", "00:07 '살아보고 싶은 지역 검색' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 '살아보고 싶은 지역 검색' 연타 x3 (분노 클릭)", "00:08 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '살아보고 싶은 지역 검색' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c058_1.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "살아보고 싶은 지역 검색"}, {"type": "로그인 벽", "t": "00:10", "shot": "c058_2.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르자 '지역 검색으로 숙소 찾기' 전에 카카오 로그인을 요구", "element": "살아보고 싶은 지역 검색"}]}, {"id": "c059", "seg": "단기임대 게스트", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "부산 출장 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.8초)", "00:07 '출장/업무' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '출장/업무' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c059_1.jpg", "detail": "'출장/업무'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "로그인 벽", "t": "00:10", "shot": "c059_2.jpg", "detail": "'출장/업무'을(를) 누르자 '부산 출장 숙소 찾기' 전에 카카오 로그인을 요구", "element": "출장/업무"}]}, {"id": "c060", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "20대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "지역 검색으로 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.5초)", "00:06 '살아보고 싶은 지역 검색' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '살아보고 싶은 지역 검색' 연타 x3 (분노 클릭)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '살아보고 싶은 지역 검색' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c060_1.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "살아보고 싶은 지역 검색"}, {"type": "로그인 벽", "t": "00:10", "shot": "c060_2.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르자 '지역 검색으로 숙소 찾기' 전에 카카오 로그인을 요구", "element": "살아보고 싶은 지역 검색"}]}, {"id": "c061", "seg": "단기임대 게스트", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "단기임대 서비스 이용료 확인", "entry": "https://tenant.zaritalk.com/short-term-vacancy/guest-faq", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 tenant.zaritalk.com/short-term-vacancy/guest-faq 진입 (2.2초)", "00:04 '예약·결제' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '이용료는'"], "signals": []}, {"id": "c062", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "부산 출장 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 8, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.2초)", "00:06 '출장/업무' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '출장/업무' 연타 x3 (분노 클릭)", "00:06 닫기 버튼을 못 찾아 팝업 버튼을 그대로 누름", "00:08 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c062_1.jpg", "detail": "'출장/업무'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "출장/업무"}, {"type": "로그인 벽", "t": "00:08", "shot": "c062_2.jpg", "detail": "'부산 출장 숙소 찾기' 전에 카카오 로그인을 요구", "element": "부산 출장 숙소 찾기"}]}, {"id": "c063", "seg": "단기임대 게스트", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "70대 이상", "가입기간": "1~3년", "가입경로": "단기임대(게스트)", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "제주 한달살기 숙소 찾기", "entry": "https://zaristay.zaritalk.com/guest", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 zaristay.zaritalk.com/guest 진입 (2.2초)", "00:06 '제주' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 이벤트 혜택 보기 잠깐)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:09 '제주' 누름 → accounts.kakao.com/login/", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c063_1.jpg", "detail": "'제주'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 이벤트 혜택 보기 잠깐 살 집, "}, {"type": "로그인 벽", "t": "00:09", "shot": "c063_2.jpg", "detail": "'제주'을(를) 누르자 '제주 한달살기 숙소 찾기' 전에 카카오 로그인을 요구", "element": "제주"}]}, {"id": "c064", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "12회 이상", "월세환급": "소득 조회함"}, "goal": "부산 출장 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.2초)", "00:06 '출장/업무' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '출장/업무' 연타 x3 (분노 클릭)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:09 '출장/업무' 누름 → accounts.kakao.com/login/", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c064_1.jpg", "detail": "'출장/업무'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "출장/업무"}, {"type": "로그인 벽", "t": "00:09", "shot": "c064_2.jpg", "detail": "'출장/업무'을(를) 누르자 '부산 출장 숙소 찾기' 전에 카카오 로그인을 요구", "element": "출장/업무"}]}, {"id": "c065", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "환불·보증금 규정 확인", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 8, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.2초)", "00:06 '자주 묻는 질문' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '자주 묻는 질문' 연타 x3 (분노 클릭)", "00:06 닫기 버튼을 못 찾아 팝업 버튼을 그대로 누름", "00:08 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c065_1.jpg", "detail": "'자주 묻는 질문'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "자주 묻는 질문"}, {"type": "로그인 벽", "t": "00:08", "shot": "c065_2.jpg", "detail": "'환불·보증금 규정 확인' 전에 카카오 로그인을 요구", "element": "환불·보증금 규정 확인"}]}, {"id": "c066", "seg": "단기임대 게스트", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "서울 1주 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.3초)", "00:06 '서울' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:09 '서울' 누름 → accounts.kakao.com/login/", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c066_1.jpg", "detail": "'서울'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "로그인 벽", "t": "00:09", "shot": "c066_2.jpg", "detail": "'서울'을(를) 누르자 '서울 1주 숙소 찾기' 전에 카카오 로그인을 요구", "element": "서울"}]}, {"id": "c067", "seg": "단기임대 게스트", "device": "iPhone", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "서울 1주 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.2초)", "00:06 '서울' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '서울' 연타 x3 (분노 클릭)", "00:06 닫기 버튼을 못 찾아 팝업 버튼을 그대로 누름", "00:09 찾는 내용이 안 보여 아래로 스크롤", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c067_1.jpg", "detail": "'서울'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "서울"}, {"type": "로그인 벽", "t": "00:09", "shot": "c067_2.jpg", "detail": "'서울 1주 숙소 찾기' 전에 카카오 로그인을 요구", "element": "서울 1주 숙소 찾기"}]}, {"id": "c068", "seg": "단기임대 게스트", "device": "iPhone", "style": "급함", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "1회", "월세환급": "시작만 함"}, "goal": "숙소 가격·조건 보고 문의하기", "entry": "https://tenant.zaritalk.com/short-term-vacancy/public/19796", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 tenant.zaritalk.com/short-term-vacancy/public/19796 진입 (2.2초)", "00:04 '문의하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c068_1.jpg", "detail": "'문의하기'을(를) 누르자 '숙소 가격·조건 보고 문의하기' 전에 카카오 로그인을 요구", "element": "문의하기"}]}, {"id": "c069", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "40대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "제주 한달살기 숙소 찾기", "entry": "https://zaristay.zaritalk.com/guest", "outcome": "로그인 벽", "durationSec": 8, "timeline": ["00:02 zaristay.zaritalk.com/guest 진입 (2.2초)", "00:06 '제주' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 이벤트 혜택 보기 잠깐)", "00:06 '제주' 연타 x3 (분노 클릭)", "00:06 닫기 버튼을 못 찾아 팝업 버튼을 그대로 누름", "00:08 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c069_1.jpg", "detail": "'제주'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 이벤트 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "제주"}, {"type": "로그인 벽", "t": "00:08", "shot": "c069_2.jpg", "detail": "'제주 한달살기 숙소 찾기' 전에 카카오 로그인을 요구", "element": "제주 한달살기 숙소 찾기"}]}, {"id": "c070", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "20대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "단기임대 서비스 이용료 확인", "entry": "https://tenant.zaritalk.com/short-term-vacancy/guest-faq", "outcome": "성공", "durationSec": 6, "timeline": ["00:03 tenant.zaritalk.com/short-term-vacancy/guest-faq 진입 (3.2초)", "00:05 '예약·결제' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '이용료는'", "00:06 2초 만에 뒤로가기"], "signals": [{"type": "바로 뒤로가기", "t": "00:06", "shot": "", "detail": "확인하자마자 2초 만에 뒤로", "element": "단기임대 서비스 이용료 확인"}]}, {"id": "c071", "seg": "단기임대 게스트", "device": "iPhone", "style": "급함", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "첫 결제 2만원 이벤트 확인", "entry": "https://zaristay.zaritalk.com/guest", "outcome": "성공", "durationSec": 5, "timeline": ["00:03 zaristay.zaritalk.com/guest 진입 (2.9초)", "00:05 '혜택 보기' 누름 → zaristay.zaritalk.com/guest/event/zs-guest-2610", "00:05 찾던 정보 확인: '2만원'"], "signals": []}, {"id": "c072", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "서울 1주 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.8초)", "00:07 '서울' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 '서울' 연타 x3 (분노 클릭)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:10 '서울' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c072_1.jpg", "detail": "'서울'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "서울"}, {"type": "로그인 벽", "t": "00:10", "shot": "c072_2.jpg", "detail": "'서울'을(를) 누르자 '서울 1주 숙소 찾기' 전에 카카오 로그인을 요구", "element": "서울"}]}, {"id": "c073", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "시작만 함"}, "goal": "지역 검색으로 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/stay 진입 (2.2초)", "00:06 '살아보고 싶은 지역 검색' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:06 '살아보고 싶은 지역 검색' 연타 x3 (분노 클릭)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:09 '살아보고 싶은 지역 검색' 누름 → accounts.kakao.com/login/", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c073_1.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "살아보고 싶은 지역 검색"}, {"type": "로그인 벽", "t": "00:09", "shot": "c073_2.jpg", "detail": "'살아보고 싶은 지역 검색'을(를) 누르자 '지역 검색으로 숙소 찾기' 전에 카카오 로그인을 요구", "element": "살아보고 싶은 지역 검색"}]}, {"id": "c074", "seg": "단기임대 게스트", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "제주 한달살기 숙소 찾기", "entry": "https://zaristay.zaritalk.com/guest", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:02 zaristay.zaritalk.com/guest 진입 (2.2초)", "00:06 '제주' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 이벤트 혜택 보기 잠깐)", "00:07 닫기 버튼이 없어 바깥 어두운 곳을 눌러 닫음", "00:09 '제주' 누름 → accounts.kakao.com/login/", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:06", "shot": "c074_1.jpg", "detail": "'제주'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 이벤트 혜택 보기 잠깐 살 집, "}, {"type": "로그인 벽", "t": "00:09", "shot": "c074_2.jpg", "detail": "'제주'을(를) 누르자 '제주 한달살기 숙소 찾기' 전에 카카오 로그인을 요구", "element": "제주"}]}, {"id": "c075", "seg": "단기임대 게스트", "device": "Android", "style": "급함", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "부산 출장 숙소 찾기", "entry": "https://tenant.zaritalk.com/stay", "outcome": "로그인 벽", "durationSec": 9, "timeline": ["00:03 tenant.zaritalk.com/stay 진입 (2.8초)", "00:07 '출장/업무' 누르려는데 팝업이 화면을 덮음 (11월 첫 예약 결제 2만원 혜택 보기 잠깐)", "00:07 '출장/업무' 연타 x3 (분노 클릭)", "00:07 닫기 버튼을 못 찾아 팝업 버튼을 그대로 누름", "00:09 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "가리는 팝업", "t": "00:07", "shot": "c075_1.jpg", "detail": "'출장/업무'을(를) 누르려는데 팝업이 화면을 덮음 · 닫기 버튼이 없음", "element": "11월 첫 예약 결제 2만원 혜택 보기 잠깐 살 집, "}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "팝업에 가린 버튼을 3번 더 누름", "element": "출장/업무"}, {"type": "로그인 벽", "t": "00:09", "shot": "c075_2.jpg", "detail": "'부산 출장 숙소 찾기' 전에 카카오 로그인을 요구", "element": "부산 출장 숙소 찾기"}]}, {"id": "c076", "seg": "월세환급 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c076_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c077", "seg": "월세환급 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.2초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c077_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c078", "seg": "월세환급 방문자", "device": "Android", "style": "탐색", "persona": {"가입기간": "1~3년", "가입경로": "자리페이", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.2초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c078_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c079", "seg": "월세환급 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c079_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c080", "seg": "월세환급 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c080_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c081", "seg": "월세환급 방문자", "device": "PC", "style": "꼼꼼", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → 새 창 열림 (accounts.kakao.com/login/)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c081_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c082", "seg": "월세환급 방문자", "device": "PC", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "12회 이상", "월세환급": "계좌 등록(결제 전)"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 4, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → 새 창 열림 (accounts.kakao.com/login/)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:04 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c082_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c083", "seg": "월세환급 방문자", "device": "iPhone", "style": "급함", "persona": {"가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 6, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:04 '내 환급액 확인하기' 누름 → accounts.kakao.com/login", "00:06 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:04", "shot": "c083_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c084", "seg": "월세환급 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 10, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.1초)", "00:10 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:10 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "느린 로딩", "t": "00:10", "shot": "c084_1.jpg", "detail": "누른 뒤 7.8초", "element": "내 환급액 확인하기"}, {"type": "로그인 벽", "t": "00:10", "shot": "c084_2.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c085", "seg": "월세환급 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "4~11회", "월세환급": "소득 조회함"}, "goal": "내 월세 환급액 확인하기", "entry": "https://refund-v0.zaritalk.com/b9", "outcome": "로그인 벽", "durationSec": 5, "timeline": ["00:02 refund-v0.zaritalk.com/b9 진입 (2.7초)", "00:05 '내 환급액 확인하기' 누름 → accounts.kakao.com/login/", "00:05 카카오 로그인 화면이 나와서 멈춤"], "signals": [{"type": "로그인 벽", "t": "00:05", "shot": "c085_1.jpg", "detail": "'내 환급액 확인하기'을(를) 누르자 '내 월세 환급액 확인하기' 전에 카카오 로그인을 요구", "element": "내 환급액 확인하기"}]}, {"id": "c086", "seg": "자리페이 방문자", "device": "PC", "style": "급함", "persona": {"가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "시작만 함"}, "goal": "무이자 할부 조건 확인", "entry": "https://tenant.zaritalk.com/pay/landing", "outcome": "막힘", "durationSec": 11, "timeline": ["00:03 tenant.zaritalk.com/pay/landing 진입 (3.3초)", "00:05 '카드사 포인트 적립' 누름 → 변화 없음", "00:06 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:08 '카드사 포인트 적립' 누름 → 변화 없음", "00:08 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:10 '카드사 포인트 적립' 누름 → 변화 없음", "00:11 '카드사 포인트 적립' 연타 x3 (분노 클릭)"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c086_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:06", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:08", "shot": "c086_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:08", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:10", "shot": "c086_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:11", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}]}, {"id": "c087", "seg": "자리페이 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "월세 카드결제 이용료 확인", "entry": "https://refund-v0.zaritalk.com/zaripay1", "outcome": "못 찾음", "durationSec": 3, "timeline": ["00:02 refund-v0.zaritalk.com/zaripay1 진입 (2.1초)", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:03 '이용료 / 수수료'을(를) 찾지 못하고 이탈"], "signals": [{"type": "못 찾음", "t": "00:03", "shot": "c087_1.jpg", "detail": "'월세 카드결제 이용료 확인'에 필요한 '이용료 / 수수료'을(를) 화면에서 찾지 못함", "element": "이용료 / 수수료"}]}, {"id": "c088", "seg": "자리페이 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "검색·기타", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "월세 카드결제 이용료 확인", "entry": "https://refund-v0.zaritalk.com/zaripay1", "outcome": "못 찾음", "durationSec": 3, "timeline": ["00:02 refund-v0.zaritalk.com/zaripay1 진입 (2.1초)", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:03 '이용료 / 수수료'을(를) 찾지 못하고 이탈"], "signals": [{"type": "못 찾음", "t": "00:03", "shot": "c088_1.jpg", "detail": "'월세 카드결제 이용료 확인'에 필요한 '이용료 / 수수료'을(를) 화면에서 찾지 못함", "element": "이용료 / 수수료"}]}, {"id": "c089", "seg": "자리페이 방문자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "40대", "가입기간": "1~3년", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "무이자 할부 조건 확인", "entry": "https://tenant.zaritalk.com/pay/landing", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/pay/landing 진입 (2.5초)", "00:05 '카드사 포인트 적립' 누름 → 변화 없음", "00:07 '카드사 포인트 적립' 누름 → 변화 없음", "00:09 '카드사 포인트 적립' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c089_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c089_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c089_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}]}, {"id": "c090", "seg": "자리페이 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "20대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "월세 카드결제 이용료 확인", "entry": "https://refund-v0.zaritalk.com/zaripay1", "outcome": "못 찾음", "durationSec": 3, "timeline": ["00:02 refund-v0.zaritalk.com/zaripay1 진입 (2.1초)", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:03 '이용료 / 수수료'을(를) 찾지 못하고 이탈"], "signals": [{"type": "못 찾음", "t": "00:03", "shot": "c090_1.jpg", "detail": "'월세 카드결제 이용료 확인'에 필요한 '이용료 / 수수료'을(를) 화면에서 찾지 못함", "element": "이용료 / 수수료"}]}, {"id": "c091", "seg": "자리페이 방문자", "device": "iPhone", "style": "급함", "persona": {"연령대": "30대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "소득 조회함"}, "goal": "무이자 할부 조건 확인", "entry": "https://tenant.zaritalk.com/pay/landing", "outcome": "막힘", "durationSec": 10, "timeline": ["00:02 tenant.zaritalk.com/pay/landing 진입 (2.4초)", "00:05 '카드사 포인트 적립' 누름 → 변화 없음", "00:05 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:07 '카드사 포인트 적립' 누름 → 변화 없음", "00:07 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:10 '카드사 포인트 적립' 누름 → 변화 없음", "00:10 '카드사 포인트 적립' 연타 x3 (분노 클릭)"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c091_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:05", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c091_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:07", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:10", "shot": "c091_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:10", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}]}, {"id": "c092", "seg": "자리페이 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "계좌 등록(결제 전)"}, "goal": "무이자 할부 조건 확인", "entry": "https://tenant.zaritalk.com/pay/landing", "outcome": "막힘", "durationSec": 9, "timeline": ["00:02 tenant.zaritalk.com/pay/landing 진입 (2.2초)", "00:04 '카드사 포인트 적립' 누름 → 변화 없음", "00:07 '카드사 포인트 적립' 누름 → 변화 없음", "00:09 '카드사 포인트 적립' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:04", "shot": "c092_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c092_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:09", "shot": "c092_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}]}, {"id": "c093", "seg": "자리페이 방문자", "device": "Android", "style": "급함", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "무이자 할부 조건 확인", "entry": "https://tenant.zaritalk.com/pay/landing", "outcome": "막힘", "durationSec": 10, "timeline": ["00:03 tenant.zaritalk.com/pay/landing 진입 (2.8초)", "00:05 '카드사 포인트 적립' 누름 → 변화 없음", "00:05 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:07 '카드사 포인트 적립' 누름 → 변화 없음", "00:08 '카드사 포인트 적립' 연타 x3 (분노 클릭)", "00:10 '카드사 포인트 적립' 누름 → 변화 없음", "00:10 '카드사 포인트 적립' 연타 x3 (분노 클릭)"], "signals": [{"type": "반응 없는 클릭", "t": "00:05", "shot": "c093_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:05", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:07", "shot": "c093_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:08", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}, {"type": "반응 없는 클릭", "t": "00:10", "shot": "c093_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "카드사 포인트 적립"}, {"type": "분노 클릭", "t": "00:10", "shot": "", "detail": "반응이 없어 3번 더 누름", "element": "카드사 포인트 적립"}]}, {"id": "c094", "seg": "자리페이 방문자", "device": "iPhone", "style": "꼼꼼", "persona": {"연령대": "20대", "가입기간": "3년 이상", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "이용 안 함"}, "goal": "월세 카드결제 이용료 확인", "entry": "https://refund-v0.zaritalk.com/zaripay1", "outcome": "못 찾음", "durationSec": 5, "timeline": ["00:02 refund-v0.zaritalk.com/zaripay1 진입 (2.1초)", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:04 찾는 내용이 안 보여 아래로 스크롤", "00:05 찾는 내용이 안 보여 아래로 스크롤", "00:05 '이용료 / 수수료'을(를) 찾지 못하고 이탈"], "signals": [{"type": "못 찾음", "t": "00:05", "shot": "c094_1.jpg", "detail": "'월세 카드결제 이용료 확인'에 필요한 '이용료 / 수수료'을(를) 화면에서 찾지 못함", "element": "이용료 / 수수료"}]}, {"id": "c095", "seg": "자리페이 방문자", "device": "Android", "style": "탐색", "persona": {"연령대": "50대", "가입기간": "1년 미만", "가입경로": "월세 환급", "자리페이결제": "없음", "월세환급": "시작만 함"}, "goal": "월세 카드결제 이용료 확인", "entry": "https://refund-v0.zaritalk.com/zaripay1", "outcome": "막힘", "durationSec": 11, "timeline": ["00:02 refund-v0.zaritalk.com/zaripay1 진입 (2.1초)", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:03 찾는 내용이 안 보여 아래로 스크롤", "00:06 '월세 600,000원' 누름 → 변화 없음", "00:08 '월세 600,000원' 누름 → 변화 없음", "00:10 '자리페이' 누름 → 변화 없음"], "signals": [{"type": "반응 없는 클릭", "t": "00:06", "shot": "c095_1.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "월세 600,000원"}, {"type": "반응 없는 클릭", "t": "00:08", "shot": "c095_2.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "월세 600,000원"}, {"type": "반응 없는 클릭", "t": "00:10", "shot": "c095_3.jpg", "detail": "눌렀지만 화면이 바뀌지 않음", "element": "자리페이"}]}, {"id": "c096", "seg": "임대인", "device": "Android", "style": "급함", "persona": {"연령대": "30대", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "수납관리 시작해 보기", "entry": "https://zaritalk.com", "outcome": "성공", "durationSec": 4, "timeline": ["00:02 zaritalk.com 진입 (2.3초)", "00:04 '휴대폰 번호로 시작하기' 누름 → 화면 바뀜", "00:04 찾던 정보 확인: '휴대폰 번호'"], "signals": []}, {"id": "c097", "seg": "임대인", "device": "Android", "style": "탐색", "persona": {"연령대": "70대 이상", "가입기간": "3년 이상", "가입경로": "세입자 월세 고지서"}, "goal": "수납관리 시작해 보기", "entry": "https://zaritalk.com", "outcome": "성공", "durationSec": 4, "timeline": ["00:02 zaritalk.com 진입 (2.3초)", "00:04 '휴대폰 번호로 시작하기' 누름 → 화면 바뀜", "00:04 찾던 정보 확인: '휴대폰 번호'"], "signals": []}, {"id": "c098", "seg": "중개사", "device": "Android", "style": "급함", "persona": {"가입기간": "1~3년"}, "goal": "집주인 매물 알림 시작해 보기", "entry": "https://realtor.zaritalk.com", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 realtor.zaritalk.com 진입 (2.2초)", "00:04 '휴대폰 번호로 시작하기' 누름 → 화면 바뀜", "00:04 찾던 정보 확인: '휴대폰 번호'", "00:05 2초 만에 뒤로가기"], "signals": [{"type": "바로 뒤로가기", "t": "00:05", "shot": "", "detail": "확인하자마자 2초 만에 뒤로", "element": "집주인 매물 알림 시작해 보기"}]}, {"id": "c099", "seg": "중개사", "device": "PC", "style": "꼼꼼", "persona": {"연령대": "50대", "가입기간": "1년 미만"}, "goal": "집주인 매물 알림 시작해 보기", "entry": "https://realtor.zaritalk.com", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 realtor.zaritalk.com 진입 (2.1초)", "00:04 '휴대폰 번호로 시작하기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '휴대폰 번호'"], "signals": []}, {"id": "c100", "seg": "사업자", "device": "Android", "style": "꼼꼼", "persona": {"연령대": "30대", "가입기간": "1~3년", "가입경로": "단기임대(호스트)"}, "goal": "마스터 입점 알아보기", "entry": "https://master.zaritalk.com", "outcome": "성공", "durationSec": 5, "timeline": ["00:02 master.zaritalk.com 진입 (2.2초)", "00:04 '휴대폰 번호로 시작하기' 누름 → 화면 바뀜", "00:05 찾던 정보 확인: '휴대폰 번호'"], "signals": []}], "traffic": {"days": ["2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "groups": ["신규", "기존", "임대인", "비로그인"], "areas": ["고지서 작성", "고지서 홈", "기타", "단기임대", "로그인·가입", "마스터", "실거주리뷰", "월세환급", "임대관리", "자리페이", "전월세 매물", "커뮤니티", "혜택·리워드"], "data": {"신규": {"고지서 작성": [2821, 2469, 2580, 2999, 2625, 2593, 2028, 1924, 1843, 2128, 2317, 2043, 2149, 2059, 1674], "고지서 홈": [1597, 1436, 1564, 1911, 1814, 1661, 1180, 1162, 1044, 1212, 1522, 1369, 1412, 1388, 1106], "기타": [3014, 2791, 3123, 3571, 3427, 3123, 2698, 2482, 2276, 2479, 3268, 2943, 3093, 2904, 2273], "단기임대": [1086, 1066, 1139, 1246, 1141, 1154, 890, 853, 827, 867, 1026, 1003, 966, 897, 718], "로그인·가입": [5191, 4699, 5096, 5819, 5215, 5048, 3924, 3731, 3522, 3900, 4547, 3945, 4535, 4067, 3172], "마스터": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "실거주리뷰": [843, 755, 1104, 1039, 869, 863, 740, 743, 684, 720, 845, 861, 908, 730, 620], "월세환급": [540, 551, 649, 717, 544, 504, 451, 431, 397, 380, 521, 467, 689, 630, 441], "임대관리": [15, 5, 9, 18, 14, 13, 17, 10, 8, 7, 19, 9, 19, 16, 14], "자리페이": [2816, 2478, 2456, 2922, 2526, 2491, 1782, 1653, 1604, 1935, 2151, 1789, 1967, 1840, 1447], "전월세 매물": [1067, 1059, 1072, 1224, 1235, 1086, 914, 927, 912, 1023, 1277, 1230, 1251, 1156, 916], "커뮤니티": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "혜택·리워드": [535, 506, 487, 627, 642, 494, 401, 264, 201, 203, 373, 375, 250, 324, 276]}, "기존": {"고지서 작성": [11812, 10418, 13509, 27368, 16915, 11489, 10653, 13053, 12117, 9813, 11698, 10591, 16803, 17382, 11119], "고지서 홈": [15657, 13792, 17322, 21621, 18484, 15652, 14464, 17547, 13924, 13071, 17663, 15249, 21145, 19297, 15648], "기타": [24963, 20587, 26788, 32903, 29282, 26411, 23386, 26050, 20172, 19857, 31217, 24810, 31065, 27908, 24031], "단기임대": [1533, 1416, 1537, 1876, 1644, 1625, 1371, 1467, 1178, 1300, 1603, 1562, 1779, 1643, 1384], "로그인·가입": [26323, 22127, 38238, 48280, 30661, 26490, 21882, 27848, 21798, 19577, 26986, 20295, 40513, 39069, 25758], "마스터": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "실거주리뷰": [2713, 2194, 7732, 5072, 3015, 2658, 2416, 2941, 2191, 2367, 2546, 2246, 4381, 2458, 1955], "월세환급": [10559, 8890, 16910, 16458, 11076, 10362, 8566, 9743, 7942, 6320, 8654, 6816, 15215, 19226, 11782], "임대관리": [62, 69, 67, 111, 92, 71, 59, 102, 67, 59, 83, 64, 109, 82, 122], "자리페이": [7159, 5713, 7485, 10068, 8060, 7017, 5921, 8554, 5180, 5249, 7988, 6454, 11996, 9396, 7223], "전월세 매물": [1862, 1776, 1991, 2523, 2296, 2047, 1906, 1954, 1621, 1788, 2372, 2142, 2410, 2431, 1940], "커뮤니티": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "혜택·리워드": [15237, 13354, 15544, 19992, 19118, 16166, 13570, 11890, 9476, 9854, 15292, 12920, 11320, 12501, 12976]}, "임대인": {"고지서 작성": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "고지서 홈": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "기타": [6818, 5589, 4789, 11034, 8271, 7214, 6906, 6994, 5539, 4558, 14179, 7149, 6716, 7334, 6429], "단기임대": [100, 98, 91, 106, 107, 104, 107, 116, 101, 75, 110, 91, 112, 98, 83], "로그인·가입": [4113, 2787, 2741, 8556, 4530, 4331, 3759, 4009, 3358, 2603, 11470, 4226, 4148, 4605, 3752], "마스터": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "실거주리뷰": [110, 86, 75, 91, 122, 101, 101, 96, 61, 43, 65, 101, 107, 81, 88], "월세환급": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "임대관리": [8469, 7115, 7282, 11022, 8809, 8628, 8220, 8704, 7357, 6579, 11131, 8662, 9135, 9565, 7869], "자리페이": [1229, 820, 990, 1343, 964, 1188, 813, 1126, 1355, 885, 1192, 975, 1054, 1418, 933], "전월세 매물": [1106, 589, 384, 872, 1026, 1137, 1039, 1003, 524, 387, 1050, 829, 1047, 1058, 873], "커뮤니티": [4073, 3427, 4628, 8344, 3933, 4108, 4329, 4016, 3496, 3753, 9186, 5301, 5444, 5730, 3872], "혜택·리워드": [2250, 2294, 1765, 2255, 3272, 2374, 2529, 2322, 1763, 1673, 2377, 2334, 1675, 2142, 2324]}, "비로그인": {"고지서 작성": [10, 14, 4, 33, 13, 9, 9, 8, 13, 17, 12, 8, 14, 26, 6], "고지서 홈": [31, 34, 42, 38, 39, 35, 24, 31, 18, 15, 15, 26, 23, 31, 19], "기타": [14493, 13205, 14161, 19470, 18181, 15041, 13193, 13229, 11011, 11241, 18093, 14906, 15743, 15993, 13646], "단기임대": [3070, 3509, 3767, 3792, 3526, 4251, 2682, 2286, 1782, 2074, 2346, 2313, 2063, 1966, 1587], "로그인·가입": [67093, 58304, 76990, 106175, 83255, 66511, 54536, 59885, 50275, 51294, 68689, 53912, 75649, 69561, 47390], "마스터": [139, 72, 63, 234, 506, 203, 95, 72, 53, 44, 253, 110, 164, 188, 99], "실거주리뷰": [13878, 11904, 13881, 15585, 16335, 15488, 16508, 18049, 11332, 11977, 15061, 14658, 14149, 14573, 11589], "월세환급": [3, 4, 4, 5, 3, 6, 3, 5, 2, 1, 5, 12, 6, 7, 2], "임대관리": [20, 4, 4, 22, 12, 3, 7, 17, 6, 9, 7, 3, 8, 5, 8], "자리페이": [344, 276, 362, 659, 172, 119, 136, 122, 118, 85, 125, 155, 242, 263, 164], "전월세 매물": [186, 134, 122, 186, 211, 166, 158, 160, 157, 121, 208, 172, 184, 219, 170], "커뮤니티": [6784, 1113, 681, 1337, 2236, 1834, 1465, 1371, 1509, 2281, 1673, 1660, 1626, 1788, 1463], "혜택·리워드": [81, 81, 47, 86, 134, 91, 74, 103, 57, 106, 210, 157, 128, 163, 203]}}, "partial_today": "2026-11-27", "note": "세입자 신규=가입 7일 이내. 로그인 상태 값은 하루 방문자 수, 비로그인은 방문 수(사람 구분 불가)."}, "funnels": {"고지서": [{"step": 1, "name": "작성 시작", "이번주_신규": 9191, "이번주_기존": 36928, "지난주_신규": 11285, "지난주_기존": 49625}, {"step": 2, "name": "계약 정보", "이번주_신규": 777, "이번주_기존": 29886, "지난주_신규": 621, "지난주_기존": 21712}, {"step": 3, "name": "작성 완료", "이번주_신규": 2177, "이번주_기존": 6315, "지난주_신규": 2273, "지난주_기존": 7250}], "단기임대": [{"step": 1, "name": "단기임대 홈", "이번주_신규": 5589, "이번주_기존": 8395, "지난주_신규": 6173, "지난주_기존": 7833}, {"step": 2, "name": "숙소 카드 클릭", "이번주_신규": 2774, "이번주_기존": 2933, "지난주_신규": 2840, "지난주_기존": 2785}, {"step": 3, "name": "기간 선택", "이번주_신규": 1158, "이번주_기존": 1288, "지난주_신규": 1167, "지난주_기존": 1207}, {"step": 4, "name": "예약 버튼", "이번주_신규": 1417, "이번주_기존": 1607, "지난주_신규": 1439, "지난주_기존": 1538}, {"step": 5, "name": "결제 화면", "이번주_신규": 1082, "이번주_기존": 1191, "지난주_신규": 1075, "지난주_기존": 1131}], "자리페이": [{"step": 1, "name": "자리페이 화면", "이번주_신규": 4725, "이번주_기존": 49367, "지난주_신규": 4036, "지난주_기존": 40316}, {"step": 2, "name": "결제 시도", "이번주_신규": 822, "이번주_기존": 16489, "지난주_신규": 679, "지난주_기존": 12477}, {"step": 3, "name": "결제 완료", "이번주_신규": 325, "이번주_기존": 12015, "지난주_신규": 237, "지난주_기존": 8744}], "환급": [{"step": 1, "name": "조회 화면 진입", "이번주_신규": 3448, "이번주_기존": 57486, "지난주_신규": 3459, "지난주_기존": 62175}, {"step": 2, "name": "월세 낸 해 보기", "이번주_신규": 3450, "이번주_기존": 57537, "지난주_신규": 3459, "지난주_기존": 62208}, {"step": 3, "name": "월세 낸 해 입력", "이번주_신규": 2553, "이번주_기존": 46429, "지난주_신규": 2669, "지난주_기존": 50565}, {"step": 4, "name": "월세 금액 입력", "이번주_신규": 1756, "이번주_기존": 34797, "지난주_신규": 1751, "지난주_기존": 38085}, {"step": 5, "name": "동의", "이번주_신규": 1547, "이번주_기존": 28857, "지난주_신규": 1519, "지난주_기존": 31152}, {"step": 6, "name": "홈택스 인증", "이번주_신규": 1018, "이번주_기존": 17142, "지난주_신규": 953, "지난주_기존": 18594}, {"step": 7, "name": "신청 결제 화면", "이번주_신규": 292, "이번주_기존": 12795, "지난주_신규": 292, "지난주_기존": 10617}, {"step": 8, "name": "결제 버튼", "이번주_신규": 142, "이번주_기존": 4206, "지난주_신규": 139, "지난주_기존": 3891}]}, "features": [{"name": "혜택 탭 리워드 개편(운세·타로·포인트 복권·출석)", "team": "그로스팀", "launch": "2026-11-19", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 3384, 13173, 10461, 11729, 15064, 10870, 11782, 11017, 14256], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 1198, 3199, 2774, 3173, 3229, 2840, 3107, 3000, 3113], "close": null, "view_sum": 101736, "click_sum": 25633, "close_sum": null, "ctr": 25.2, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "혜택·리워드 화면 방문자", "series": [0, 0, 0, 18022, 16154, 17796, 22874, 23032, 19034, 16500, 14476, 11440, 11730, 18042, 15629, 13245, 14967, 15576], "before": 16701.7, "after": 14503.6, "after_days": 8, "change": -13.2}, "caveats": ["11/19~20에 다른 기능도 함께 배포됨"], "guard": {"name": "광고 오류 본 사람", "series": [0, 0, 0, 0, 0, 0, 0, 0, 0, 139, 293, 131, 141, 166, 134, 131, 94, 158], "before": 0.0, "after": 153.6}}, {"name": "하단 메뉴에 「환급」 탭 추가", "team": "환급팀", "launch": "2026-11-19", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 745, 1605, 1165, 1125, 1474, 1195, 1288, 1413, 1015], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 315, 731, 586, 538, 691, 514, 588, 663, 421], "close": null, "view_sum": 11025, "click_sum": 5047, "close_sum": null, "ctr": 45.8, "labels": ["탭 누른 사람", "바로 환급 신청으로 간 사람"], "partial_today": "2026-11-27", "metric": {"name": "월세환급 화면 방문자", "series": [0, 0, 0, 11099, 9441, 17559, 17175, 11620, 10866, 9017, 10174, 8339, 6700, 9175, 7283, 15904, 19856, 12223], "before": 11108.6, "after": 10806.0, "after_days": 8, "change": -2.7}, "caveats": ["11/19~20에 다른 기능도 함께 배포됨"]}, {"name": "환급 화면 「정부 지원금」 안내 4종", "team": "환급팀", "launch": "2026-11-20", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 837, 796, 780, 1067, 967, 1223, 2076, 1074], "click": null, "close": null, "view_sum": 8820, "click_sum": null, "close_sum": null, "ctr": null, "labels": ["지원금 안내 누른 사람", ""], "partial_today": "2026-11-27", "metric": {"name": "환급 신청 결제 버튼 누른 사람", "series": [549, 504, 386, 552, 411, 789, 876, 621, 571, 442, 505, 400, 359, 525, 404, 695, 1113, 602], "before": 608.9, "after": 571.6, "after_days": 7, "change": -6.1}, "caveats": ["11/19~20에 다른 기능도 함께 배포됨"]}, {"name": "커뮤니티 목록 위 「비교견적」 배너", "team": "마스터팀", "launch": "2026-11-20", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2242, 2085, 2405, 7644, 3842, 3699, 3679, 1993], "click": [0, 0, 0, 0, 21, 0, 23, 57, 28, 0, 0, 0, 0, 0, 23, 22, 27, 0], "close": null, "view_sum": 27589, "click_sum": 72, "close_sum": null, "ctr": 0.3, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "커뮤니티 방문 임대인", "series": [0, 0, 0, 4073, 3427, 4628, 8344, 3933, 4108, 4329, 4016, 3496, 3753, 9186, 5301, 5444, 5730, 3872], "before": 4691.7, "after": 5275.1, "after_days": 7, "change": 12.4}, "caveats": ["11/19~20에 다른 기능도 함께 배포됨"]}, {"name": "「서류가 더 필요해요」 플로팅 배너(자리페이·홈)", "team": "환급팀", "launch": "2026-11-23", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 270, 823, 1265, 1023, 869], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 115, 95, 58], "close": null, "view_sum": 4250, "click_sum": 348, "close_sum": null, "ctr": 8.2, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "환급 서류 업로드 완료한 사람", "series": [0, 0, 0, 0, 0, 0, 0, 124, 341, 221, 226, 182, 127, 284, 237, 292, 358, 216], "before": 174.4, "after": 292.8, "after_days": 4, "change": 67.9}, "caveats": ["25일 월세 납부일 전후라 결제·환급이 원래 늘어나는 시기와 겹침"]}, {"name": "홈 「자리페이」 플로팅 배너", "team": "자리페이팀", "launch": "2026-11-24", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2647, 7327, 6748, 5163], "click": null, "close": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 130, 389, 382, 266], "view_sum": 21885, "click_sum": null, "close_sum": 1167, "ctr": null, "labels": ["배너 본 사람", ""], "partial_today": "2026-11-27", "metric": {"name": "자리페이 결제 시도한 사람", "series": [3561, 2261, 2064, 2125, 1473, 1878, 2829, 2314, 2015, 1775, 2813, 1391, 1436, 2554, 2146, 3679, 2766, 2354], "before": 2042.6, "after": 2863.7, "after_days": 3, "change": 40.2}, "caveats": ["25일 월세 납부일 전후라 결제·환급이 원래 늘어나는 시기와 겹침"]}, {"name": "홈 「계약 만기」 말풍선", "team": "코어팀", "launch": "2026-11-24", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 973, 1636, 1591, 1316], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 20, 0], "close": null, "view_sum": 5516, "click_sum": 42, "close_sum": null, "ctr": 0.8, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "caveats": []}, {"name": "자리페이 OX 퀴즈에 「다음」 버튼 추가", "team": "자리페이팀", "launch": "2026-11-25", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 325, 686, 1783, 1336, 1399, 2153, 1486, 2952, 212, 593], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 260, 751], "close": null, "view_sum": 3757, "click_sum": 1011, "close_sum": null, "ctr": 26.9, "labels": ["1번 문제 푼 사람", "「다음」 누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "자리페이 결제 완료한 사람", "series": [2588, 1504, 1360, 1477, 918, 1161, 1843, 1461, 1329, 1185, 2000, 843, 825, 1730, 1508, 2486, 1915, 1709], "before": 1345.7, "after": 2200.5, "after_days": 2, "change": 63.5}, "caveats": ["도입 후 2일치라 판단 보류", "25일 월세 납부일 전후라 결제·환급이 원래 늘어나는 시기와 겹침"]}, {"name": "단기임대 결제 이탈 뒤 추천 팝업", "team": "자리스테이팀", "launch": "2026-11-25", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 298, 245], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 46, 50], "close": null, "view_sum": 630, "click_sum": 96, "close_sum": null, "ctr": 15.2, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "단기임대 예약 버튼 누른 사람", "series": [529, 557, 583, 503, 459, 502, 593, 585, 573, 520, 495, 396, 461, 557, 559, 528, 478, 392], "before": 508.7, "after": 503.0, "after_days": 2, "change": -1.1}, "caveats": ["도입 후 2일치라 판단 보류"]}, {"name": "혜택 탭 「월세환급·자리페이」 배너", "team": "그로스팀", "launch": "2026-11-26", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9659, 14264], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 407, 758, 643, 665, 989, 737, 890, 852, 504], "close": null, "view_sum": 23923, "click_sum": 1356, "close_sum": null, "ctr": 5.7, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "월세환급 화면 방문자", "series": [0, 0, 0, 11099, 9441, 17559, 17175, 11620, 10866, 9017, 10174, 8339, 6700, 9175, 7283, 15904, 19856, 12223], "before": 9513.1, "after": 19856.0, "after_days": 1, "change": 108.7}, "caveats": ["도입 후 1일치라 판단 보류", "25일 월세 납부일 전후라 결제·환급이 원래 늘어나는 시기와 겹침"]}, {"name": "매물 탭 「단기임대·비교견적」 툴팁", "team": "중개팀", "launch": "2026-11-26", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1558, 3556], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22], "close": null, "view_sum": 5114, "click_sum": 22, "close_sum": null, "ctr": 0.4, "labels": ["본 사람", "누른 사람"], "partial_today": "2026-11-27", "metric": {"name": "단기임대 화면 방문 세입자", "series": [0, 0, 0, 2619, 2482, 2676, 3122, 2785, 2779, 2261, 2320, 2005, 2167, 2629, 2565, 2745, 2540, 2102], "before": 2384.6, "after": 2540.0, "after_days": 1, "change": 6.5}, "caveats": ["도입 후 1일치라 판단 보류"]}, {"name": "결제 포인트 당첨 팝업", "team": "자리페이팀", "launch": "2026-11-27", "days": ["2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "view": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 899], "click": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 337], "close": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 543], "view_sum": 899, "click_sum": 337, "close_sum": 543, "ctr": 37.5, "labels": ["팝업 본 사람", "환급 보러 간 사람"], "partial_today": "2026-11-27", "caveats": []}], "rito": {"source": "리토 rito.zaritalk.com 「오늘의 변화 › 평소와 다른 것」, 2026-11-27 20:03 갱신 화면에서 읽음 (Redshift 마감 11/27 06:01)", "items": [{"team": "자리스테이팀", "metric": "검색→예약→확정 · 취소·거절", "change": "+703.7%", "window": "마감된 최근 2주(11/09~11/22) vs 그 전 6주"}, {"team": "전체", "metric": "푸시 발송 오류", "change": "+174.2%", "window": "최근 7일 평균 vs 직전 4주"}, {"team": "중개팀", "metric": "임차인 사는이야기 · 글", "change": "−68.3%", "window": "최근 7일 평균 vs 직전 4주"}, {"team": "중개팀", "metric": "임차인 사는이야기 · 좋아요", "change": "−68.2%", "window": "최근 7일 평균 vs 직전 4주"}, {"team": "중개팀", "metric": "임차인 사는이야기 · 댓글", "change": "−49.5%", "window": "최근 7일 평균 vs 직전 4주"}], "deploy_note": "리토: 최근 60일 주요 배포 뒤 평소보다 크게 움직인 지표 없음", "next": ["배포 목록 연결: 리토 「배포·검증」의 배포 이름·날짜를 받아 「신규 기능」을 로그 추정이 아니라 실제 배포 단위로 묶기", "로그인 화면 분기: 리토 「플로우 › Live View(WEB·APP)」 화면을 받아 기가입 고객 화면을 에이전트가 직접 보게 하기(지금은 로그로만 봄)", "이상 신호 자동 연결: 리토 「평소와 다른 것」이 뜨면 그 지표와 같은 화면의 에이전트 주행·오류 이벤트를 같이 띄우기", "판독 위임: 리토 AI 패널(내 Claude 구독)로 매일 아침 이 대시보드 요약을 팀 채널에 보내기", "필요한 것: Claude Code 재시작 후 리토 MCP 연결 + 리토 앱 페어링(지금 paired=false)"]}, "meta": {"outcomes": {"성공": 26, "막힘": 42, "로그인 벽": 28, "못 찾음": 4}, "stamp": "실제 로그 7일(11/20~27) + 고객 에이전트 100명 실주행 · 2026-11-27"}};
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtN = n => n==null?"-":Number(n).toLocaleString();
+const AG = Object.fromEntries(D.agents.map(a=>[a.id,a]));
+function toast(m){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
+function getS(k){try{return localStorage.getItem(k)}catch(e){return null}} function setS(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}
+function pct(a,b){if(!b) return null; return Math.round((a-b)/b*100);}
+function chg(p){if(p==null) return `<span class="flat">-</span>`; const c=p>3?"up":p<-3?"down":"flat"; return `<span class="${c}">${p>0?"+":""}${p}%</span>`;}
+function chgBad(p){if(p==null) return `<span class="flat">-</span>`; const c=p>3?"down":p<-3?"up":"flat"; return `<span class="${c}">${p>0?"+":""}${p}%</span>`;}
+// 작은 막대 그래프(일별). mark=도입일 인덱스, partial=마지막 날 부분
+function spark(vals,{w=260,h=54,mark=null,days=null,color="var(--brand)",partial=true}={}){
+  const n=vals.length, mx=Math.max(1,...vals); const bw=w/n;
+  const bars=vals.map((v,i)=>`<rect x="${i*bw+1}" y="${h-14-(v/mx)*(h-20)}" width="${Math.max(1,bw-2)}" height="${(v/mx)*(h-20)}" fill="${color}" opacity="${partial&&i===n-1?.35:1}"><title>${days?days[i]:""} ${fmtN(v)}</title></rect>`).join("");
+  const m = mark!=null?`<line x1="${mark*bw}" x2="${mark*bw}" y1="0" y2="${h-12}" stroke="var(--hot)" stroke-dasharray="3 2"/><text x="${mark*bw+3}" y="9" font-size="9" fill="var(--hot)">도입</text>`:"";
+  const lab = days?`<text x="0" y="${h-2}" font-size="9" fill="var(--muted)">${days[0].slice(5)}</text><text x="${w}" y="${h-2}" font-size="9" fill="var(--muted)" text-anchor="end">${days[n-1].slice(5)}${partial?" (오늘·부분)":""}</text>`:"";
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px" role="img" aria-label="일별 추이">${bars}${m}${lab}</svg>`;
 }
-// 녹화별 문제 순간: 판독이 짚은 시각 → 없으면 신호가 처음 나온 줄
-function momentOf(s, sid, ts){
-  if(sid===s.sessionId && ts) return ts;
-  const ref=byId[sid]?.timeline.find(l=>l.startsWith(ts||"~"))||"";
-  if(/JS 오류/.test(ref)){const e=s.timeline.find(l=>/JS 오류/.test(l)); if(e) return e.slice(0,5);}
-  const lab=(ref.match(/'([^']+)'/)||[])[1]; const [rk]=kindOf(ref);
-  const hit=(lab&&s.timeline.find(l=>l.includes(lab)&&SIG_RE.test(l))) || (lab&&s.timeline.find(l=>l.includes(lab)))
-    || (rk&&s.timeline.find(l=>kindOf(l)[0]===rk)) || s.timeline.find(l=>SIG_RE.test(l)) || s.timeline[0];
-  return hit.slice(0,5);
+// ───── 문제
+let branch="신규", team="전체", curId=null, curShot=0, curAgent=null;
+const ISS = () => (branch==="신규"?D.issuesNew:D.issuesExisting).filter(x=>team==="전체"||x.team.startsWith(team));
+const TEAMS = ["전체",...new Set([...D.issuesNew,...D.issuesExisting].map(x=>x.team.replace(/\(.*$/,"")))];
+function renderFilters(){
+  document.getElementById("teamSel").innerHTML=TEAMS.map(t=>`<option ${t===team?"selected":""}>${t}</option>`).join("");
+  document.querySelectorAll("[data-branch]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.branch===branch)));
+  document.getElementById("branchNote").textContent = branch==="신규" ? "고객 에이전트 100명이 실제 자리톡 웹을 로그인 없이 직접 써 본 결과 · 실제 비로그인 트래픽 비중대로 배치" : "실제 로그인 고객의 최근 7일 행동 기록(account_activity_log) · 신규 = 가입 7일 이내";
 }
-function idxAt(s, n){let k=0; s.timeline.forEach((l,i)=>{if(sec(l.slice(0,5))<=n) k=i;}); return k;}
-function pageAt(s, i){for(let j=i;j>=0;j--){const m=s.timeline[j].match(/\/[a-z][a-z0-9\-\/]*/);if(m) return m[0];} return s.entry;}
-// 실제 운영 링크: 시작 시각 파라미터(미확인) — 안 되면 클래리티 공유 창의 「이 시각부터」 링크로 바꾼다
-const srcUrl = (s, ts) => `${s.url}?time=${sec(ts)*1000}`;
-// 화면 그림: 실제 운영에서는 헤드리스 크롬으로 클래리티 재생기를 그 시각에 멈춰 캡처한 이미지로 바꾼다
-const SCREEN=[["/pay/card","카드 등록"],["/pay/complete","결제 완료"],["/pay","자리페이"],["/estimate","견적 선택"],["/order","청소 주문"],["/point-shop/exchange","포인트 교환"],["/point-shop","포인트샵"],["/benefit","혜택"],["/vacancy","매물 찾기"],["/real-residence-review","실거주 리뷰"],["/short-term-vacancy","단기 숙소 찾기"],["/stay","숙소 상세"],["/my/room/short-term","내 숙소"],["/host/contract/upload","계약서 업로드"],["/host/contract","계약 관리"],["/host/building","건물 관리"],["/refund","월세 환급"]];
-const TKEY={"중개팀":"brokerage","자리페이팀":"pay","그로스팀":"growth","마스터팀":"master","자리스테이팀":"stay","코어팀":"core","환급팀":"refund"};
-const TPAGE={"중개팀":"매물 화면","자리페이팀":"자리페이 화면","그로스팀":"포인트샵·혜택 화면","마스터팀":"청소 주문 화면","자리스테이팀":"단기 숙소 화면","코어팀":"건물·계약 화면","환급팀":"환급 화면"};
-const screenName = pg => (SCREEN.find(([u])=>pg.startsWith(u))||[,pg])[1];
-// 폰 화면 그림: 실제 운영에서는 헤드리스 크롬으로 클래리티 재생 화면을 그 시각에 멈춰 캡처한 이미지로 바꾼다
-function screen(s, i){
-  const line=s.timeline[i]; const [k,kl]=kindOf(line); const page=pageAt(s,i); const name=screenName(page);
-  const labOf = l => (l.match(/'([^']+)'/)||[])[1] || (/카드사|드롭다운/.test(l)?"카드사 선택":/필터/.test(l)?"보증금 필터":/지도/.test(l)?"지도 핀":/사진/.test(l)?"사진 보기":/업로드|파일 선택/.test(l)?"업로드":/날짜/.test(l)?"날짜 선택":"");
-  const lab = labOf(line) || (k==="err" && i>0 ? labOf(s.timeline[i-1]) : "");
-  const rep=+((line.match(/x(\d+)/)||[])[1]||0);
-  const col = k==="err"||k==="rage"?"var(--hot)":k==="dead"||k==="back"?"var(--warn)":"var(--brand)";
-  const by = 150;
-  const taps = (k==="rage"||k==="dead"||k==="repeat") ? `<circle cx="132" cy="${by+20}" r="16" fill="${col}" fill-opacity=".18"/><circle cx="132" cy="${by+20}" r="7" fill="${col}"/>
-     ${rep?`<rect x="140" y="${by-6}" width="28" height="18" rx="9" fill="${col}"/><text x="154" y="${by+7}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">×${rep}</text>`:""}` : "";
-  const extra =
-    k==="err" ? `<rect x="12" y="236" width="156" height="38" rx="8" fill="var(--hot)"/><text x="22" y="252" font-size="10.5" font-weight="700" fill="#fff">⚠ 오류</text><text x="22" y="266" font-size="9" fill="#fff" font-family="var(--mono)">${esc((s.signals.jsErrors[0]||"").replace(/^\w+:\s*/,"").slice(0,27))}</text>` :
-    k==="back" ? `<path d="M120 ${by-18} q-30 -20 -60 0" stroke="${col}" stroke-width="3" fill="none" marker-end="url(#ar)"/><text x="90" y="${by-30}" text-anchor="middle" font-size="10" font-weight="700" fill="${col}">2초 만에 뒤로</text>` :
-    k==="stop" ? `<rect x="40" y="${by+40}" width="100" height="22" rx="11" fill="var(--warn)"/><text x="90" y="${by+55}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">⏸ 30초 멈춤</text>` :
-    k==="scroll" ? `<text x="160" y="170" text-anchor="middle" font-size="22" fill="${col}">⇅</text>` : "";
-  const label = kl ? `<rect x="12" y="${k==="err"?212:240}" width="${kl.length*11+30}" height="20" rx="10" fill="${col}"/><text x="22" y="${k==="err"?226:254}" font-size="10.5" font-weight="700" fill="#fff">${kl}${rep?` ${rep}번`:""}</text>` : "";
-  return `<svg viewBox="0 0 180 300" role="img" aria-label="${esc(name)} 화면, ${esc(ko(line.slice(6)))}" style="font-family:var(--sans)">
-    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="${col}"/></marker></defs>
-    <rect x="1" y="1" width="178" height="298" rx="18" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/>
-    <rect x="70" y="8" width="40" height="5" rx="2.5" fill="var(--line)"/>
-    <text x="16" y="38" font-size="13" font-weight="700" fill="var(--fg)">‹ ${esc(name)}</text>
-    <text x="16" y="54" font-size="8.5" fill="var(--muted)" font-family="var(--mono)">${esc(page.slice(0,30))}</text>
-    <rect x="14" y="66" width="152" height="40" rx="8" fill="var(--idle-soft)"/>
-    <rect x="22" y="76" width="70" height="7" rx="3" fill="var(--line)"/><rect x="22" y="90" width="110" height="6" rx="3" fill="var(--line)" opacity=".6"/>
-    <rect x="14" y="114" width="152" height="6" rx="3" fill="var(--idle-soft)"/><rect x="14" y="126" width="120" height="6" rx="3" fill="var(--idle-soft)"/>
-    ${lab?`<rect x="20" y="${by}" width="140" height="40" rx="9" fill="${k?col:"var(--brand)"}" fill-opacity="${k?".12":"1"}" stroke="${k?col:"var(--brand)"}" stroke-width="2"/>
-      <text x="${taps?78:90}" y="${by+25}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${k?col:"#fff"}">${esc(lab.slice(0,9))}</text>`:`<rect x="14" y="${by+6}" width="152" height="6" rx="3" fill="var(--idle-soft)"/><rect x="14" y="${by+18}" width="140" height="6" rx="3" fill="var(--idle-soft)"/>`}
-    ${taps}${extra}${label}
-  </svg>`;
-}
-function toast(msg){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
-
-
-const KO = [[/\(rage\)/g,"(분노 클릭)"],[/\(dead\)/g,"(반응 없는 클릭)"],[/\(quickback\)/g,"(바로 뒤로가기)"],[/\(excessive scroll\)/g,"(스크롤 반복)"],
-  [/\brage\b/g,"분노 클릭"],[/\bdead\b/g,"반응 없는 클릭"],[/\bquickback\b/g,"바로 뒤로가기"],[/excessive scroll/g,"스크롤 반복"],[/ x(\d+)/g," $1번"],[/\bx(\d+)\b/g,"$1번"]];
-const ko = s => KO.reduce((a,[r,v])=>a.replace(r,v), String(s));
-function splitHyp(h){const i=h.indexOf("확인 필요"); if(i<0) return [h,""]; const head=h.slice(0,i).replace(/[\s.:(]+$/,"").trim()||"기록만으로 단정할 수 없음"; let unk=h.slice(i).replace(/^확인 필요[:)\s]*/,"").replace(/\)$/,"").trim(); if(unk.replace(/[\s.。]/g,"").length<4) unk="코드·네트워크 기록으로 원인 확인"; return [head, unk];}
-function splitSug(s){const m=s.split(/\s(?=\(?\d\)\s?)|\s(?=대안:)/); const first=m[0].replace(/^[^(]*?:\s*(?=\(1\))/,"").replace(/^\(?1\)\s?/,""); return [first.trim(), m.slice(1).join(" ").trim()];}
-const isObserve = it => (it.similar!=null ? it.similar<3 : true) && !it.sessions.some(x=>byId[x]?.signals.jsErrors.length);
-function sigList(s){return Object.keys(LABEL).filter(k=>cnt(s,k)).map(k=>LABEL[k]);}
-
-function team(s){const p=[s.entry,s.exit,...s.timeline].join(" ");return TEAMS.find(t=>t.urls.some(u=>p.includes(u)));}
-function cnt(s,k){const v=s.signals[k];return Array.isArray(v)?v.length:v;}
-function score(s){
-  let b=0; for(const k of Object.keys(LABEL)) b+=cfg[k]*cnt(s,k);
-  const idle = s.durationSec>600 && s.timeline.length<=3;
-  if(cfg.idle && idle) b-=5;
-  return {v:b, idle};
-}
-function select(){
-  const out={}; // id -> {status, score}
-  const groups={};
-  for(const s of SESSIONS){const t=team(s); if(!t) continue; (groups[t.name] ||= []).push(s);}
-  for(const [name,ss] of Object.entries(groups)){
-    const ranked=ss.map(s=>({s,...score(s)})).sort((a,b)=>b.v-a.v);
-    const hot=ranked.filter(r=>r.v>0).slice(0,cfg.top);
-    const calm=ranked.filter(r=>r.v<=0 && !r.s.exit.includes("complete") && r.s.timeline.length>3).slice(0,cfg.explore);
-    for(const r of ranked){
-      let st="low";
-      if(hot.includes(r)) st="sig"; else if(calm.includes(r)) st="exp"; else if(r.idle && cfg.idle) st="idle";
-      else if(r.s.exit.includes("complete")) st="done";
-      out[r.s.sessionId]={st,v:r.v,team:name};
-    }
-  }
-  return out;
-}
-const ST = {sig:["p-sig","신호로 선별"],exp:["p-exp","탐색 몫"],idle:["p-idle","제외: 방치"],done:["p-low","제외: 완료"],low:["p-low","제외: 신호 없음"]};
-
-function renderCtrl(){
-  const c=document.getElementById("ctrl");
-  c.innerHTML = `<h3>점수 가중치</h3>` + Object.keys(LABEL).map(k=>`
-    <div class="item"><label for="w-${k}"><span>${LABEL[k]}</span><span class="mono" id="v-${k}">×${cfg[k]}</span></label>
-    <input type="range" id="w-${k}" min="0" max="10" step="1" value="${cfg[k]}"></div>`).join("") + `
-    <h3>고르는 수 (팀당)</h3>
-    <div class="item"><label for="w-top"><span>신호 상위</span><span class="mono" id="v-top">${cfg.top}개</span></label><input type="range" id="w-top" min="1" max="10" value="${cfg.top}"></div>
-    <div class="item"><label for="w-explore"><span>탐색 몫</span><span class="mono" id="v-explore">${cfg.explore}개</span></label><input type="range" id="w-explore" min="0" max="3" value="${cfg.explore}"></div>
-    <label class="chk" for="w-idle"><input type="checkbox" id="w-idle" ${cfg.idle?"checked":""}><span>10분 넘게 켜두고 행동이 3개 이하인 녹화 감점 (방치 녹화)</span></label>
-    <button class="reset" id="reset">기본값으로</button>`;
-  for(const k of [...Object.keys(LABEL),"top","explore"]){
-    document.getElementById("w-"+k).addEventListener("input",e=>{cfg[k]=+e.target.value;
-      document.getElementById("v-"+k).textContent = (k==="top"||k==="explore")?`${cfg[k]}개`:`×${cfg[k]}`; renderTable();});
-  }
-  document.getElementById("w-idle").addEventListener("change",e=>{cfg.idle=e.target.checked;renderTable();});
-  document.getElementById("reset").addEventListener("click",()=>{cfg={...DEF};renderCtrl();renderTable();});
-}
-function renderTable(){
-  const sel=select();
-  const rows=SESSIONS.filter(s=>sel[s.sessionId]).sort((a,b)=>sel[a.sessionId].team.localeCompare(sel[b.sessionId].team,"ko")||sel[b.sessionId].v-sel[a.sessionId].v);
-  document.getElementById("rows").innerHTML = rows.map(s=>{const r=sel[s.sessionId];const [cls,txt]=ST[r.st];
-    const chips=Object.keys(LABEL).map(k=>{const n=cnt(s,k);return `<span class="chip ${n?"on":""}">${LABEL[k]} ${n}</span>`}).join("");
-    return `<tr><td>${esc(r.team)}</td><td><button class="rowbtn" data-sid="${s.sessionId}">${s.sessionId}</button></td><td class="mono">${fmt(s.durationSec)}</td>
-      <td><div class="chips">${chips}</div></td><td class="num">${r.v}</td><td><span class="pill ${cls}">${txt}</span></td></tr>`}).join("");
-  const c={sig:0,exp:0,out:0}; for(const r of Object.values(sel)){ if(r.st==="sig")c.sig++; else if(r.st==="exp")c.exp++; else c.out++; }
-  document.getElementById("sum").innerHTML = `<span class="pill p-sig">신호로 선별 ${c.sig}</span><span class="pill p-exp">탐색 몫 ${c.exp}</span><span class="pill p-low">제외 ${c.out}</span><span class="muted" style="font-size:13px">전체 ${SESSIONS.length}개 중 AI에게 ${c.sig+c.exp}개 보냄</span>`;
-  document.getElementById("note").hidden = JSON.stringify(cfg)===JSON.stringify(DEF);
-}
-
-function fbKey(t,i){return `fb:${t}:${i}`}
-function getFb(k){try{return localStorage.getItem(k)}catch(e){return null}}
-function setFb(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
-function jiraText(tname,i){
-  const it=ISSUES[tname][i]; const [sid,ts]=it.moment.split(" "); const s=byId[sid]; const ctx=CTX.teams[tname]||{};
-  const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
-  const links=[sid,...it.sessions.filter(x=>x!==sid)].filter(x=>byId[x]).map(x=>{const m=x===sid?ts:momentOf(byId[x],sid,ts);return `- ${x} ${m}부터: ${srcUrl(byId[x],m)}`;}).join("\n");
-  return `[${tname}] ${ko(it.title)}
-
-■ 영향
-- 어제 ${TPAGE[tname]||"팀 화면"} 녹화 ${ctx.pageSessions??"-"}개 중 ${it.similar??"-"}개에서 같은 문제
-- 요약: ${it.summary||""}
-- ${ctx.metric||""} 어제 ${ctx.value||"-"} (7일 평균 ${ctx.avg7||"-"})
-
-■ 재현 정보 (대표 녹화 ${sid})
-- 화면: ${pageAt(s,idxAt(s,sec(ts)))}
-- 기기: ${s.device} · ${s.os} · ${s.browser}
-${s.signals.jsErrors.length?`- 오류 원문: ${s.signals.jsErrors.join(" / ")}\n`:""}- 행동 순서:
-${s.timeline.map(l=>"  "+ko(l)).join("\n")}
-
-■ 원인 가설 (확신 ${unk?"낮음":"중간"})
-${hy}${unk?`\n- 확인할 것: ${unk}`:""}
-
-■ 추천 개선안
-${s1}${s2?`\n- 다른 안: ${s2.replace(/^대안:\s*/,"")}`:""}
-
-■ 녹화 (그 시각부터 열기)
-${links}
-
-— 클래리티 리뷰 에이전트 자동 작성`;
-}
-
-// ───── 화면 상태
-const TEAM_NAMES = TEAMS.map(t=>t.name).filter(n=>ISSUES[n]);
-function initTeam(){
-  const q=new URLSearchParams(location.search).get("team");
-  const hit=Object.entries(TKEY).find(([n,k])=>k===q);
-  if(hit && ISSUES[hit[0]]) return hit[0];
-  try{const v=localStorage.getItem("team"); if(v&&ISSUES[v]) return v;}catch(e){}
-  return TEAM_NAMES[0];
-}
-let curTeam=initTeam(), curIdx=null, curRec=null;
-const P={s:null,n:0,timer:null,key:""};
-
-function ordered(tname){ // 문제 → 관찰 순, 같은 그룹 안에서는 심각도·반복 순
-  const sv={"높음":0,"중간":1,"낮음":2};
-  return (ISSUES[tname]||[]).map((it,i)=>({it,i,obs:isObserve(it)}))
-    .sort((a,b)=>a.obs-b.obs || (b.it.repeat&&!b.it.repeat.jira?1:0)-(a.it.repeat&&!a.it.repeat.jira?1:0) || sv[a.it.severity]-sv[b.it.severity]);
-}
-function statusTxt(k){const a=getFb(k+":act");return a==="send"?"전달함":a==="known"?"이미 앎":a==="jira"?"지라 만듦":"";}
-
-function renderTeams(){
-  document.getElementById("teams").innerHTML=TEAM_NAMES.map(n=>{const m=ISSUES[n].filter(it=>!isObserve(it)).length;
-    return `<button role="tab" aria-selected="${n===curTeam}" data-team="${n}">${n}<span class="n">${m}</span></button>`}).join("");
-}
+function sevDot(s){return s==="높음"?"높음":s==="중간"?"중간":"obs";}
 function renderList(){
-  const ctx=CTX.teams[curTeam]||{}; const o=ordered(curTeam);
-  const main=o.filter(x=>!x.obs), obs=o.filter(x=>x.obs);
-  const row=({it,i,obs})=>{const k=fbKey(curTeam,i);const st=statusTxt(k);
-    const rp=it.repeat;
-    const tag=obs?`<span class="badge b-obs">관찰</span>`:rp?(rp.jira?`<span class="badge b-jira">${esc(rp.jira)} 진행 중</span>`:`<span class="badge b-rep">🔁 ${rp.days}일째 미처리</span>`):`<span class="badge b-new">🆕 오늘 처음</span>`;
-    const pct=it.similar!=null&&ctx.pageSessions?` (${Math.round(it.similar/ctx.pageSessions*1000)/10}%)`:"";
-    return `<button class="row" role="option" aria-selected="${i===curIdx}" data-issue="${i}">
-      <span class="dot ${obs?"obs":esc(it.severity)}" aria-label="심각도 ${esc(it.severity)}"></span>
-      <span><span class="t">${esc(ko(it.title))}</span>
-      <span class="m">${tag}<span>${it.similar!=null?`녹화 ${it.similar}개${pct}`:"녹화 1개"}</span>${st?`<span class="done">✓ ${st}</span>`:""}</span></span></button>`};
-  document.getElementById("list").innerHTML=`
-    <div class="lhead"><h2>${esc(curTeam)} · 어제 녹화 판독 결과</h2>
-      <div class="kpi">${esc(ctx.metric||"")} 어제 <b>${esc(ctx.value||"-")}</b> (7일 평균 ${esc(ctx.avg7||"-")}) · 녹화 ${ctx.pageSessions?.toLocaleString()||"-"}개</div></div>
-    <div role="listbox" aria-label="문제 목록">
-    <div class="group">오늘 볼 문제 ${main.length}</div>${main.map(row).join("")||`<p class="lfoot">오늘은 바로 볼 문제가 없어요.</p>`}
-    ${obs.length?`<div class="group">관찰 ${obs.length} · 겪은 녹화가 3개 미만</div>${obs.map(row).join("")}`:""}
-    </div>
-    <p class="lfoot"><span class="kbd">↑</span> <span class="kbd">↓</span> 문제 이동 · <span class="kbd">Space</span> 재생 · <span class="kbd">J</span> 지라 초안</p>`;
+  const L=ISS();
+  document.getElementById("list").innerHTML = `<div class="lhead"><h2>${branch==="신규"?"신규 방문자가 걸린 곳":"기가입 고객이 겪는 문제"}</h2>
+    <div class="kpi">${branch==="신규"?`에이전트 100명 · 성공 <b>${D.meta.outcomes["성공"]||0}</b> · 로그인 벽 <b>${D.meta.outcomes["로그인 벽"]||0}</b> · 막힘 <b>${D.meta.outcomes["막힘"]||0}</b> · 못 찾음 <b>${D.meta.outcomes["못 찾음"]||0}</b>`:`최근 7일 · 실제 로그 기준 · 겪은 사람 순`}</div></div>
+    <div role="listbox">${L.map(x=>{const st=getS("act:"+x.id);
+      const right = branch==="신규" ? `<span>100명 중 <b>${x.n}</b>명</span>` : `<span><b>${fmtN(x.n)}</b>명 · 지난주 ${chgBad(x.change)}</span>`;
+      return `<button class="row" role="option" aria-selected="${x.id===curId}" data-issue="${x.id}"><span class="dot ${sevDot(x.sev)}"></span>
+      <span><span class="t">${esc(x.title)}</span><span class="m"><span class="badge b-${esc(x.sev)}">${esc(x.sev)}</span><span>${esc(x.team)}</span>${right}${st?`<span class="done">✓ ${st==="jira"?"지라 만듦":st==="send"?"전달함":"이미 앎"}</span>`:""}</span></span></button>`}).join("")||`<p class="lfoot">이 팀 문제 없음</p>`}</div>
+    <p class="lfoot"><span class="kbd">↑</span> <span class="kbd">↓</span> 이동 · <span class="kbd">J</span> 지라 초안</p>`;
 }
+function bars(pairs,total,hot){const mx=Math.max(1,...pairs.map(p=>p[1]));return `<div class="bars">${pairs.map(([k,v])=>`<div class="bar1"><span>${esc(k)}</span><span class="tr"><i class="${hot?"hot":""}" style="width:${v/mx*100}%"></i></span><span class="v">${v}${total?"명":""}</span></div>`).join("")}</div>`;}
+function actBar(x){const a=getS("act:"+x.id), f=getS("fb:"+x.id);
+  return `<div class="bar"><button class="primary" data-jira="1">지라 초안 만들기 <span class="kbd" style="color:#fff;border-color:rgba(255,255,255,.5)">J</span></button>
+    <button data-act="send" aria-pressed="${a==="send"}">담당자에게 전달</button><button data-act="known" aria-pressed="${a==="known"}">이미 아는 문제</button>
+    <span class="judge"><span class="muted small">AI 판독이 맞나요?</span><button class="yes" data-k="y" aria-pressed="${f==="y"}">✅ 맞음</button><button class="no" data-k="n" aria-pressed="${f==="n"}">❌ 틀림</button></span></div>`;}
+function aiPane(x){return `<div class="pane ai"><h3>AI 판독</h3>
+  <section><span class="lbl">무슨 일이 있었나</span><p>${esc(x.summary)}</p></section>
+  <section class="fix"><span class="lbl">이렇게 고쳐 보세요</span><p>${esc(x.suggestion)}</p></section>
+  <section><span class="lbl">다른 방법</span><p>${esc(x.alt)}</p></section>
+  <section><span class="lbl">원인 가설 · ${/확인 필요/.test(x.hypothesis)?"AI 확신 낮음":"AI 확신 중간"}</span><p>${esc(x.hypothesis)}</p></section>
+  ${x.real?`<section><span class="lbl">실제 트래픽·지표</span><p>${esc(x.real)}</p></section>`:""}
+  ${x.ev?`<section><span class="lbl">근거 이벤트(검증용)</span><p class="raw mono">${x.ev.map(esc).join("<br>")}</p></section>`:""}
+  ${x.page?`<section><span class="lbl">화면</span><p class="raw mono">${esc(x.page||x.where)}</p></section>`:""}</div>`;}
 function renderDetail(){
-  const it=ISSUES[curTeam][curIdx]; const ctx=CTX.teams[curTeam]||{}; const obs=isObserve(it); const k=fbKey(curTeam,curIdx); const f=getFb(k);
-  const [sid,ts]=it.moment.split(" "); const order=[sid,...it.sessions.filter(x=>x!==sid)].filter(x=>byId[x]);
-  if(!curRec||!order.includes(curRec)) curRec=sid;
-  const rp=it.repeat;
-  const badges=[obs?`<span class="badge b-obs">관찰</span>`:rp?(rp.jira?`<span class="badge b-jira">🔁 ${rp.days}일 연속 · ${esc(rp.jira)} 진행 중</span>`:`<span class="badge b-rep">🔁 ${rp.days}일 연속 보고 · 지라 없음</span>`):`<span class="badge b-new">🆕 오늘 처음</span>`,
-    `<span class="badge b-${esc(it.severity)}">심각도 ${esc(it.severity)}</span>`, it.kind==="탐색"?`<span class="badge b-exp">오류 없이 이탈</span>`:""].join(" ");
-  const pct=it.similar!=null&&ctx.pageSessions?Math.round(it.similar/ctx.pageSessions*1000)/10:null;
-  const imp = it.similar!=null
-    ? `어제 ${esc(TPAGE[curTeam]||"팀 화면")} 녹화 ${ctx.pageSessions.toLocaleString()}개 중 <b>${it.similar}개(${pct}%)</b>에서 같은 문제 · AI가 직접 본 녹화 ${order.length}개`
-    : `오류 신호가 없는 녹화 1개 · 비슷한 녹화가 3개 쌓이면 문제로 올려요`;
-  const [hy,unk]=splitHyp(ko(it.hypothesis)); const [s1,s2]=splitSug(ko(it.suggestion));
-  const act=getFb(k+":act");
-  document.getElementById("detail").innerHTML=`
-    <div class="dhead"><div>${badges}</div>
-      ${rp&&!rp.jira&&!obs?`<p class="warn">⚠ ${rp.days}일째 같은 문제가 보고됐는데 아직 처리 전이에요</p>`:""}
-      <h1>${esc(ko(it.title))}</h1><p class="imp">${imp}</p></div>
-    <div class="bar">
-      <button class="primary" data-jira="1">지라 초안 만들기 <span class="kbd" style="color:#fff;border-color:rgba(255,255,255,.5)">J</span></button>
-      <button data-act="send" aria-pressed="${act==="send"}">담당자에게 전달</button>
-      <button data-act="known" aria-pressed="${act==="known"}">이미 아는 문제</button>
-      <span class="judge"><span class="muted small">AI 판독이 맞나요?</span>
-        <button class="yes" data-k="y" aria-pressed="${f==="y"}">✅ 맞음</button>
-        <button class="no" data-k="n" aria-pressed="${f==="n"}">❌ 틀림</button>
-        <select data-why aria-label="틀린 이유" ${f==="n"?"":"hidden"}>${["이유 고르기","원인이 다름","정상 동작임","우리 팀 아님","기록 데이터 오류"].map(o=>`<option ${getFb(k+":why")===o?"selected":""}>${o}</option>`).join("")}</select>
-      </span>
-    </div>
-    <div class="grid2">
-      <div class="pane player">
-        <h3>녹화 재생 · 문제 순간부터</h3>
-        <div class="stage"><div class="phone" id="pscreen"></div><div class="now" id="pnow"></div></div>
-        <div class="ctrl"><button id="pplay">▶ 재생</button><div class="scrub" id="pscrubw"></div><span class="mono small" id="ptime"></span></div>
-        <div class="recs">${order.map((x,j)=>{const s=byId[x];return `<button class="rec" data-rec="${x}" aria-pressed="${x===curRec}">${j===0?"대표 녹화":"녹화 "+(j+1)} · ${esc(s.device)}<small>${x} · ${fmt(s.durationSec)} · ${esc(s.os||"")}</small></button>`}).join("")}</div>
-        <ol class="events" id="pev" aria-label="행동 기록"></ol>
-      </div>
-      <div class="pane ai">
-        <h3>AI 판독</h3>
-        <section><span class="lbl">무슨 일이 있었나</span><p>${esc(it.summary||ko(it.evidence))}</p></section>
-        <section class="fix"><span class="lbl">이렇게 고쳐 보세요</span><p>${esc(s1)}</p></section>
-        ${s2?`<section><span class="lbl">다른 방법</span><p>${esc(s2.replace(/^대안:\s*/,"").replace(/^\(?\d\)\s*/,""))}</p></section>`:""}
-        <section><span class="lbl">원인 가설 · AI 확신 ${unk?"낮음":"중간"}</span><p>${esc(hy)}</p></section>
-        ${unk?`<section><span class="lbl">확인할 것</span><p>${esc(unk)}</p></section>`:""}
-        <section><span class="lbl">행동 기록 원문</span><p class="raw">${esc(ko(it.evidence))}</p></section>
-        <section><span class="lbl">대표 녹화 정보</span><dl>
-          <dt>기기</dt><dd>${esc(byId[sid].device)} · ${esc(byId[sid].os||"")} · ${esc(byId[sid].browser||"")}</dd>
-          <dt>들어온 화면</dt><dd class="mono">${esc(byId[sid].entry)}</dd><dt>나간 화면</dt><dd class="mono">${esc(byId[sid].exit)}</dd>
-          ${byId[sid].signals.jsErrors.length?`<dt>오류 원문</dt><dd class="mono small" style="word-break:break-all">${esc(byId[sid].signals.jsErrors.join(", "))}</dd>`:""}
-        </dl></section>
-      </div>
-    </div>`;
-  loadRec(curRec, curRec===sid?ts:momentOf(byId[curRec],sid,ts));
+  const x=ISS().find(y=>y.id===curId); const el=document.getElementById("detail"); if(!x){el.innerHTML="";return;}
+  if(branch==="신규"){
+    const shots=x.shots; const sh=shots[curShot]||shots[0];
+    const ag=curAgent&&x.agents.includes(curAgent)?curAgent:(sh?sh.agent:x.agents[0]); const A=AG[ag];
+    el.innerHTML=`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span> <span class="badge b-obs">${esc(x.team)}</span>${x.kind?` <span class="badge b-exp">${esc(x.kind)}</span>`:""}</div>
+      <h1>${esc(x.title)}</h1><p class="big">100명 중 <b>${x.n}</b>명 <span class="muted">(이 입구로 들어온 ${x.base}명 중)</span></p>
+      ${x.real?`<p class="realbox">실제 트래픽: ${esc(x.real)}</p>`:""}</div>
+      ${actBar(x)}
+      <div class="grid2"><div class="pane">
+        <h3>무엇을 하다가 걸렸나</h3><div style="padding:8px 14px">${bars(x.goals,true,true)}</div>
+        <h3>그다음 어떻게 됐나 · 기기</h3><div style="padding:8px 14px" class="chips2">${x.outcomes.map(([k,v])=>`<span class="chip2">${esc(k)} ${v}명</span>`).join("")}${x.devices.map(([k,v])=>`<span class="chip2">${esc(k)} ${v}</span>`).join("")}</div>
+        ${shots.length?`<h3>실제 화면 (에이전트가 걸린 순간)</h3>
+        <div class="shotview"><img src="shots/${esc(sh.shot)}" alt="${esc(sh.agent)} ${esc(sh.type)} 순간 실제 화면" loading="lazy"><div class="now"><span class="ts">${esc(sh.t)}</span><span class="ev">${esc(sh.type)}</span><span class="muted small">${esc(sh.agent)} · ${esc(AG[sh.agent].device)} · ${esc(AG[sh.agent].style)} · 목표 「${esc(AG[sh.agent].goal)}」</span></div></div>
+        <div class="thumbs">${shots.map((s,i)=>`<button data-shot="${i}" aria-pressed="${i===curShot}" aria-label="${esc(s.agent)} 화면"><img src="shots/${esc(s.shot)}" alt="" loading="lazy"></button>`).join("")}</div>`:`<p class="muted small" style="padding:8px 14px">원문을 직접 검색해 확인한 문제라 캡처 대신 원문 문구를 근거로 둡니다.</p>`}
+        <h3>이 문제를 겪은 에이전트 ${x.agents.length}명 · 누르면 그 사람의 여정</h3>
+        <div style="padding:8px 14px" class="chips2">${x.agents.map(i=>`<button class="chip2" data-agent="${i}" aria-pressed="${i===ag}">${i}</button>`).join("")}</div>
+        ${A?`<div style="padding:4px 14px 14px"><p class="small"><b>${A.id}</b> · ${esc(A.seg)} · ${esc(A.device)} · ${esc(A.style)} · 목표 「${esc(A.goal)}」 → <b>${esc(A.outcome)}</b></p>
+          <ol class="journey">${A.timeline.map(l=>{const t=l.slice(0,5);const s=A.signals.find(z=>z.t===t&&z.shot);return `<li class="${/누름 → 변화 없음|가려|팝업|로그인|찾지 못|빈 페이지|연타|개인정보/.test(l)?"sig":""}"><span class="t">${t}</span><span>${esc(l.slice(6))}${s?` <button class="linkish" data-ashot="${esc(s.shot)}">화면</button>`:""}</span></li>`}).join("")}</ol></div>`:""}
+      </div>${aiPane(x)}</div>`;
+  } else {
+    el.innerHTML=`<div class="dhead"><div><span class="badge b-${esc(x.sev)}">심각도 ${esc(x.sev)}</span> <span class="badge b-obs">${esc(x.team)}</span></div>
+      <h1>${esc(x.title)}</h1><p class="big">최근 7일 <b>${fmtN(x.n)}</b>명 <span class="muted">· 지난주 ${fmtN(x.prev)}명 (${x.change>0?"+":""}${x.change}%)</span></p>
+      <p class="imp">${esc(x.where)}</p></div>
+      ${actBar(x)}
+      <div class="grid2"><div class="pane"><h3>${esc(x.seriesLabel||"일별 겪은 사람 수 (실제 로그)")}</h3><div style="padding:10px 14px">${spark(x.series,{w:420,h:90,days:x.days,color:"var(--hot)"})}</div>
+        <p class="muted small" style="padding:0 14px 14px">세입자·임대인 합계, 하루 단위 고유 인원. 마지막 막대는 오늘이라 덜 쌓였어요.</p></div>${aiPane(x)}</div>`;
+  }
 }
-function loadRec(rid,ts){
-  stopPlay(); const s=byId[rid]; P.s=s; P.key=ts;
-  document.getElementById("pscrubw").innerHTML = s.timeline.filter(l=>SIG_RE.test(l)).map(l=>`<span class="mk ${/오류/.test(l)?"err":""}" style="left:${sec(l.slice(0,5))/s.durationSec*100}%" title="${esc(ko(l))}"></span>`).join("")
-    + `<input type="range" id="pscrub" min="0" max="${s.durationSec}" value="${sec(ts)}" aria-label="재생 위치">`;
-  document.getElementById("pev").innerHTML = s.timeline.map(l=>{const t=l.slice(0,5);return `<li data-seek="${sec(t)}" class="${SIG_RE.test(l)?"sig":""} ${t===ts?"key":""}"><span class="t">${t}</span><span class="i"></span><span>${esc(ko(l.slice(6)))}</span></li>`}).join("");
-  document.getElementById("pscrub").addEventListener("input",e=>{stopPlay();seek(+e.target.value);});
-  document.getElementById("pplay").onclick=()=>P.timer?stopPlay():startPlay();
-  document.querySelectorAll("[data-rec]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.rec===rid)));
-  seek(sec(ts));
+function selIssue(id){curId=id;curShot=0;curAgent=null;renderList();renderDetail();const r=document.querySelector(`[data-issue="${id}"]`);r&&r.scrollIntoView({block:"nearest"});}
+function jiraText(x){
+  const lines=[`[${x.team}] ${x.title}`,"",`■ 영향`, branch==="신규"?`- 고객 에이전트 100명 중 ${x.n}명(이 입구 ${x.base}명 중)`:`- 최근 7일 ${x.n}명 · 지난주 ${x.prev}명 (${x.change}%)`];
+  if(x.real) lines.push(`- 실제 트래픽: ${x.real}`);
+  lines.push("","■ 무슨 일",x.summary,"","■ 원인 가설",x.hypothesis,"","■ 추천 개선안",x.suggestion,`- 다른 방법: ${x.alt}`,"","■ 화면",x.page||x.where||"");
+  if(x.ev) lines.push("","■ 근거 이벤트",...x.ev);
+  if(branch==="신규"&&x.agents.length){const a=AG[x.agents[0]];lines.push("","■ 재현 (에이전트 "+a.id+", "+a.device+")",...a.timeline.map(l=>"  "+l));}
+  lines.push("","— 실서비스 문제 탐지 자동 작성"); return lines.join("\n");
 }
-function seek(n){
-  const s=P.s; P.n=Math.max(0,Math.min(n,s.durationSec)); const i=idxAt(s,P.n); const line=s.timeline[i]; const [,kl]=kindOf(line);
-  document.getElementById("pscreen").innerHTML=screen(s,i);
-  document.getElementById("pnow").innerHTML=`<span class="ts">${mmss(P.n)}</span><span class="ev">${esc(ko(line.slice(6)))}</span>
-    ${kl?`<span><span class="badge b-높음">${esc(kl)}</span></span>`:""}<span class="pg">${esc(screenName(pageAt(s,i)))} · ${esc(pageAt(s,i))}</span>
-    <a href="${esc(srcUrl(s,mmss(P.n)))}" data-src="1" target="_blank" rel="noopener">클래리티 원본을 이 시각부터 열기 ↗</a>
-    <span class="muted small">체험판은 행동 기록을 10배속으로 재생해요. 실제로는 클래리티 녹화 화면이 이 자리에 나옵니다.</span>`;
-  document.getElementById("pscrub").value=P.n;
-  document.getElementById("ptime").textContent=`${mmss(P.n)} / ${mmss(s.durationSec)}`;
-  document.querySelectorAll("#pev li").forEach((li,j)=>li.classList.toggle("cur",j===i));
+// ───── 트래픽
+let tGroup="기존";
+function renderTraffic(){
+  const T=D.traffic, d=T.days, n=d.length; const idxNow=[...Array(7)].map((_,i)=>n-8+i), idxPrev=[...Array(7)].map((_,i)=>n-15+i); // 오늘 제외 7일 vs 그 전 7일
+  const sum=(arr,ix)=>ix.reduce((s,i)=>s+(arr[i]||0),0);
+  const rows=T.areas.filter(a=>a!=="기타").map(a=>{const s=T.data[tGroup][a];return {a,s,now:sum(s,idxNow),prev:sum(s,idxPrev)};}).filter(r=>r.now+r.prev>0).sort((x,y)=>y.now-x.now);
+  const unit = tGroup==="비로그인"?"방문 수":"하루 방문자 합계";
+  document.getElementById("v-traffic").innerHTML=`<h2>최근 7일 실제 트래픽</h2>
+    <p class="lead">자리톡 로그(account_activity_log, 화면 열림)를 화면 영역별로 묶었어요. ${esc(T.note)} 비교는 오늘을 뺀 최근 7일(${d[n-8].slice(5)}~${d[n-2].slice(5)}) vs 그 전 7일입니다.</p>
+    <div class="branch" role="group" aria-label="고객군" style="width:fit-content;margin-bottom:12px">${T.groups.map(g=>`<button data-tg="${g}" aria-pressed="${g===tGroup}">${g==="신규"?"신규 세입자(가입 7일 이내)":g==="기존"?"기존 세입자":g}</button>`).join("")}</div>
+    <table class="tbl"><thead><tr><th>화면 영역</th><th style="text-align:right">최근 7일 ${unit}</th><th style="text-align:right">그 전 7일</th><th style="text-align:right">변화</th><th>일별 추이 (14일)</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td><b>${esc(r.a)}</b></td><td class="n">${fmtN(r.now)}</td><td class="n">${fmtN(r.prev)}</td><td class="n">${chg(pct(r.now,r.prev))}</td><td style="width:300px">${spark(r.s,{w:280,h:40,days:d})}</td></tr>`).join("")}</tbody></table>
+    <p class="muted small" style="margin-top:8px">11/16(월)은 고지서·로그인이 크게 몰린 날이라 「그 전 7일」 값이 높게 잡혀요. 25일 전후는 월세 납부일이라 자리페이·환급이 원래 늘어나요.</p>`;
 }
-function startPlay(){if(P.n>=P.s.durationSec) P.n=0; document.getElementById("pplay").textContent="⏸ 멈춤"; P.timer=setInterval(()=>{if(P.n>=P.s.durationSec){stopPlay();return;} seek(P.n+1);},100);}
-function stopPlay(){clearInterval(P.timer);P.timer=null;const b=document.getElementById("pplay"); if(b) b.textContent="▶ 재생";}
-
-function selectIssue(i){curIdx=i; curRec=null; renderList(); renderDetail();
-  const r=document.querySelector(`[data-issue="${i}"]`); r&&r.scrollIntoView({block:"nearest"});}
-function selectTeam(n){curTeam=n; try{localStorage.setItem("team",n)}catch(e){}; history.replaceState(null,"","?team="+TKEY[n]);
-  renderTeams(); selectIssue(ordered(n)[0].i);}
-function openJira(){const ta=document.getElementById("jiraTxt");ta.value=jiraText(curTeam,curIdx);document.getElementById("jira").showModal();ta.scrollTop=0;ta.setSelectionRange(0,0);document.getElementById("jiraCopy").focus();
-  setFb(fbKey(curTeam,curIdx)+":act","jira"); renderList();}
-
-document.addEventListener("click",e=>{
-  const t=e.target;
-  const tb=t.closest("[data-team]"); if(tb){selectTeam(tb.dataset.team);return;}
-  const ib=t.closest("[data-issue]"); if(ib){selectIssue(+ib.dataset.issue);return;}
-  const rb=t.closest("[data-rec]"); if(rb){const it=ISSUES[curTeam][curIdx];const [sid,ts]=it.moment.split(" ");curRec=rb.dataset.rec;loadRec(curRec,curRec===sid?ts:momentOf(byId[curRec],sid,ts));return;}
-  const sl=t.closest("[data-seek]"); if(sl){stopPlay();seek(+sl.dataset.seek);return;}
-  const sr=t.closest("[data-src]"); if(sr){e.preventDefault();toast("체험판 녹화는 가짜라 클래리티 원본이 없습니다. 실제로는 원본이 이 시각부터 열립니다.");return;}
-  if(t.closest("[data-jira]")){openJira();return;}
-  const ab=t.closest("[data-act]"); if(ab){const k=fbKey(curTeam,curIdx)+":act";const v=getFb(k)===ab.dataset.act?null:ab.dataset.act;setFb(k,v);
-    document.querySelectorAll("[data-act]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.act===v)));
-    if(v==="send") toast("실제로는 이 문제를 스레드로 만들고 담당 디자이너·개발자를 태그합니다.");
-    if(v==="known") toast("내일부터 같은 문제는 「이미 아는 문제」로 표시하고 맨 아래로 내립니다.");
-    renderList();return;}
-  const fb=t.closest("[data-k]"); if(fb){const k=fbKey(curTeam,curIdx);const v=getFb(k)===fb.dataset.k?null:fb.dataset.k;setFb(k,v);
-    document.querySelectorAll("[data-k]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.k===v)));
-    document.querySelector("[data-why]").hidden = v!=="n"; if(v==="y") toast("고마워요. 비슷한 문제를 더 자신 있게 올릴게요.");return;}
-  const vb=t.closest("[data-view]"); if(vb){const lab=vb.dataset.view==="lab";
-    document.querySelectorAll("[data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===vb)));
-    document.getElementById("reportView").hidden=lab; document.getElementById("labView").hidden=!lab; stopPlay(); return;}
-  const rw=t.closest(".rowbtn"); if(rw){const s=byId[rw.dataset.sid];toast(`${rw.dataset.sid}: ${s.timeline.length}개 행동 · ${fmt(s.durationSec)}`);return;}
+// ───── 퍼널
+function renderFunnel(){
+  const F=D.funnels, order=["환급","자리페이","단기임대","고지서"];
+  document.getElementById("v-funnel").innerHTML=`<h2>로그인 고객 퍼널 · 신규 vs 기존</h2>
+    <p class="lead">각 단계에 도달한 사람 수(이번 주, 오늘 포함 7일). 막대는 1단계 대비 비율, 괄호는 바로 앞 단계 대비 전환율, 화살표는 지난주 대비 변화예요. 신규 = 가입 7일 이내.</p>
+    <div class="legend"><span><i style="background:var(--warn)"></i>신규</span><span><i style="background:var(--brand)"></i>기존</span></div>
+    <div class="funnels">${order.map(k=>{const st=F[k];const s1n=st[0]["이번주_신규"]||1,s1e=st[0]["이번주_기존"]||1;
+      return `<div class="fun"><h3>${esc(k)}</h3>${st.map((s,i)=>{const p=st[i-1];
+        const cn=p?Math.round(s["이번주_신규"]/Math.max(1,p["이번주_신규"])*100):null, ce=p?Math.round(s["이번주_기존"]/Math.max(1,p["이번주_기존"])*100):null;
+        return `<div class="frow"><span>${s.step}. ${esc(s.name)}</span>
+          <span class="cell"><span class="tr"><i class="new" style="width:${Math.min(100,s["이번주_신규"]/s1n*100)}%"></i></span><small>${fmtN(s["이번주_신규"])}${cn!=null?` (${cn}%)`:""} ${chg(pct(s["이번주_신규"],s["지난주_신규"]))}</small></span>
+          <span class="cell"><span class="tr"><i style="width:${Math.min(100,s["이번주_기존"]/s1e*100)}%"></i></span><small>${fmtN(s["이번주_기존"])}${ce!=null?` (${ce}%)`:""} ${chg(pct(s["이번주_기존"],s["지난주_기존"]))}</small></span></div>`}).join("")}</div>`}).join("")}</div>
+    <p class="muted small" style="margin-top:8px">단계는 그 주에 해당 행동을 한 사람 수라 순서가 꼭 이어지지는 않아요(예: 고지서 「계약 정보」는 신규가 다른 경로로 건너뛰는 경우가 많음).</p>`;
+}
+// ───── 신규 기능
+function renderFeatures(){
+  const F=D.features;
+  document.getElementById("v-features").innerHTML=`<h2>제품별 신규 기능과 영향 (최근 30일)</h2>
+    <p class="lead">최근 30일 안에 로그에 처음 나타난 행동 기록으로 새로 배포된 기능을 찾았어요. 11/19에 행동 종류가 701 → 749개로 늘어 큰 배포가 있었어요. 연결 지표는 도입 전 7일 평균 vs 도입 후 평균(오늘 제외)이고, 다른 변화와 겹치면 주의 문구를 붙였어요. <b>전후 비교는 인과가 아니에요.</b></p>
+    <div class="cards">${F.map(f=>{const i=f.days.indexOf(f.launch);const m=f.metric;
+      return `<article class="fcard"><div class="meta">${f.launch.slice(5).replace("-","/")} 도입 · ${esc(f.team)}</div><h3>${esc(f.name)}</h3>
+        <div class="kv3"><div><small>${esc(f.labels[0]||"본 사람")}(누적)</small><b>${fmtN(f.view_sum)}</b></div><div><small>${esc(f.labels[1]||"누른 사람")}</small><b>${fmtN(f.click_sum)}</b></div><div><small>누른 비율</small><b>${f.ctr!=null?f.ctr+"%":"-"}</b></div></div>
+        ${f.close_sum?`<p class="small muted">닫은 사람 ${fmtN(f.close_sum)}</p>`:""}
+        ${spark(f.view.slice(Math.max(0,i-3)),{w:300,h:44,days:f.days.slice(Math.max(0,i-3)),mark:Math.min(3,i)})}
+        ${m?`<div><p class="small">연결 지표 · <b>${esc(m.name)}</b>: 하루 평균 ${fmtN(m.before)} → ${fmtN(m.after)} ${m.change!=null?chg(Math.round(m.change)):""}</p>${spark(m.series,{w:300,h:44,days:f.days,mark:i,color:"var(--ok)"})}</div>`:`<p class="small muted">연결 지표 없음(노출·클릭만 측정)</p>`}
+        ${f.guard?`<p class="small">함께 볼 지표 · ${esc(f.guard.name)}: ${fmtN(f.guard.before)} → <b class="down">${fmtN(f.guard.after)}</b>명/일</p>`:""}
+        ${(f.caveats||[]).map(c=>`<span class="cav">⚠ ${esc(c)}</span>`).join("")}</article>`}).join("")}</div>`;
+}
+// ───── 고객 100명
+let selAgent=null;
+function renderAgents(){
+  const A=D.agents; const a=selAgent?AG[selAgent]:A[0];
+  const oc=o=>o==="성공"?"p-exp":o==="로그인 벽"?"p-sig":"p-low";
+  document.getElementById("v-agents").innerHTML=`<h2>고객 에이전트 100명 여정</h2>
+    <p class="lead">실제 비로그인 트래픽 비중대로 입구를 배치했어요(실거주리뷰 40 · 단기임대 20 · 커뮤니티 15 · 환급 랜딩 10 · 자리페이 랜딩 10 · 홈 5). 성향: 급함(반응 없으면 연타·바로 뒤로) · 꼼꼼(스크롤하며 찾음) · 탐색(아무거나 눌러 봄). 가입·결제·전송은 하지 않았고, 분석·광고 스크립트는 막아 실제 지표에 섞이지 않게 했어요.</p>
+    <div class="split"><div style="max-height:70vh;overflow:auto"><table class="tbl"><thead><tr><th>ID</th><th>입구</th><th>기기·성향</th><th>목표</th><th>결과</th><th>겪은 문제</th></tr></thead><tbody>
+    ${A.map(x=>`<tr data-arow="${x.id}" style="cursor:pointer;${x.id===a.id?"background:var(--brand-soft)":""}"><td class="mono">${x.id}</td><td>${esc(x.seg)}</td><td class="small">${esc(x.device)} · ${esc(x.style)}</td><td class="small">${esc(x.goal)}</td><td><span class="pill ${oc(x.outcome)}">${esc(x.outcome)}</span></td><td class="small">${[...new Set(x.signals.map(s=>s.type))].map(esc).join(", ")||"-"}</td></tr>`).join("")}</tbody></table></div>
+    <div class="pane"><h3>${a.id} 여정</h3><div style="padding:10px 14px"><p class="small">${esc(a.seg)} · ${esc(a.device)} · ${esc(a.style)} · ${Object.entries(a.persona||{}).map(([k,v])=>esc(k+" "+v)).join(" · ")}</p>
+      <p class="small">목표 「${esc(a.goal)}」 → <b>${esc(a.outcome)}</b> · ${a.durationSec}초 · 입구 <span class="mono">${esc((a.entry||"").replace("https://",""))}</span></p>
+      <ol class="journey" style="margin-top:8px">${a.timeline.map(l=>`<li class="${/변화 없음|가려|팝업|로그인|찾지 못|빈 페이지|연타|개인정보/.test(l)?"sig":""}"><span class="t">${l.slice(0,5)}</span><span>${esc(l.slice(6))}</span></li>`).join("")}</ol>
+      <div class="thumbs" style="padding:10px 0 0">${a.signals.filter(s=>s.shot).map(s=>`<a href="shots/${esc(s.shot)}" target="_blank" rel="noopener" style="width:110px"><img src="shots/${esc(s.shot)}" alt="${esc(s.type)} 화면" loading="lazy" style="width:100%;border-radius:8px;border:1px solid var(--line)"><span class="small">${esc(s.t)} ${esc(s.type)}</span></a>`).join("")}</div></div></div></div>`;
+}
+// ───── 리토
+function renderRito(){
+  const R=D.rito;
+  document.getElementById("v-rito").innerHTML=`<h2>리토(사내 AI)와 함께 보기</h2>
+    <p class="lead">${esc(R.source)}</p>
+    <table class="tbl"><thead><tr><th>팀</th><th>지표</th><th style="text-align:right">변화</th><th>비교 기간</th></tr></thead><tbody>
+    ${R.items.map(i=>`<tr><td>${esc(i.team)}</td><td>${esc(i.metric)}</td><td class="n">${/^\+/.test(i.change)?`<span class="down">${esc(i.change)}</span>`:`<span class="down">${esc(i.change)}</span>`}</td><td class="small">${esc(i.window)}</td></tr>`).join("")}</tbody></table>
+    <p class="small muted" style="margin-top:8px">${esc(R.deploy_note)}</p>
+    <h2 style="margin-top:24px">리토로 더 고도화할 수 있는 것</h2>
+    <ul class="small" style="line-height:1.8">${R.next.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
+}
+// ───── 공통
+function setView(v){document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===v)));
+  document.querySelectorAll(".vw").forEach(s=>{const on=s.id==="v-"+v; s.hidden=!on; if(s.id==="v-issues") s.style.display=on?"grid":"none";});
+  ({traffic:renderTraffic,funnel:renderFunnel,features:renderFeatures,agents:renderAgents,rito:renderRito})[v]?.();}
+document.addEventListener("click",e=>{const t=e.target;
+  const vb=t.closest("[data-view]"); if(vb){setView(vb.dataset.view);return;}
+  const bb=t.closest("[data-branch]"); if(bb){branch=bb.dataset.branch;renderFilters();selIssue(ISS()[0]?.id);return;}
+  const ib=t.closest("[data-issue]"); if(ib){selIssue(ib.dataset.issue);return;}
+  const sb=t.closest("[data-shot]"); if(sb){curShot=+sb.dataset.shot;curAgent=ISS().find(y=>y.id===curId).shots[curShot].agent;renderDetail();return;}
+  const ab=t.closest("[data-agent]"); if(ab){curAgent=ab.dataset.agent;const x=ISS().find(y=>y.id===curId);const k=x.shots.findIndex(s=>s.agent===curAgent);if(k>=0)curShot=k;renderDetail();return;}
+  const as=t.closest("[data-ashot]"); if(as){window.open("shots/"+as.dataset.ashot,"_blank","noopener");return;}
+  const tg=t.closest("[data-tg]"); if(tg){tGroup=tg.dataset.tg;renderTraffic();return;}
+  const ar=t.closest("[data-arow]"); if(ar){selAgent=ar.dataset.arow;renderAgents();return;}
+  if(t.closest("[data-jira]")){const x=ISS().find(y=>y.id===curId);const ta=document.getElementById("jiraTxt");ta.value=jiraText(x);document.getElementById("jira").showModal();ta.scrollTop=0;document.getElementById("jiraCopy").focus();setS("act:"+x.id,"jira");renderList();return;}
+  const ac=t.closest("[data-act]"); if(ac){const k="act:"+curId;const v=getS(k)===ac.dataset.act?null:ac.dataset.act;setS(k,v);renderList();renderDetail();if(v==="send")toast("실제로는 담당 팀 채널에 스레드로 올리고 담당자를 태그합니다.");if(v==="known")toast("내일부터 이 문제는 「이미 앎」으로 아래로 내립니다.");return;}
+  const fb=t.closest("[data-k]"); if(fb){const k="fb:"+curId;const v=getS(k)===fb.dataset.k?null:fb.dataset.k;setS(k,v);renderDetail();toast(v==="n"?"틀린 판독은 다음 판독 기준에 반영합니다.":"고마워요.");return;}
 });
-document.addEventListener("change",e=>{if(e.target.matches("[data-why]")){setFb(fbKey(curTeam,curIdx)+":why",e.target.value);toast("틀린 이유를 다음 판독 기준에 반영합니다.");}});
-document.addEventListener("keydown",e=>{
-  if(document.getElementById("jira").open||(e.target.matches&&e.target.matches("input,select,textarea,button"))&&e.key===" "||(e.target.matches&&e.target.matches("input,select,textarea"))||!document.getElementById("labView").hidden) return;
-  const o=ordered(curTeam).map(x=>x.i); const p=o.indexOf(curIdx);
-  if(e.key==="ArrowDown"||e.key==="j"&&false){e.preventDefault();selectIssue(o[Math.min(p+1,o.length-1)]);}
-  else if(e.key==="ArrowUp"){e.preventDefault();selectIssue(o[Math.max(p-1,0)]);}
-  else if(e.key===" "){e.preventDefault();P.timer?stopPlay():startPlay();}
-  else if(e.key==="j"||e.key==="J"){openJira();}
-});
+document.getElementById("teamSel").addEventListener("change",e=>{team=e.target.value;selIssue(ISS()[0]?.id);});
+document.addEventListener("keydown",e=>{if(document.getElementById("jira").open||(e.target.matches&&e.target.matches("input,select,textarea"))||document.getElementById("v-issues").hidden) return;
+  const L=ISS().map(x=>x.id),p=L.indexOf(curId);
+  if(e.key==="ArrowDown"){e.preventDefault();selIssue(L[Math.min(p+1,L.length-1)]);} else if(e.key==="ArrowUp"){e.preventDefault();selIssue(L[Math.max(p-1,0)]);}
+  else if(e.key==="j"||e.key==="J"){document.querySelector("[data-jira]")?.click();}});
 document.getElementById("jiraClose").addEventListener("click",()=>document.getElementById("jira").close());
 document.getElementById("jiraCopy").addEventListener("click",async()=>{const ta=document.getElementById("jiraTxt");try{await navigator.clipboard.writeText(ta.value);toast("복사했어요.");}catch(e){ta.select();toast("선택했어요. Cmd+C로 복사하세요.");}});
-
-renderCtrl(); renderTable(); renderTeams(); selectIssue(ordered(curTeam)[0].i);
+document.getElementById("stamp").textContent=D.meta.stamp;
+const q=new URLSearchParams(location.search); if(q.get("branch")==="existing") branch="기가입"; if(q.get("team")) team=q.get("team");
+renderFilters(); selIssue(ISS()[0]?.id); if(q.get("view")) setView(q.get("view"));
 </script>
-
 </body></html>
